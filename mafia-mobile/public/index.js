@@ -49267,8 +49267,7 @@ Please use another name.` );
 	  const femaleScreamAudio = new Audio('./assets/female-scream.wav');
 	  const maleScreamAudio = new Audio('./assets/male-scream.wav');
 	  function sendMessageToParent(message) {
-	    window.ReactNativeWebView.postMessage(JSON.stringify(message), '*');
-	    // window.parent.postMessage(message, '*');
+	    window.ReactNativeWebView.postMessage(JSON.stringify(message));
 	  }
 	  function handleMessageFromParent(event) {
 	    const msg = event.data;
