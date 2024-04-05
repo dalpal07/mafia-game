@@ -1,0 +1,44 @@
+:root {
+    --Main-Black: #101010;
+    --Main-Gray: #2B2B2B;
+    --Main-White: #EBEBEB;
+    --Main-Red: #BB3737;
+    --Main-Blue: #4B73C0;
+    --Main-Yellow: #D2AD4C;
+}
+
+@font-face {
+    font-family: 'American Typewriter';
+    src: url('./fonts/American-Typewriter/American-Typewriter.ttf');
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: 'American Typewriter';
+    src: url('./fonts/American-Typewriter/American-Typewriter-Bold.ttf');
+    font-weight: 700;
+}
+
+@font-face {
+    font-family: 'American Typewriter';
+    src: url('./fonts/American-Typewriter/American-Typewriter-Light.ttf');
+    font-weight: 300;
+}
+
+/* Apply CSS reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Reset body styles */
+body {
+    overflow: hidden;
+    background-color: var(--Main-Black);
+}
+
+/* Optionally reset HTML and root styles */
+html, root {
+    overflow: hidden;
+}
