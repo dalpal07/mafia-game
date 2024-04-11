@@ -70,11 +70,11 @@ function App() {
 
     function sendMessageToParent(message) {
         if(window.ReactNativeWebView){
-            window.ReactNativeWebView.postMessage(message);
+            window.ReactNativeWebView.postMessage(JSON.stringify(message));
         }
 
         if(window.parent){
-            window.parent.postMessage(message, "*");
+            window.parent.postMessage(JSON.stringify(message), "*");
         }
     }
 
