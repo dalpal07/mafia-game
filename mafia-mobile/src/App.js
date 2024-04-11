@@ -69,7 +69,13 @@ function App() {
     const maleScreamAudio = new Audio('./assets/male-scream.wav');
 
     function sendMessageToParent(message) {
-      window.ReactNativeWebView.postMessage(JSON.stringify(message));
+        if(window.ReactNativeWebView){
+            window.ReactNativeWebView.postMessage(message);
+        }
+
+        if(window.parent){
+            window.parent.postMessage(message, "*");
+        }
     }
 
     function handleMessageFromParent(event) {
