@@ -58,7 +58,6 @@ function App() {
     const [page, setPage] = useState(WAITING_PLAYERS);
     const pageRef = useRef(page);
     const messagePageRef = useRef(null);
-    const [roomCode, setRoomCode] = useState(null);
     const [players, setPlayers] = useState([]);
     const playersRef = useRef(players);
     const [died, setDied] = useState(false);
@@ -124,6 +123,10 @@ function App() {
     }
 
     function sendMessageToParent(message) {
+        if (typeof message !== 'string') {
+            parent.postMessage(JSON.stringify(message), '*');
+            return;
+        }
         parent.postMessage(message, '*');
     }
 
@@ -154,10 +157,7 @@ function App() {
 
     function handleMessageFromParent(event) {
         const msg = event.data;
-        if (msg.name === 'roomCode') {
-            setRoomCode(msg.roomCode);
-        }
-        else if (msg.name === 'addPlayer') {
+        if (msg.name === 'addPlayer') {
             sendMessageToParent({to: 'all', name: 'notEveryoneReady'});
             if (pageRef.current !== WAITING_PLAYERS) return;
             setPlayers(prevState => [
@@ -440,7 +440,6 @@ function App() {
             playersRef.current = [];
             setPage(WAITING_PLAYERS);
             pageRef.current = WAITING_PLAYERS;
-            setRoomCode(null);
             setDied(false);
             setAccused(null);
             setAccusedRole(null);
@@ -775,6 +774,8 @@ function App() {
     useEffect(() => {
         window.addEventListener('message', handleMessageFromParent);
 
+        sendMessageToParent({name: 'showCode'});
+
         return () => {
             window.removeEventListener('message', handleMessageFromParent);
         }
@@ -823,19 +824,13 @@ function App() {
     if (page === WAITING_PLAYERS) {
         return (
             <StandardPageBox>
-                <WaitingPlayers roomCode={roomCode} players={players}/>
+                <WaitingPlayers players={players}/>
             </StandardPageBox>
         )
     }
 
     return (
         <StandardPageBox>
-            <SpaceBetweenRowBox>
-                <Box/>
-                <Text>
-                    room code: {roomCode}
-                </Text>
-            </SpaceBetweenRowBox>
             <InnerPageBox>
                 {getPage(page)}
             </InnerPageBox>

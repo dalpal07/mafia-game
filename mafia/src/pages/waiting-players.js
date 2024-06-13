@@ -5,7 +5,7 @@ import {CoinColumnBox, CoinRowBox} from "../components/boxes";
 import Coin from "../components/coin";
 import {BannerIcon} from "../components/mafia-icon";
 
-export default function WaitingPlayers({roomCode, players}) {
+export default function WaitingPlayers({players}) {
     const waitingRoomAudio = new Audio('./assets/waiting-room.mp3');
     waitingRoomAudio.volume = 0.75;
 
@@ -20,17 +20,23 @@ export default function WaitingPlayers({roomCode, players}) {
             <Box style={{
                 position: 'absolute',
                 top: 0,
-                right: 95.26,
+                left: 95.26,
             }}>
                 <BannerIcon/>
             </Box>
-            <Text size={56} weight={700}>
-                room code: {roomCode}
-            </Text>
-            <Text size={36} opacity={0.5}>
-                waiting for players to join
-            </Text>
             <Box style={{height: 25}}/>
+            <Box style={{height: 25}}/>
+            <Box style={{height: 25}}/>
+            <Box style={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                alignItems: 'center',
+                width: '100%',
+            }}>
+                <Text size={36} opacity={0.5}>
+                    waiting for players to join
+                </Text>
+            </Box>
             <CoinColumnBox>
                 <CoinRowBox>
                     <Coin name={players.length > 0 ? players[0].realName : undefined} isHost={true}/>

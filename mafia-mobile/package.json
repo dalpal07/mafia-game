@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "rollup -c -w",
-    "start": "PORT=3001 serve ./public",
+    "start": "PORT=333 serve ./public",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "npm run build & npm run start"
   },

@@ -16243,7 +16243,7 @@ Please use another name.` );
 	} ;
 	var Box$1 = Box;
 
-	const SpaceBetweenRowBox = styled$1(Box$1)({
+	styled$1(Box$1)({
 	  display: 'flex',
 	  flexDirection: 'row',
 	  alignItems: 'center',
@@ -16446,7 +16446,6 @@ Please use another name.` );
 	};
 
 	function WaitingPlayers({
-	  roomCode,
 	  players
 	}) {
 	  const waitingRoomAudio = new Audio('./assets/waiting-room.mp3');
@@ -16460,19 +16459,31 @@ Please use another name.` );
 	    style: {
 	      position: 'absolute',
 	      top: 0,
-	      right: 95.26
+	      left: 95.26
 	    }
-	  }, /*#__PURE__*/React.createElement(BannerIcon, null)), /*#__PURE__*/React.createElement(Text, {
-	    size: 56,
-	    weight: 700
-	  }, "room code: ", roomCode), /*#__PURE__*/React.createElement(Text, {
-	    size: 36,
-	    opacity: 0.5
-	  }, "waiting for players to join"), /*#__PURE__*/React.createElement(Box$1, {
+	  }, /*#__PURE__*/React.createElement(BannerIcon, null)), /*#__PURE__*/React.createElement(Box$1, {
 	    style: {
 	      height: 25
 	    }
-	  }), /*#__PURE__*/React.createElement(CoinColumnBox, null, /*#__PURE__*/React.createElement(CoinRowBox, null, /*#__PURE__*/React.createElement(Coin, {
+	  }), /*#__PURE__*/React.createElement(Box$1, {
+	    style: {
+	      height: 25
+	    }
+	  }), /*#__PURE__*/React.createElement(Box$1, {
+	    style: {
+	      height: 25
+	    }
+	  }), /*#__PURE__*/React.createElement(Box$1, {
+	    style: {
+	      display: 'flex',
+	      justifyContent: 'flex-end',
+	      alignItems: 'center',
+	      width: '100%'
+	    }
+	  }, /*#__PURE__*/React.createElement(Text, {
+	    size: 36,
+	    opacity: 0.5
+	  }, "waiting for players to join")), /*#__PURE__*/React.createElement(CoinColumnBox, null, /*#__PURE__*/React.createElement(CoinRowBox, null, /*#__PURE__*/React.createElement(Coin, {
 	    name: players.length > 0 ? players[0].realName : undefined,
 	    isHost: true
 	  }), /*#__PURE__*/React.createElement(Coin, {
@@ -63354,7 +63365,6 @@ Please use another name.` );
 	  const [page, setPage] = reactExports.useState(WAITING_PLAYERS);
 	  const pageRef = reactExports.useRef(page);
 	  const messagePageRef = reactExports.useRef(null);
-	  const [roomCode, setRoomCode] = reactExports.useState(null);
 	  const [players, setPlayers] = reactExports.useState([]);
 	  const playersRef = reactExports.useRef(players);
 	  const [died, setDied] = reactExports.useState(false);
@@ -63435,9 +63445,7 @@ Please use another name.` );
 	  }
 	  function handleMessageFromParent(event) {
 	    const msg = event.data;
-	    if (msg.name === 'roomCode') {
-	      setRoomCode(msg.roomCode);
-	    } else if (msg.name === 'addPlayer') {
+	    if (msg.name === 'addPlayer') {
 	      sendMessageToParent({
 	        to: 'all',
 	        name: 'notEveryoneReady'
@@ -63747,7 +63755,6 @@ Please use another name.` );
 	      playersRef.current = [];
 	      setPage(WAITING_PLAYERS);
 	      pageRef.current = WAITING_PLAYERS;
-	      setRoomCode(null);
 	      setDied(false);
 	      setAccused(null);
 	      setAccusedRole(null);
@@ -64112,6 +64119,9 @@ Please use another name.` );
 	  }, [players]);
 	  reactExports.useEffect(() => {
 	    window.addEventListener('message', handleMessageFromParent);
+	    sendMessageToParent({
+	      name: 'showCode'
+	    });
 	    return () => {
 	      window.removeEventListener('message', handleMessageFromParent);
 	    };
@@ -64206,11 +64216,10 @@ Please use another name.` );
 	  }
 	  if (page === WAITING_PLAYERS) {
 	    return /*#__PURE__*/React.createElement(StandardPageBox, null, /*#__PURE__*/React.createElement(WaitingPlayers, {
-	      roomCode: roomCode,
 	      players: players
 	    }));
 	  }
-	  return /*#__PURE__*/React.createElement(StandardPageBox, null, /*#__PURE__*/React.createElement(SpaceBetweenRowBox, null, /*#__PURE__*/React.createElement(Box$1, null), /*#__PURE__*/React.createElement(Text, null, "room code: ", roomCode)), /*#__PURE__*/React.createElement(InnerPageBox, null, getPage(page)));
+	  return /*#__PURE__*/React.createElement(StandardPageBox, null, /*#__PURE__*/React.createElement(InnerPageBox, null, getPage(page)));
 	}
 
 	createRoot(document.querySelector('#root')).render( /*#__PURE__*/React.createElement(App, null));
