@@ -15,8 +15,6 @@ import Voting from "./pages/voting";
 import VotingTimer from "./pages/voting-timer";
 import VotingResults from "./pages/voting-results";
 import GameOver from "./pages/game-over";
-import {Box} from "@mui/material";
-import {Text} from "./components/text";
 
 const MIN_PLAYERS = 5;
 const MAX_PLAYERS = 18;

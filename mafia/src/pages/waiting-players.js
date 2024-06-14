@@ -29,7 +29,7 @@ export default function WaitingPlayers({players}) {
             <Box style={{height: 25}}/>
             <Box style={{
                 display: 'flex',
-                justifyContent: 'flex-end',
+                justifyContent: 'center',
                 alignItems: 'center',
                 width: '100%',
             }}>

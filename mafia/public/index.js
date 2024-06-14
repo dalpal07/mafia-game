@@ -16476,7 +16476,7 @@ Please use another name.` );
 	  }), /*#__PURE__*/React.createElement(Box$1, {
 	    style: {
 	      display: 'flex',
-	      justifyContent: 'flex-end',
+	      justifyContent: 'center',
 	      alignItems: 'center',
 	      width: '100%'
 	    }
@@ -63420,6 +63420,10 @@ Please use another name.` );
 	    narrationAudio.current.pause();
 	  };
 	  function sendMessageToParent(message) {
+	    if (typeof message !== 'string') {
+	      parent.postMessage(JSON.stringify(message), '*');
+	      return;
+	    }
 	    parent.postMessage(message, '*');
 	  }
 	  async function assignRoles(players) {
