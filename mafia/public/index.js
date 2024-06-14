@@ -16729,8 +16729,6 @@ Please use another name.` );
 	  children
 	}) => {
 	  const introAudio = reactExports.useRef(new Audio('./assets/Introloop.wav'));
-	  // const nightAudio = useRef(new Audio('./assets/Nightloop.wav'));
-
 	  const [page, setPage] = reactExports.useState(DESKTOP_WAITING_PLAYERS);
 	  const pageRef = reactExports.useRef(page);
 	  const [playerStates, setPlayerStates] = reactExports.useState([]);
@@ -16851,7 +16849,6 @@ Please use another name.` );
 	    }
 	    introAudio.current.pause();
 	    introAudio.current.currentTime = 0;
-	    // nightAudio.current.play();
 	    const newPlayerStates = getNewPlayersForNighttime(playerStatesRef.current);
 	    setPlayerStates(newPlayerStates);
 	    playerStatesRef.current = newPlayerStates;
@@ -42832,19 +42829,27 @@ Please use another name.` );
 	}) {
 	  const nighttimeSeePhonesAudio = new Audio('./assets/nighttime-see-phones.mp3');
 	  const nighttimeAgainAudio = new Audio('./assets/nighttime-again.mp3');
+	  const narrationAudio = new Audio('./assets/narration.mp3');
 	  reactExports.useEffect(() => {
+	    narrationAudio.play();
 	    if (firstNight) {
 	      setTimeout(() => nighttimeSeePhonesAudio.play(), 1000);
 	      nighttimeSeePhonesAudio.onended = () => {
 	        setTimeout(() => moveToNighttimeTimer(), 1000);
 	      };
-	      return () => nighttimeSeePhonesAudio.pause();
+	      return () => {
+	        nighttimeSeePhonesAudio.pause();
+	        narrationAudio.pause();
+	      };
 	    } else {
 	      setTimeout(() => nighttimeAgainAudio.play(), 1000);
 	      nighttimeAgainAudio.onended = () => {
 	        setTimeout(() => moveToNighttimeTimer(), 1000);
 	      };
-	      return () => nighttimeAgainAudio.pause();
+	      return () => {
+	        nighttimeAgainAudio.pause();
+	        narrationAudio.pause();
+	      };
 	    }
 	  }, []);
 	  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("svg", {

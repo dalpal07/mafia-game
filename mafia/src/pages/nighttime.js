@@ -4,8 +4,10 @@ import React, {useEffect} from "react";
 export default function Nighttime({moveToNighttimeTimer, firstNight}) {
     const nighttimeSeePhonesAudio = new Audio('./assets/nighttime-see-phones.mp3');
     const nighttimeAgainAudio = new Audio('./assets/nighttime-again.mp3');
+    const narrationAudio = new Audio('./assets/narration.mp3');
 
     useEffect(() => {
+        narrationAudio.play();
         if (firstNight) {
             setTimeout(() => nighttimeSeePhonesAudio.play(), 1000);
 
@@ -13,7 +15,10 @@ export default function Nighttime({moveToNighttimeTimer, firstNight}) {
                 setTimeout(() => moveToNighttimeTimer(), 1000);
             }
 
-            return () => nighttimeSeePhonesAudio.pause();
+            return () => {
+                nighttimeSeePhonesAudio.pause();
+                narrationAudio.pause();
+            }
         }
         else {
             setTimeout(() => nighttimeAgainAudio.play(), 1000);
@@ -22,7 +27,10 @@ export default function Nighttime({moveToNighttimeTimer, firstNight}) {
                 setTimeout(() => moveToNighttimeTimer(), 1000);
             }
 
-            return () => nighttimeAgainAudio.pause();
+            return () => {
+                nighttimeAgainAudio.pause();
+                narrationAudio.pause();
+            }
         }
     }, []);
 

@@ -266,7 +266,6 @@ const getNewPlayersForNighttime = (players) => {
 
 export const GlobalProvider = ({ children }) => {
     const introAudio = useRef(new Audio('./assets/Introloop.wav'));
-    // const nightAudio = useRef(new Audio('./assets/Nightloop.wav'));
 
     const [page, setPage] = useState(DESKTOP_WAITING_PLAYERS);
     const pageRef = useRef(page);
@@ -379,7 +378,6 @@ export const GlobalProvider = ({ children }) => {
         }
         introAudio.current.pause();
         introAudio.current.currentTime = 0;
-        // nightAudio.current.play();
         const newPlayerStates = getNewPlayersForNighttime(playerStatesRef.current);
         setPlayerStates(newPlayerStates);
         playerStatesRef.current = newPlayerStates;
