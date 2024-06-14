@@ -1,8 +1,9 @@
-import React, {useState} from "react";
+import React, {useContext, useState} from "react";
 import {Box, Input, styled} from "@mui/material";
 import {FullLogo} from "../components/icons";
 import {TheButton} from "../components/button";
 import {Text} from "../components/text";
+import { GlobalContext } from "../contexts/global";
 
 const InputBox = styled(Input)({
     padding: '12px 24px',
@@ -19,12 +20,14 @@ const InputBox = styled(Input)({
     color: 'var(--Main-Black)',
 });
 
-export default function EnterName({name, setPage, sendMessageToParent}) {
-    const [realName, setRealName] = useState('');
+export default function EnterName({ name, setPage, sendMessageToParent }) {
+    const { state } = useContext(GlobalContext);
+
+    const [realName, setRealName] = useState(state.gamername || '');
     const [fitsRequiredLength, setFitsRequiredLength] = useState(true);
 
     const handleSubmit = () => {
-        if (realName.length < 2 || realName.length > 10) {
+        if (realName.length < 1 || realName.length > 12) {
             setFitsRequiredLength(false);
             return;
         }
@@ -36,9 +39,12 @@ export default function EnterName({name, setPage, sendMessageToParent}) {
         <>
             <Box style={{height: 50}}/>
             <FullLogo/>
-            <Box style={{height: 25}}/>
+            <Box style={{ height: 25 }} />
+            <Text size={24} weight={400}>
+                Enter your Mafia name
+            </Text>
             <InputBox
-                placeholder={'use your real name'}
+                placeholder={'Mafia name'}
                 value={realName}
                 onChange={(e) => setRealName(e.target.value)}
                 disableUnderline={true}
@@ -46,7 +52,7 @@ export default function EnterName({name, setPage, sendMessageToParent}) {
             {
                 !fitsRequiredLength ?
                     <Text size={12} color={'var(--Main-Red)'}>
-                        name must be between 2-10 characters
+                        name must be between 1-12 characters
                     </Text>
                     :
                     null

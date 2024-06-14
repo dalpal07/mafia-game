@@ -1,11 +1,17 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useState, useContext} from "react";
 import {Box} from "@mui/material";
 import {Text} from "../components/text";
 import {TheButton} from "../components/button";
 import Lottie from 'react-lottie-player'
 import lottieJson from '../assets/welcome-banner.json';
+import {GlobalContext} from "../contexts/global";
 
-export default function WaitingPlayers({isHost, enoughPlayers, screenHeight, minPlayers, everyoneReady, sendMessageToParent}) {
+export default function WaitingPlayers({ isHost, enoughPlayers, screenHeight, minPlayers, everyoneReady, sendMessageToParent }) {
+    const { state } = useContext(GlobalContext);
+    const [enough, setEnough] = useState(false);
+    const [ready, setReady] = useState(false);
+    const [host, setHost] = useState(false);
+
     const [bannerShown, setBannerShown] = useState(false);
 
     useEffect(() => {
@@ -14,11 +20,31 @@ export default function WaitingPlayers({isHost, enoughPlayers, screenHeight, min
         }, 1250);
     }, []);
 
+    useEffect(() => {
+        setEnough(state.totalPlayers >= minPlayers);
+    }, [state.totalPlayers]);
+
+    useEffect(() => {
+        setReady(state.allReady);
+    }, [state.allReady]);
+
+    useEffect(() => {
+        setHost(state.isHost);
+    }, [state.isHost]);
+
+    useEffect(() => {
+        console.log({
+            enough: state.totalPlayers >= minPlayers,
+            ready: state.allReady,
+            host: state.isHost,
+        });
+    }, [state]);
+
     const handleStart = () => {
-        sendMessageToParent({name: 'start'});
+        sendMessageToParent({name: 'start', player: state.gamername });
     }
 
-    if (!isHost) {
+    if (!host) {
         return (
             <>
                 <Lottie
@@ -79,9 +105,9 @@ export default function WaitingPlayers({isHost, enoughPlayers, screenHeight, min
                     welcome
                 </Text>
                 <Text size={18} opacity={0.5}>
-                    {enoughPlayers ? 'press start once all players are in ' : `requires ${minPlayers} players to start`}
+                    {enough ? 'press start once all players are in ' : `requires ${minPlayers} players to start`}
                 </Text>
-                <TheButton disabled={!enoughPlayers || !everyoneReady} onClick={handleStart}>
+                <TheButton disabled={!enough || !ready} onClick={handleStart}>
                     <Text size={18} weight={700}>
                         Start
                     </Text>

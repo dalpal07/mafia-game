@@ -1,15 +1,18 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useContext } from "react";
 import { HeaderBox, Line, SpaceBetweenRowBox } from "./boxes";
 import { Box } from "@mui/material";
 import { Text } from "./text";
 import Lottie from "react-lottie-player";
 import lottieJson from '../assets/moon-sun.json';
 import lottieJsonHeaven from '../assets/moon-sun-heaven.json';
+import { GlobalContext } from "../contexts/global";
 
 export default function Header({ name, role, time, color = 'var(--Main-White)' }) {
     const [currentTime, setCurrentTime] = useState('night');
     const animationRef = useRef(null);
     const [enteredHeaven, setEnteredHeaven] = useState(false);
+
+    const { state } = useContext(GlobalContext);
 
     useEffect(() => {
         if (!enteredHeaven && color === 'var(--Main-Black)') {
@@ -31,7 +34,7 @@ export default function Header({ name, role, time, color = 'var(--Main-White)' }
             <Box style={{ height: 50 }} />
             <SpaceBetweenRowBox>
                 <Text color={color} size={18} style={{ width: '45%', display: 'flex', justifyContent: 'flex-start' }}>
-                    {name}
+                    {state.realname}
                 </Text>
                 {
                     time ?
@@ -46,7 +49,7 @@ export default function Header({ name, role, time, color = 'var(--Main-White)' }
                         null
                 }
                 <Text color={color} size={18} style={{ width: '45%', display: 'flex', justifyContent: 'flex-end' }}>
-                    role: {role}
+                    role: {state.role}
                 </Text>
             </SpaceBetweenRowBox>
             <Line color={color} />

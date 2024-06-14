@@ -1,11 +1,14 @@
-import React, {useState} from "react";
+import React, {useState, useContext} from "react";
 import {Text} from "../components/text";
-import {TheButton} from "../components/button";
+import { TheButton } from "../components/button";
+import { GlobalContext } from "../contexts/global";
 
-export default function Instructions({isHost, sendMessageToParent}) {
+export default function Instructions({ isHost, sendMessageToParent }) {
+    const { state } = useContext(GlobalContext);
+
     const [skipPressed, setSkipPressed] = useState(false);
     const handleSkip = () => {
-        sendMessageToParent({name: 'skip'});
+        sendMessageToParent({name: 'skip', player: state.gamername});
         setSkipPressed(true);
     }
 
@@ -15,7 +18,7 @@ export default function Instructions({isHost, sendMessageToParent}) {
                 see screen for instructions
             </Text>
             {
-                isHost ?
+                state.isHost ?
                     <TheButton onClick={handleSkip} disabled={skipPressed}>
                         <Text size={18} weight={700}>
                             skip

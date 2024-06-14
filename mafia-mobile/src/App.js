@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState, useContext} from 'react';
 import {Box} from "@mui/material";
 import WaitingPlayers from "./pages/waiting-players";
 import Preparation from "./pages/preparation";
@@ -18,6 +18,7 @@ import HeavenDay from "./pages/heaven/day";
 import Header from "./components/header";
 import {StandardPageBox} from "./components/boxes";
 import EnterName from "./pages/enter-name";
+import {GlobalContext} from './contexts/global';
 
 const MIN_PLAYERS = 5;
 
@@ -39,6 +40,8 @@ const TRANSITION_TO_DAY_STALL = 1225;
 const TRANSITION_TO_NIGHT_STALL = 1450;
 
 function App() {
+    const { state, setState } = useContext(GlobalContext);
+
     const [page, setPage] = useState(ENTER_NAME);
     const [screenHeight, setScreenHeight] = useState(window.innerHeight);
 
@@ -105,6 +108,10 @@ function App() {
         }
         else if (msg.name === 'male-scream') {
             maleScreamAudio.play();
+        }
+        else if (msg.name === 'state update') {
+            setState(msg.state);
+            sendMessageToParent({name: 'confirm state', state: msg.state, player: msg.state.gamername })
         }
         else if (msg.name === 'stateUpdate') {
             if (msg.players) {
@@ -334,7 +341,19 @@ function App() {
         }
     }
 
-    if (page <= IDENTITY_REVEAL) {
+    if (!state || !state.gamername) {
+        return (
+            <Box style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'flex-start',
+                height: '100vh',
+                width: '100vw',
+            }}/>
+        )
+    }
+    else if (state.page <= IDENTITY_REVEAL) {
         return (
             <Box style={{
                 display: 'flex',
@@ -345,12 +364,12 @@ function App() {
                 width: '100vw',
             }}>
                 <StandardPageBox>
-                    {getPage(page)}
+                    {getPage(state.page)}
                 </StandardPageBox>
             </Box>
         )
     }
-    else if (page === INSTRUCTIONS || page === WIN) {
+    else if (state.page === INSTRUCTIONS || state.page === WIN) {
         return (
             <Box style={{
                 display: 'flex',
@@ -362,7 +381,7 @@ function App() {
             }}>
                 <StandardPageBox>
                     <Header name={realName} role={role}/>
-                    {getPage(page)}
+                    {getPage(state.page)}
                 </StandardPageBox>
             </Box>
         )
@@ -416,7 +435,7 @@ function App() {
                 >
                     <StandardPageBox>
                         <Header name={realName} role={role} time={time} color={headerColor}/>
-                        {getPage(page)}
+                        {getPage(state.page)}
                         <Box style={{height: 18}}/>
                     </StandardPageBox>
                 </Box>
