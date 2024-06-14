@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState, useContext} from 'react';
 import {InnerPageBox, SpaceBetweenRowBox, StandardPageBox} from "./components/boxes";
 import WaitingPlayers from "./pages/waiting-players";
 import Welcome from "./pages/welcome";
@@ -15,6 +15,7 @@ import Voting from "./pages/voting";
 import VotingTimer from "./pages/voting-timer";
 import VotingResults from "./pages/voting-results";
 import GameOver from "./pages/game-over";
+import {GlobalContext} from "./contexts/global";
 
 const MIN_PLAYERS = 5;
 const MAX_PLAYERS = 18;
@@ -52,8 +53,30 @@ function shuffle(array) {
 let timeout;
 
 function App() {
+    const {
+        page,
+        playerStates,
+        handlePlayerJoin,
+        handleAddPlayerRealname,
+        handleStartGame,
+        handleAdvanceToYouReady,
+        handleAdvanceToRevealIdentity,
+        handleAdvanceToInstructions,
+        handleSkipInstructions,
+        handleAdvanceToNighttime,
+        handleAdvanceToNighttimeTimer,
+        handleMafiaSelectPlayer,
+        handleMafiaConfirmSelection,
+        handleDetectiveIdentifyPlayer,
+        handleAngelProtectPlayer,
+    } = useContext(GlobalContext);
+
+    const playerStatesRef = useRef(playerStates);
+
+    const playersNeedingConfirmationRef = useRef([]);
+
     const playingAgain = useRef(false);
-    const [page, setPage] = useState(WAITING_PLAYERS);
+    // const [page, setPage] = useState(WAITING_PLAYERS);
     const pageRef = useRef(page);
     const messagePageRef = useRef(null);
     const [players, setPlayers] = useState([]);
@@ -153,120 +176,165 @@ function App() {
         });
     }
 
+    const continueToNudgePlayer = (player) => {
+        setTimeout(() => {
+            if (!playersNeedingConfirmationRef.current.includes(player)) {
+                return;
+            }
+            for (let i = 0; i < playerStates.length; i++) {
+                if (playerStates[i].gamername === player) {
+                    sendMessageToParent({ to: 'one', player: player, name: "state update", state: playerStates[i] });
+                    break;
+                }
+            }
+            continueToNudgePlayer(player);
+        }, 200);
+    }
+
+    useEffect(() => {
+        for (let i = 0; i < playerStates.length; i++) {
+            sendMessageToParent({ to: 'one', player: playerStates[i].gamername, name: "state update", state: playerStates[i] });
+            if (!playersNeedingConfirmationRef.current.includes(playerStates[i].gamername)) {
+                playersNeedingConfirmationRef.current.push(playerStates[i].gamername);
+                continueToNudgePlayer(playerStates[i].gamername);
+            }
+        }
+        playerStatesRef.current = playerStates;
+    }, [playerStates]);
+
     function handleMessageFromParent(event) {
         const msg = event.data;
-        if (msg.name === 'addPlayer') {
-            sendMessageToParent({to: 'all', name: 'notEveryoneReady'});
-            if (pageRef.current !== WAITING_PLAYERS) return;
-            setPlayers(prevState => [
-                ...prevState,
-                {
-                    realName: '',
-                    name: msg.player,
-                    role: null,
-                    finishedNight: false,
-                    killVotes: [],
-                    accusations: [],
-                    inHeaven: false,
-                    saved: false,
-                    identified: false,
-                    vote: null,
-                    voteSubmitted: false,
-                    accused: false,
-                    locked: false,
-                    winner: false,
+        if (msg.name === 'confirm state') {
+            const playerState = playerStatesRef.current.find(player => player.gamername === msg.player);
+            if (JSON.stringify(msg.state) !== JSON.stringify(playerState)) {
+                sendMessageToParent({ to: 'one', player: msg.player, name: "state update", state: playerState });
+                if (!playersNeedingConfirmationRef.current.includes(msg.player)) {
+                    playersNeedingConfirmationRef.current.push(msg.player);
+                    continueToNudgePlayer(msg.player);
                 }
-            ]);
-            playersRef.current = [
-                ...playersRef.current,
-                {
-                    realName: '',
-                    name: msg.player,
-                    role: null,
-                    finishedNight: false,
-                    killVotes: [],
-                    accusations: [],
-                    inHeaven: false,
-                    saved: false,
-                    identified: false,
-                    vote: null,
-                    voteSubmitted: false,
-                    accused: false,
-                    locked: false,
-                    winner: false,
-                }
-            ];
+            }
+            else {
+                playersNeedingConfirmationRef.current = playersNeedingConfirmationRef.current.filter(player => player !== msg.player);
+            }
+        }
+        else if (msg.name === 'addPlayer') {
+            handlePlayerJoin(msg.player);
+            // sendMessageToParent({to: 'all', name: 'notEveryoneReady'});
+            // if (pageRef.current !== WAITING_PLAYERS) return;
+            // setPlayers(prevState => [
+            //     ...prevState,
+            //     {
+            //         realName: '',
+            //         name: msg.player,
+            //         role: null,
+            //         finishedNight: false,
+            //         killVotes: [],
+            //         accusations: [],
+            //         inHeaven: false,
+            //         saved: false,
+            //         identified: false,
+            //         vote: null,
+            //         voteSubmitted: false,
+            //         accused: false,
+            //         locked: false,
+            //         winner: false,
+            //     }
+            // ]);
+            // playersRef.current = [
+            //     ...playersRef.current,
+            //     {
+            //         realName: '',
+            //         name: msg.player,
+            //         role: null,
+            //         finishedNight: false,
+            //         killVotes: [],
+            //         accusations: [],
+            //         inHeaven: false,
+            //         saved: false,
+            //         identified: false,
+            //         vote: null,
+            //         voteSubmitted: false,
+            //         accused: false,
+            //         locked: false,
+            //         winner: false,
+            //     }
+            // ];
         }
         else if (msg.name === 'setRealName') {
             const playerJoinAudio = new Audio('./assets/death-bell.wav');
-            playerJoinAudio.volume = 0.5;
+            playerJoinAudio.volume = 0.25;
             playerJoinAudio.play();
-            let realName = msg.realName;
-            const allNames = playersRef.current.map(player => player.realName);
-            if (allNames.includes(realName)) {
-                for (let i = 2; i <= MAX_PLAYERS; i++) {
-                    if (!allNames.includes(`${realName}${i}`)) {
-                        realName = `${realName}${i}`;
-                        break;
-                    }
-                }
-            }
-            sendMessageToParent({to: 'one', name: 'realName', realName: realName, player: msg.player});
-            const newPlayers = playersRef.current.map(player => {
-                if (player.name === msg.player) {
-                    return {
-                        ...player,
-                        realName: realName,
-                    }
-                }
-                return player;
-            });
-            setPlayers(newPlayers);
-            playersRef.current = newPlayers;
-            if (!newPlayers.find(player => player.realName === '')) {
-                sendMessageToParent({to: 'all', name: 'everyoneReady'});
-            }
+            handleAddPlayerRealname(msg.player, msg.realName);
+            // let realName = msg.realName;
+            // const allNames = playersRef.current.map(player => player.realName);
+            // if (allNames.includes(realName)) {
+            //     for (let i = 2; i <= MAX_PLAYERS; i++) {
+            //         if (!allNames.includes(`${realName}${i}`)) {
+            //             realName = `${realName}${i}`;
+            //             break;
+            //         }
+            //     }
+            // }
+            // sendMessageToParent({to: 'one', name: 'realName', realName: realName, player: msg.player});
+            // const newPlayers = playersRef.current.map(player => {
+            //     if (player.name === msg.player) {
+            //         return {
+            //             ...player,
+            //             realName: realName,
+            //         }
+            //     }
+            //     return player;
+            // });
+            // setPlayers(newPlayers);
+            // playersRef.current = newPlayers;
+            // if (!newPlayers.find(player => player.realName === '')) {
+            //     // sendMessageToParent({to: 'all', name: 'everyoneReady'});
+            // }
         }
         else if (msg.name === 'start') {
-            assignRoles(playersRef.current).then((newPlayers) => {
-                playersRef.current = newPlayers;
-                setPlayers(newPlayers);
-                messagePageRef.current = 'preparation';
-                sendMessageToParent({to: 'all', name: 'stateUpdate', players: newPlayers, page: 'preparation'});
-                onStartGame();
-            });
+            handleStartGame(msg.player);
+            // assignRoles(playersRef.current).then((newPlayers) => {
+            //     playersRef.current = newPlayers;
+            //     setPlayers(newPlayers);
+            //     messagePageRef.current = 'preparation';
+            //     // sendMessageToParent({to: 'all', name: 'stateUpdate', players: newPlayers, page: 'preparation'});
+            //     onStartGame();
+            // });
         }
         else if (msg.name === 'skip') {
-            setStartNighttime(true);
+            handleSkipInstructions(msg.player);
+            // setStartNighttime(true);
         }
         else if (msg.name === 'protect') {
-            setSavedPlayer(msg.target);
-            const newPlayers = playersRef.current.map(player => {
-                if (player.realName === msg.target) {
-                    return {
-                        ...player,
-                        saved: true,
-                    }
-                }
-                return player;
-            });
-            setPlayers(newPlayers);
-            playersRef.current = newPlayers;
-            messagePageRef.current = null;
-            sendMessageToParent({to: 'all', name: 'stateUpdate', players: newPlayers});
+            handleAngelProtectPlayer(msg.player, msg.target);
+            // setSavedPlayer(msg.target);
+            // const newPlayers = playersRef.current.map(player => {
+            //     if (player.realName === msg.target) {
+            //         return {
+            //             ...player,
+            //             saved: true,
+            //         }
+            //     }
+            //     return player;
+            // });
+            // setPlayers(newPlayers);
+            // playersRef.current = newPlayers;
+            // messagePageRef.current = null;
+            // sendMessageToParent({to: 'all', name: 'stateUpdate', players: newPlayers});
         }
         else if (msg.name === 'identified') {
-            const newPlayers = playersRef.current.map(player => {
-                if (player.name === msg.target) {
-                    return {
-                        ...player,
-                        identified: true,
-                    }
-                }
-                return player;
-            });
-            messagePageRef.current = null;
-            sendMessageToParent({to: 'all', name: 'stateUpdate', players: newPlayers});
+            handleDetectiveIdentifyPlayer(msg.player, msg.target);
+            // const newPlayers = playersRef.current.map(player => {
+            //     if (player.name === msg.target) {
+            //         return {
+            //             ...player,
+            //             identified: true,
+            //         }
+            //     }
+            //     return player;
+            // });
+            // messagePageRef.current = null;
+            // sendMessageToParent({to: 'all', name: 'stateUpdate', players: newPlayers});
         }
         else if (msg.name === 'killVote') {
             const newPlayers = playersRef.current.map(player => {
@@ -281,7 +349,7 @@ function App() {
             setPlayers(newPlayers);
             playersRef.current = newPlayers;
             messagePageRef.current = null;
-            sendMessageToParent({to: 'all', name: 'stateUpdate', players: newPlayers});
+            // sendMessageToParent({to: 'all', name: 'stateUpdate', players: newPlayers});
         }
         else if (msg.name === 'changeKillVote') {
             const newPlayers = playersRef.current.map(player => {
@@ -302,7 +370,7 @@ function App() {
             setPlayers(newPlayers);
             playersRef.current = newPlayers;
             messagePageRef.current = null;
-            sendMessageToParent({to: 'all', name: 'stateUpdate', players: newPlayers});
+            // sendMessageToParent({to: 'all', name: 'stateUpdate', players: newPlayers});
         }
         else if (msg.name === 'finishedNight') {
             const newPlayers = playersRef.current.map(player => {
@@ -355,7 +423,7 @@ function App() {
             }
             else {
                 messagePageRef.current = null;
-                sendMessageToParent({to: 'all', name: 'stateUpdate', players: newPlayers});
+                // sendMessageToParent({to: 'all', name: 'stateUpdate', players: newPlayers});
             }
         }
         else if (msg.name === 'vote') {
@@ -407,7 +475,7 @@ function App() {
                 playersRef.current = newPlayers;
                 setPlayers(newPlayers);
                 messagePageRef.current = 'restart';
-                sendMessageToParent({to: 'all', name: 'stateUpdate', players: newPlayers, page: 'restart'});
+                // sendMessageToParent({to: 'all', name: 'stateUpdate', players: newPlayers, page: 'restart'});
                 onStartGame();
             });
             setFirstNight(true);
@@ -432,7 +500,7 @@ function App() {
         else if (msg.name === 'exit-press') {
             introAudio.current.loop = false;
             introAudio.current.pause();
-            sendMessageToParent({to: 'all', name: 'exit'});
+            // sendMessageToParent({to: 'all', name: 'exit'});
             // reset all props
             setPlayers([]);
             playersRef.current = [];
@@ -459,10 +527,10 @@ function App() {
         else if (msg.name === 'needsCurrentState' || msg.name === 'playerNeedsCurrentState') {
             if (pageRef.current === WAITING_PLAYERS) {
                 if (playersRef.current.length >= MIN_PLAYERS) {
-                    sendMessageToParent({to: 'one', name: 'enoughPlayers', player: msg.player});
+                    // sendMessageToParent({to: 'one', name: 'enoughPlayers', player: msg.player});
                 }
             }
-            sendMessageToParent({to: 'one', name: 'stateUpdate', page: messagePageRef.current, players: playersRef.current, player: msg.player});
+            // sendMessageToParent({to: 'one', name: 'stateUpdate', page: messagePageRef.current, players: playersRef.current, player: msg.player});
         }
     }
 
@@ -479,7 +547,7 @@ function App() {
                 setPage(REVEAL_IDENTITY);
                 pageRef.current = REVEAL_IDENTITY;
                 messagePageRef.current = 'identityReveal';
-                sendMessageToParent({to: 'all', name: 'stateUpdate', page: 'identityReveal'});
+                // sendMessageToParent({to: 'all', name: 'stateUpdate', page: 'identityReveal'});
                 setTimeout(() => {
                     introAudio.current.loop = false;
                     introAudio.current.currentTime = 1;
@@ -491,7 +559,7 @@ function App() {
                         setPage(INSTRUCTIONS);
                         pageRef.current = INSTRUCTIONS;
                         messagePageRef.current = 'instructions';
-                        sendMessageToParent({to: 'all', name: 'stateUpdate', page: 'instructions'});
+                        // sendMessageToParent({to: 'all', name: 'stateUpdate', page: 'instructions'});
                     }
                 }, 19000);
             }, 10000);
@@ -507,7 +575,7 @@ function App() {
     const goToVotingTimer = () => {
         endNarrationAudio();
         messagePageRef.current = 'votingActive';
-        sendMessageToParent({to: 'all', name: 'stateUpdate', page: 'votingActive'});
+        // sendMessageToParent({to: 'all', name: 'stateUpdate', page: 'votingActive'});
         introAudio.current.loop = true;
         introAudio.current.currentTime = 0;
         introAudio.current.play();
@@ -588,7 +656,7 @@ function App() {
             introAudio.current.currentTime = 0;
             introAudio.current.play();
             messagePageRef.current = 'win';
-            sendMessageToParent({to: 'all', name: 'stateUpdate', players: newPlayers, page: 'win'});
+            // sendMessageToParent({to: 'all', name: 'stateUpdate', players: newPlayers, page: 'win'});
             setPage(GAME_OVER);
             pageRef.current = GAME_OVER;
             return true;
@@ -612,7 +680,7 @@ function App() {
             introAudio.current.currentTime = 0;
             introAudio.current.play();
             messagePageRef.current = 'win';
-            sendMessageToParent({to: 'all', name: 'stateUpdate', players: newPlayers, page: 'win'});
+            // sendMessageToParent({to: 'all', name: 'stateUpdate', players: newPlayers, page: 'win'});
             setPage(GAME_OVER);
             pageRef.current = GAME_OVER;
             return true;
@@ -644,7 +712,7 @@ function App() {
             setPage(NIGHT_OVER);
             pageRef.current = NIGHT_OVER;
             messagePageRef.current = 'nightFinished';
-            sendMessageToParent({to: 'all', name: 'stateUpdate', page: 'nightFinished', players: playersRef.current});
+            // sendMessageToParent({to: 'all', name: 'stateUpdate', page: 'nightFinished', players: playersRef.current});
         }
     }, [nighttimeOver]);
 
@@ -666,7 +734,7 @@ function App() {
         setDayOver(false);
         resetPlayersForDay().then((newPlayers) => {
             messagePageRef.current = 'day';
-            sendMessageToParent({to: 'all', name: 'stateUpdate', players: newPlayers, page: 'day'});
+            // sendMessageToParent({to: 'all', name: 'stateUpdate', players: newPlayers, page: 'day'});
         });
         dayAudio.current.loop = true;
         dayAudio.current.currentTime = 0;
@@ -715,7 +783,7 @@ function App() {
             }
 
             messagePageRef.current = null;
-            sendMessageToParent({to: 'all', name: 'stateUpdate', players: newPlayers});
+            // sendMessageToParent({to: 'all', name: 'stateUpdate', players: newPlayers});
             setDayOver(true);
         } else {
             setDayPaused(false);
@@ -726,7 +794,7 @@ function App() {
             pageRef.current = ACCUSATIONS;
             resetPlayersForDay(accused).then((newPlayers) => {
                 messagePageRef.current = 'day';
-                sendMessageToParent({to: 'all', name: 'stateUpdate', players: newPlayers, page: 'day'});
+                // sendMessageToParent({to: 'all', name: 'stateUpdate', players: newPlayers, page: 'day'});
             });
         }
     }
@@ -750,7 +818,7 @@ function App() {
         pageRef.current = NIGHTTIME_TIMER;
         resetPlayersForNight().then((newPlayers) => {
             messagePageRef.current = 'night';
-            sendMessageToParent({to: 'all', name: 'stateUpdate', players: newPlayers, page: 'night'});
+            // sendMessageToParent({to: 'all', name: 'stateUpdate', players: newPlayers, page: 'night'});
         });
     }
 
@@ -772,7 +840,7 @@ function App() {
     useEffect(() => {
         window.addEventListener('message', handleMessageFromParent);
 
-        sendMessageToParent({name: 'showCode'});
+        // sendMessageToParent({name: 'showCode'});
 
         return () => {
             window.removeEventListener('message', handleMessageFromParent);

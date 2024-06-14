@@ -16445,9 +16445,599 @@ Please use another name.` );
 	  }));
 	};
 
+	const questions = [{
+	  question: "who is known as the \"Queen of Pop\"?",
+	  options: ["Madonna", "Beyonce", "Rihanna", "Taylor Swift"],
+	  answer: "Madonna"
+	}, {
+	  question: "which country won the FIFA World Cup in 2018?",
+	  options: ["Croatia", "Belgium", "France", "England"],
+	  answer: "France"
+	}, {
+	  question: "what was considered to be the first video game ever created?",
+	  options: ["Space Invaders", "Pacman", "Tetris", "Pong"],
+	  answer: "Pong"
+	}, {
+	  question: "where does the game Mafia Originate From?",
+	  options: ["Italy", "Soviet Union", "USA", "Russia"],
+	  answer: "Soviet Union"
+	}, {
+	  question: "during the mid-20th century, the Mafia played a significant role in the development of which American city?",
+	  options: ["New York", "Chicago", "Los Angeles", "Las Vegas"],
+	  answer: "Las Vegas"
+	}, {
+	  question: "what term is commonly used to describe the Mafia's code of silence and refusal to cooperate with law enforcement?",
+	  options: ["Omerta", "Cosa Nostra", "Capo", "Consigliere"],
+	  answer: "Omerta"
+	}, {
+	  question: "what former Mafia member became a high-profile informant, helping the FBI dismantle the American Mafia in the 1980s?",
+	  options: ["John Junior Gotti", "Salvatore \"Sammy the Bull\" Gravano", "Vincent \"The Chin\" Gigante", "Joseph \"Joe Bananas\" Bonanno"],
+	  answer: "Salvatore \"Sammy the Bull\" Gravano"
+	}, {
+	  question: "what city is often considered the birthplace of the real-life Mafia, where criminal organizations like the Sicilian Mafia first emerged?",
+	  options: ["Rome", "Naples", "Palermo", "Venice"],
+	  answer: "Palermo"
+	}, {
+	  question: "what is the name of the Italian-American Mafia that emerged in the United States during the late 19th century?",
+	  options: ["Cosa Nostra", "La Cosa Nostra", "The Mob", "The Outfit"],
+	  answer: "Cosa Nostra"
+	}, {
+	  question: "which country doesn't border the Caspian Sea?",
+	  options: ["Azerbaijan", "Uzbekistan", "Kazakhstan", "Iran"],
+	  answer: "Uzbekistan"
+	}];
+	const getRandomTriviaQuestion = () => {
+	  const randomIndex = Math.floor(Math.random() * questions.length);
+	  return questions[randomIndex];
+	};
+
+	const GlobalContext = /*#__PURE__*/reactExports.createContext();
+
+	/*
+	* PlayerInfo: {
+	*  gamername: string,
+	*  realname: string,
+	*  role: string, // Resets every game
+	* }
+	*/
+
+	/*
+	* PlayerState: {
+	*  gamername: string,
+	*  realname: string,
+	*  page: number, // Resets every game
+	*  isHost: boolean,
+	*  role: string, // Resets every game
+	*  isAlive: boolean, // Resets every game
+	*  detective: {
+	*   player: PlayerInfo, // Resets every game
+	*   discoveredPlayers PlayerInfo[], // Resets every game
+	*   currentSuspect: PlayerInfo | null, // Resets every night
+	*  },
+	*  angel: {
+	*   player: PlayerInfo, // Resets every game
+	*   currentProtected: PlayerInfo | null, // Resets every night
+	*  },
+	*  mafia: {
+	*   currentSelections: PlayerInfo[], // Resets every night
+	*   currentVotes: PlayerInfo[], // Resets every night
+	*   players: PlayerInfo[], // Resets every game
+	*  },
+	*  trivia: {
+	*   currentQuestion: string, // Resets every night
+	*   currentQuestionsAnswered: number, // Resets every night
+	*   currentQuestionsCorrect: number, // Resets every night
+	*  },
+	*  day: {
+	*   currentAccusations: PlayerInfo[], // Resets every start of accusation phase
+	*   currentAccused: PlayerInfo | null, // Resets every start of accusation phase
+	*   currentVotes: PlayerInfo[], // Resets every start of voting phase
+	*  },
+	*  heaven: {
+	*   watchingRole: string | null, // Resets every night
+	*  }
+	*  isProtected: boolean, // Resets every night
+	*  isInvestigated: boolean, // Resets every night
+	*  isTargeted: boolean, // Resets every night
+	*  isBeingAccused: boolean, // Resets every start of accusation phase
+	*  isAccused: boolean, // Resets every start of accusation phase
+	*  totalPlayers: number,
+	*  allReady: boolean,
+	* }
+	*/
+
+	const MIN_PLAYERS$1 = 5;
+	const MOBILE_ENTER_NAME = 0;
+	const MOBILE_WAITING_PLAYERS = 1;
+	const MOBILE_PREPARATION = 2;
+	const MOBILE_IDENTITY_REVEAL = 3;
+	const MOBILE_INSTRUCTIONS = 4;
+	const MOBILE_NIGHT = 5;
+	const DESKTOP_WAITING_PLAYERS = 0;
+	const DESKTOP_WELCOME = 1;
+	const DESKTOP_YOU_READY = 2;
+	const DESKTOP_REVEAL_IDENTITY = 3;
+	const DESKTOP_INSTRUCTIONS = 4;
+	const DESKTOP_NIGHTTIME = 5;
+	const DESKTOP_NIGHTTIME_TIMER = 6;
+	const initialPlayerState = {
+	  gamername: "",
+	  realname: "",
+	  page: MOBILE_ENTER_NAME,
+	  isHost: false,
+	  role: "",
+	  isAlive: true,
+	  detective: {
+	    player: {
+	      gamername: "",
+	      realname: "",
+	      role: ""
+	    },
+	    discoveredPlayers: [],
+	    currentSuspect: null
+	  },
+	  angel: {
+	    player: {
+	      gamername: "",
+	      realname: "",
+	      role: ""
+	    },
+	    currentProtected: null
+	  },
+	  mafia: {
+	    currentSelections: [],
+	    currentVotes: [],
+	    players: []
+	  },
+	  trivia: {
+	    currentQuestion: "",
+	    currentQuestionsAnswered: 0,
+	    currentQuestionsCorrect: 0
+	  },
+	  day: {
+	    currentAccusations: [],
+	    currentAccused: {
+	      gamername: "",
+	      realname: "",
+	      role: ""
+	    },
+	    currentVotes: []
+	  },
+	  heaven: {
+	    watchingRole: null
+	  },
+	  isProtected: false,
+	  isInvestigated: false,
+	  isTargeted: false,
+	  isBeingAccused: false,
+	  isAccused: false,
+	  totalPlayers: 0,
+	  allReady: false
+	};
+	function shuffle$1(array) {
+	  let currentIndex = array.length,
+	    randomIndex;
+	  while (currentIndex !== 0) {
+	    randomIndex = Math.floor(Math.random() * currentIndex);
+	    currentIndex--;
+	    [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+	  }
+	  return array;
+	}
+	const getNewRoles = players => {
+	  const roles = [];
+	  for (let i = 0; i < players.length; i++) {
+	    if (i === 0) {
+	      roles.push('detective');
+	    } else if (i === 1) {
+	      roles.push('angel');
+	    } else if (i % 4 === 2) {
+	      roles.push('mafia');
+	    } else {
+	      roles.push('civilian');
+	    }
+	  }
+	  return shuffle$1(roles);
+	};
+	const getNewPlayersForStartGame = players => {
+	  const roles = getNewRoles(players);
+	  const detectiveIndex = roles.indexOf('detective');
+	  const angelIndex = roles.indexOf('angel');
+	  const mafiaIndexes = [];
+	  roles.forEach((role, i) => {
+	    if (role === 'mafia') {
+	      mafiaIndexes.push(i);
+	    }
+	  });
+	  return players.map((player, i) => {
+	    return {
+	      ...player,
+	      role: roles[i],
+	      detective: {
+	        ...player.detective,
+	        player: {
+	          gamername: players[detectiveIndex].gamername,
+	          realname: players[detectiveIndex].realname,
+	          role: 'detective'
+	        }
+	      },
+	      angel: {
+	        ...player.angel,
+	        player: {
+	          gamername: players[angelIndex].gamername,
+	          realname: players[angelIndex].realname,
+	          role: 'angel'
+	        }
+	      },
+	      mafia: {
+	        ...player.mafia,
+	        players: mafiaIndexes.map(index => {
+	          return {
+	            gamername: players[index].gamername,
+	            realname: players[index].realname,
+	            role: 'mafia'
+	          };
+	        })
+	      },
+	      page: MOBILE_PREPARATION
+	    };
+	  });
+	};
+	const getNewPlayersForNighttime = players => {
+	  return players.map(player => {
+	    return {
+	      ...player,
+	      isProtected: false,
+	      isInvestigated: false,
+	      isTargeted: false,
+	      isBeingAccused: false,
+	      isAccused: false,
+	      detective: {
+	        ...player.detective,
+	        currentSuspect: null
+	      },
+	      angel: {
+	        ...player.angel,
+	        currentProtected: null
+	      },
+	      mafia: {
+	        ...player.mafia,
+	        currentSelections: [],
+	        currentVotes: []
+	      },
+	      trivia: {
+	        ...player.trivia,
+	        currentQuestion: getRandomTriviaQuestion(),
+	        currentQuestionsAnswered: 0,
+	        currentQuestionsCorrect: 0
+	      },
+	      day: {
+	        ...player.day,
+	        currentAccusations: [],
+	        currentAccused: null,
+	        currentVotes: []
+	      },
+	      heaven: {
+	        ...player.heaven,
+	        watchingRole: null
+	      },
+	      page: MOBILE_NIGHT
+	    };
+	  });
+	};
+	const GlobalProvider = ({
+	  children
+	}) => {
+	  const introAudio = reactExports.useRef(new Audio('./assets/Introloop.wav'));
+	  // const nightAudio = useRef(new Audio('./assets/Nightloop.wav'));
+
+	  const [page, setPage] = reactExports.useState(DESKTOP_WAITING_PLAYERS);
+	  const pageRef = reactExports.useRef(page);
+	  const [playerStates, setPlayerStates] = reactExports.useState([]);
+	  const playerStatesRef = reactExports.useRef(playerStates);
+	  const handlePlayerJoin = gamername => {
+	    if (pageRef.current !== DESKTOP_WAITING_PLAYERS || !gamername) {
+	      return;
+	    }
+	    const totalPlayers = playerStatesRef.current.length + 1;
+	    const newPlayerState = {
+	      ...initialPlayerState
+	    };
+	    newPlayerState.gamername = gamername;
+	    newPlayerState.totalPlayers = totalPlayers;
+	    newPlayerState.isHost = totalPlayers === 1;
+	    const newPlayerStates = playerStatesRef.current.map(playerState => {
+	      return {
+	        ...playerState,
+	        totalPlayers,
+	        allReady: false
+	      };
+	    });
+	    setPlayerStates([...newPlayerStates, newPlayerState]);
+	    playerStatesRef.current = [...newPlayerStates, newPlayerState];
+	  };
+	  const handleAddPlayerRealname = (gamername, realname) => {
+	    if (pageRef.current !== DESKTOP_WAITING_PLAYERS || !gamername || !realname) {
+	      return;
+	    }
+	    let allReady = true;
+	    for (let i = 0; i < playerStatesRef.current.length; i++) {
+	      if (playerStatesRef.current[i].gamername === gamername) {
+	        continue;
+	      }
+	      if (!playerStatesRef.current[i].realname) {
+	        allReady = false;
+	      }
+	    }
+	    const newPlayerStates = playerStatesRef.current.map(playerState => {
+	      if (playerState.gamername === gamername) {
+	        return {
+	          ...playerState,
+	          realname,
+	          page: MOBILE_WAITING_PLAYERS,
+	          allReady
+	        };
+	      }
+	      return {
+	        ...playerState,
+	        allReady
+	      };
+	    });
+	    setPlayerStates(newPlayerStates);
+	    playerStatesRef.current = newPlayerStates;
+	  };
+	  const handleStartGame = gamername => {
+	    const playerIsHost = playerStatesRef.current.find(playerState => playerState.gamername === gamername)?.isHost;
+	    if (playerStatesRef.current.length < MIN_PLAYERS$1 || pageRef.current !== DESKTOP_WAITING_PLAYERS || !playerIsHost) {
+	      return;
+	    }
+	    const newPlayerStates = getNewPlayersForStartGame(playerStatesRef.current);
+	    setPlayerStates(newPlayerStates);
+	    playerStatesRef.current = newPlayerStates;
+	    introAudio.current.play();
+	    setPage(DESKTOP_WELCOME);
+	    pageRef.current = DESKTOP_WELCOME;
+	  };
+	  const handleAdvanceToYouReady = () => {
+	    if (pageRef.current !== DESKTOP_WELCOME) {
+	      return;
+	    }
+	    setPage(DESKTOP_YOU_READY);
+	    pageRef.current = DESKTOP_YOU_READY;
+	  };
+	  const handleAdvanceToRevealIdentity = () => {
+	    if (pageRef.current !== DESKTOP_YOU_READY) {
+	      return;
+	    }
+	    const newPlayerStates = playerStatesRef.current.map(playerState => {
+	      return {
+	        ...playerState,
+	        page: MOBILE_IDENTITY_REVEAL
+	      };
+	    });
+	    setPlayerStates(newPlayerStates);
+	    playerStatesRef.current = newPlayerStates;
+	    setPage(DESKTOP_REVEAL_IDENTITY);
+	    pageRef.current = DESKTOP_REVEAL_IDENTITY;
+	  };
+	  const handleAdvanceToInstructions = () => {
+	    if (pageRef.current !== DESKTOP_REVEAL_IDENTITY) {
+	      return;
+	    }
+	    const newPlayerStates = playerStatesRef.current.map(playerState => {
+	      return {
+	        ...playerState,
+	        page: MOBILE_INSTRUCTIONS
+	      };
+	    });
+	    introAudio.current.pause();
+	    introAudio.current.currentTime = 0;
+	    introAudio.current.play();
+	    setPlayerStates(newPlayerStates);
+	    playerStatesRef.current = newPlayerStates;
+	    setPage(DESKTOP_INSTRUCTIONS);
+	    pageRef.current = DESKTOP_INSTRUCTIONS;
+	  };
+	  const handleSkipInstructions = gamername => {
+	    const isHost = playerStatesRef.current.find(playerState => playerState.gamername === gamername)?.isHost;
+	    if (!isHost) {
+	      return;
+	    }
+	    handleAdvanceToNighttime();
+	  };
+	  const handleAdvanceToNighttime = () => {
+	    if (pageRef.current !== DESKTOP_INSTRUCTIONS) {
+	      return;
+	    }
+	    introAudio.current.pause();
+	    introAudio.current.currentTime = 0;
+	    // nightAudio.current.play();
+	    const newPlayerStates = getNewPlayersForNighttime(playerStatesRef.current);
+	    setPlayerStates(newPlayerStates);
+	    playerStatesRef.current = newPlayerStates;
+	    setPage(DESKTOP_NIGHTTIME);
+	    pageRef.current = DESKTOP_NIGHTTIME;
+	  };
+	  const handleAdvanceToNighttimeTimer = () => {
+	    if (pageRef.current !== DESKTOP_NIGHTTIME) {
+	      return;
+	    }
+	    setPage(DESKTOP_NIGHTTIME_TIMER);
+	    pageRef.current = DESKTOP_NIGHTTIME_TIMER;
+	  };
+	  const handleMafiaSelectPlayer = (gamername, selectedGamername) => {
+	    const mafiaIndex = playerStatesRef.current.findIndex(playerState => playerState.gamername === gamername);
+	    const victimIndex = playerStatesRef.current.findIndex(playerState => playerState.gamername === selectedGamername);
+	    if (mafiaIndex === -1 || victimIndex === -1) {
+	      return;
+	    }
+	    const isMafia = playerStatesRef.current[mafiaIndex].role === 'mafia';
+	    const isAlive = playerStatesRef.current[mafiaIndex].isAlive;
+	    const isVictimMafia = playerStatesRef.current[victimIndex].role === 'mafia';
+	    const isVictimAlive = playerStatesRef.current[victimIndex].isAlive;
+	    if (pageRef.current !== DESKTOP_NIGHTTIME && pageRef.current !== DESKTOP_NIGHTTIME_TIMER || !isMafia || !isAlive || isVictimMafia || !isVictimAlive) {
+	      return;
+	    }
+	    let mafiaAlreadySelected = false;
+	    let mafiaAlreadySelectedThisVictim = false;
+	    playerStatesRef.current[mafiaIndex].mafia.currentSelections.forEach(element => {
+	      if (gamername === element.selectorGamername) {
+	        mafiaAlreadySelected = true;
+	        if (selectedGamername === element.gamername) {
+	          mafiaAlreadySelectedThisVictim = true;
+	        }
+	      }
+	    });
+	    let newCurrentSelections = playerStatesRef.current[mafiaIndex].mafia.currentSelections;
+	    const victimPlayerInfo = {
+	      gamername: playerStatesRef.current[victimIndex].gamername,
+	      realname: playerStatesRef.current[victimIndex].realname,
+	      role: playerStatesRef.current[victimIndex].role,
+	      selectorGamername: playerStatesRef.current[mafiaIndex].gamername
+	    };
+	    if (mafiaAlreadySelected && !mafiaAlreadySelectedThisVictim) {
+	      newCurrentSelections = newCurrentSelections.map(element => {
+	        if (gamername === element.selectorGamername) {
+	          return victimPlayerInfo;
+	        }
+	        return element;
+	      });
+	    } else if (mafiaAlreadySelected && mafiaAlreadySelectedThisVictim) {
+	      newCurrentSelections = newCurrentSelections.filter(element => {
+	        return gamername !== element.selectorGamername;
+	      });
+	    } else {
+	      newCurrentSelections = [...newCurrentSelections, victimPlayerInfo];
+	    }
+	    const newPlayerStates = playerStatesRef.current.map((playerState, i) => ({
+	      ...playerState,
+	      mafia: {
+	        ...playerState.mafia,
+	        currentSelections: newCurrentSelections
+	      }
+	    }));
+	    setPlayerStates(newPlayerStates);
+	    playerStatesRef.current = newPlayerStates;
+	  };
+	  const handleMafiaConfirmSelection = gamername => {
+	    const mafiaIndex = playerStatesRef.current.findIndex(playerState => playerState.gamername === gamername);
+	    if (mafiaIndex === -1) {
+	      return;
+	    }
+	    const isMafia = playerStatesRef.current[mafiaIndex].role === 'mafia';
+	    const isAlive = playerStatesRef.current[mafiaIndex].isAlive;
+	    if (pageRef.current !== DESKTOP_NIGHTTIME && pageRef.current !== DESKTOP_NIGHTTIME_TIMER || !isMafia || !isAlive) {
+	      return;
+	    }
+	    let selections = playerStatesRef.current[mafiaIndex].mafia.currentSelections;
+	    let mafiaAlreadySelected = false;
+	    let newVotes = playerStatesRef.current[mafiaIndex].mafia.currentVotes;
+	    selections.forEach(element => {
+	      if (gamername === element.selectorGamername) {
+	        mafiaAlreadySelected = true;
+	        newVotes = [...newVotes, element];
+	      }
+	    });
+	    if (!mafiaAlreadySelected) {
+	      return;
+	    }
+	    let newSelections = playerStatesRef.current[mafiaIndex].mafia.currentSelections.filter(element => {
+	      return gamername !== element.selectorGamername;
+	    });
+	    const newPlayerStates = playerStatesRef.current.map((playerState, i) => ({
+	      ...playerState,
+	      mafia: {
+	        ...playerState.mafia,
+	        currentSelections: newSelections,
+	        currentVotes: newVotes
+	      }
+	    }));
+	    setPlayerStates(newPlayerStates);
+	    playerStatesRef.current = newPlayerStates;
+	  };
+	  const handleDetectiveIdentifyPlayer = (gamername, selectedGamername) => {
+	    const detectiveIndex = playerStatesRef.current.findIndex(playerState => playerState.gamername === gamername);
+	    const suspectIndex = playerStatesRef.current.findIndex(playerState => playerState.gamername === selectedGamername);
+	    if (detectiveIndex === -1 || suspectIndex === -1 || detectiveIndex === suspectIndex) {
+	      return;
+	    }
+	    const isDetective = playerStatesRef.current[detectiveIndex].role === 'detective';
+	    const isAlive = playerStatesRef.current[detectiveIndex].isAlive;
+	    const isSuspectAlive = playerStatesRef.current[suspectIndex].isAlive;
+	    if (pageRef.current !== DESKTOP_NIGHTTIME && pageRef.current !== DESKTOP_NIGHTTIME_TIMER || !isDetective || !isAlive || !isSuspectAlive) {
+	      return;
+	    }
+	    const suspectPlayerInfo = {
+	      gamername: playerStatesRef.current[suspectIndex].gamername,
+	      realname: playerStatesRef.current[suspectIndex].realname,
+	      role: playerStatesRef.current[suspectIndex].role
+	    };
+	    const newDiscoveredPlayers = [...playerStatesRef.current[detectiveIndex].detective.discoveredPlayers, suspectPlayerInfo];
+	    const newPlayerStates = playerStatesRef.current.map((playerState, i) => ({
+	      ...playerState,
+	      detective: {
+	        ...playerState.detective,
+	        discoveredPlayers: newDiscoveredPlayers,
+	        currentSuspect: suspectPlayerInfo
+	      }
+	    }));
+	    setPlayerStates(newPlayerStates);
+	    playerStatesRef.current = newPlayerStates;
+	  };
+	  const handleAngelProtectPlayer = (gamername, selectedGamername) => {
+	    const angelIndex = playerStatesRef.current.findIndex(playerState => playerState.gamername === gamername);
+	    const protectedIndex = playerStatesRef.current.findIndex(playerState => playerState.gamername === selectedGamername);
+	    if (angelIndex === -1 || protectedIndex === -1 || angelIndex === protectedIndex) {
+	      return;
+	    }
+	    const isAngel = playerStatesRef.current[angelIndex].role === 'angel';
+	    const isAlive = playerStatesRef.current[angelIndex].isAlive;
+	    const isProtectedAlive = playerStatesRef.current[protectedIndex].isAlive;
+	    if (pageRef.current !== DESKTOP_NIGHTTIME && pageRef.current !== DESKTOP_NIGHTTIME_TIMER || !isAngel || !isAlive || !isProtectedAlive) {
+	      return;
+	    }
+	    const protectedPlayerInfo = {
+	      gamername: playerStatesRef.current[protectedIndex].gamername,
+	      realname: playerStatesRef.current[protectedIndex].realname,
+	      role: playerStatesRef.current[protectedIndex].role
+	    };
+	    const newPlayerStates = playerStatesRef.current.map((playerState, i) => ({
+	      ...playerState,
+	      angel: {
+	        ...playerState.angel,
+	        currentProtected: protectedPlayerInfo
+	      }
+	    }));
+	    setPlayerStates(newPlayerStates);
+	    playerStatesRef.current = newPlayerStates;
+	  };
+	  return /*#__PURE__*/React.createElement(GlobalContext.Provider, {
+	    value: {
+	      page,
+	      playerStates,
+	      handlePlayerJoin,
+	      handleAddPlayerRealname,
+	      handleStartGame,
+	      handleAdvanceToYouReady,
+	      handleAdvanceToRevealIdentity,
+	      handleAdvanceToInstructions,
+	      handleSkipInstructions,
+	      handleAdvanceToNighttime,
+	      handleAdvanceToNighttimeTimer,
+	      handleMafiaSelectPlayer,
+	      handleMafiaConfirmSelection,
+	      handleDetectiveIdentifyPlayer,
+	      handleAngelProtectPlayer
+	    }
+	  }, children);
+	};
+
 	function WaitingPlayers({
 	  players
 	}) {
+	  const {
+	    playerStates
+	  } = reactExports.useContext(GlobalContext);
 	  const waitingRoomAudio = new Audio('./assets/waiting-room.mp3');
 	  waitingRoomAudio.volume = 0.75;
 	  reactExports.useEffect(() => {
@@ -16484,42 +17074,42 @@ Please use another name.` );
 	    size: 36,
 	    opacity: 0.5
 	  }, "waiting for players to join")), /*#__PURE__*/React.createElement(CoinColumnBox, null, /*#__PURE__*/React.createElement(CoinRowBox, null, /*#__PURE__*/React.createElement(Coin, {
-	    name: players.length > 0 ? players[0].realName : undefined,
+	    name: playerStates.length > 0 ? playerStates[0].realname : undefined,
 	    isHost: true
 	  }), /*#__PURE__*/React.createElement(Coin, {
-	    name: players.length > 1 ? players[1].realName : undefined
+	    name: playerStates.length > 1 ? playerStates[1].realname : undefined
 	  }), /*#__PURE__*/React.createElement(Coin, {
-	    name: players.length > 2 ? players[2].realName : undefined
+	    name: playerStates.length > 2 ? playerStates[2].realname : undefined
 	  }), /*#__PURE__*/React.createElement(Coin, {
-	    name: players.length > 3 ? players[3].realName : undefined
+	    name: playerStates.length > 3 ? playerStates[3].realname : undefined
 	  }), /*#__PURE__*/React.createElement(Coin, {
-	    name: players.length > 4 ? players[4].realName : undefined
+	    name: playerStates.length > 4 ? playerStates[4].realname : undefined
 	  }), /*#__PURE__*/React.createElement(Coin, {
-	    name: players.length > 5 ? players[5].realName : undefined
+	    name: playerStates.length > 5 ? playerStates[5].realname : undefined
 	  })), /*#__PURE__*/React.createElement(CoinRowBox, null, /*#__PURE__*/React.createElement(Coin, {
-	    name: players.length > 6 ? players[6].realName : undefined
+	    name: playerStates.length > 6 ? playerStates[6].realname : undefined
 	  }), /*#__PURE__*/React.createElement(Coin, {
-	    name: players.length > 7 ? players[7].realName : undefined
+	    name: playerStates.length > 7 ? playerStates[7].realname : undefined
 	  }), /*#__PURE__*/React.createElement(Coin, {
-	    name: players.length > 8 ? players[8].realName : undefined
+	    name: playerStates.length > 8 ? playerStates[8].realname : undefined
 	  }), /*#__PURE__*/React.createElement(Coin, {
-	    name: players.length > 9 ? players[9].realName : undefined
+	    name: playerStates.length > 9 ? playerStates[9].realname : undefined
 	  }), /*#__PURE__*/React.createElement(Coin, {
-	    name: players.length > 10 ? players[10].realName : undefined
+	    name: playerStates.length > 10 ? playerStates[10].realname : undefined
 	  }), /*#__PURE__*/React.createElement(Coin, {
-	    name: players.length > 11 ? players[11].realName : undefined
+	    name: playerStates.length > 11 ? playerStates[11].realname : undefined
 	  })), /*#__PURE__*/React.createElement(CoinRowBox, null, /*#__PURE__*/React.createElement(Coin, {
-	    name: players.length > 12 ? players[12].realName : undefined
+	    name: playerStates.length > 12 ? playerStates[12].realname : undefined
 	  }), /*#__PURE__*/React.createElement(Coin, {
-	    name: players.length > 13 ? players[13].realName : undefined
+	    name: playerStates.length > 13 ? playerStates[13].realname : undefined
 	  }), /*#__PURE__*/React.createElement(Coin, {
-	    name: players.length > 14 ? players[14].realName : undefined
+	    name: playerStates.length > 14 ? playerStates[14].realname : undefined
 	  }), /*#__PURE__*/React.createElement(Coin, {
-	    name: players.length > 15 ? players[15].realName : undefined
+	    name: playerStates.length > 15 ? playerStates[15].realname : undefined
 	  }), /*#__PURE__*/React.createElement(Coin, {
-	    name: players.length > 16 ? players[16].realName : undefined
+	    name: playerStates.length > 16 ? playerStates[16].realname : undefined
 	  }), /*#__PURE__*/React.createElement(Coin, {
-	    name: players.length > 17 ? players[17].realName : undefined
+	    name: playerStates.length > 17 ? playerStates[17].realname : undefined
 	  }))));
 	}
 
@@ -42107,14 +42697,30 @@ Please use another name.` );
 	}) {
 	  const welcomeAudio = new Audio('./assets/welcome.mp3');
 	  const readyAudio = new Audio('./assets/ready.mp3');
+	  const {
+	    handleAdvanceToYouReady,
+	    handleAdvanceToRevealIdentity
+	  } = reactExports.useContext(GlobalContext);
 	  reactExports.useEffect(() => {
-	    setTimeout(() => welcomeAudio.play(), 1000);
+	    setTimeout(() => {
+	      welcomeAudio.play();
+	    }, 3000);
+	    welcomeAudio.onended = () => {
+	      setTimeout(() => {
+	        handleAdvanceToYouReady();
+	      }, 6500);
+	    };
 	    return () => welcomeAudio.pause();
 	  }, []);
 	  reactExports.useEffect(() => {
 	    if (youReady) {
-	      setTimeout(() => readyAudio.play(), 1000);
+	      setTimeout(() => readyAudio.play(), 3000);
 	    }
+	    readyAudio.onended = () => {
+	      setTimeout(() => {
+	        handleAdvanceToRevealIdentity();
+	      }, 6000);
+	    };
 	    return () => readyAudio.pause();
 	  }, [youReady]);
 	  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(LottiePlayer, {
@@ -42133,8 +42739,14 @@ Please use another name.` );
 
 	function RevealIdentity() {
 	  const identityAudio = new Audio('./assets/identity.mp3');
+	  const {
+	    handleAdvanceToInstructions
+	  } = reactExports.useContext(GlobalContext);
 	  reactExports.useEffect(() => {
 	    setTimeout(() => identityAudio.play(), 1000);
+	    setTimeout(() => {
+	      handleAdvanceToInstructions();
+	    }, 19000);
 	    return () => identityAudio.pause();
 	  }, []);
 	  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Text, {
@@ -42152,13 +42764,16 @@ Please use another name.` );
 	}) {
 	  const instructions1Audio = new Audio('./assets/instructions1.mp3');
 	  const instructions2Audio = new Audio('./assets/instructions2.mp3');
+	  const {
+	    handleAdvanceToNighttime
+	  } = reactExports.useContext(GlobalContext);
 	  reactExports.useEffect(() => {
 	    const timeout = setTimeout(() => instructions1Audio.play(), 1000);
 	    instructions1Audio.onended = () => {
 	      setTimeout(() => instructions2Audio.play(), 1000);
 	    };
 	    instructions2Audio.onended = () => {
-	      setTimeout(() => setStartNighttime(true), 1000);
+	      setTimeout(() => handleAdvanceToNighttime(), 1000);
 	    };
 	    return () => {
 	      clearTimeout(timeout);
@@ -63333,7 +63948,6 @@ Please use another name.` );
 	}
 
 	const MIN_PLAYERS = 5;
-	const MAX_PLAYERS = 18;
 	const WAITING_PLAYERS = 0;
 	const WELCOME = 1;
 	const YOU_READY = 2;
@@ -63361,8 +63975,27 @@ Please use another name.` );
 	  return array;
 	}
 	function App() {
+	  const {
+	    page,
+	    playerStates,
+	    handlePlayerJoin,
+	    handleAddPlayerRealname,
+	    handleStartGame,
+	    handleAdvanceToYouReady,
+	    handleAdvanceToRevealIdentity,
+	    handleAdvanceToInstructions,
+	    handleSkipInstructions,
+	    handleAdvanceToNighttime,
+	    handleAdvanceToNighttimeTimer,
+	    handleMafiaSelectPlayer,
+	    handleMafiaConfirmSelection,
+	    handleDetectiveIdentifyPlayer,
+	    handleAngelProtectPlayer
+	  } = reactExports.useContext(GlobalContext);
+	  const playerStatesRef = reactExports.useRef(playerStates);
+	  const playersNeedingConfirmationRef = reactExports.useRef([]);
 	  const playingAgain = reactExports.useRef(false);
-	  const [page, setPage] = reactExports.useState(WAITING_PLAYERS);
+	  // const [page, setPage] = useState(WAITING_PLAYERS);
 	  const pageRef = reactExports.useRef(page);
 	  const messagePageRef = reactExports.useRef(null);
 	  const [players, setPlayers] = reactExports.useState([]);
@@ -63447,133 +64080,171 @@ Please use another name.` );
 	      };
 	    });
 	  }
-	  function handleMessageFromParent(event) {
-	    const msg = event.data;
-	    if (msg.name === 'addPlayer') {
-	      sendMessageToParent({
-	        to: 'all',
-	        name: 'notEveryoneReady'
-	      });
-	      if (pageRef.current !== WAITING_PLAYERS) return;
-	      setPlayers(prevState => [...prevState, {
-	        realName: '',
-	        name: msg.player,
-	        role: null,
-	        finishedNight: false,
-	        killVotes: [],
-	        accusations: [],
-	        inHeaven: false,
-	        saved: false,
-	        identified: false,
-	        vote: null,
-	        voteSubmitted: false,
-	        accused: false,
-	        locked: false,
-	        winner: false
-	      }]);
-	      playersRef.current = [...playersRef.current, {
-	        realName: '',
-	        name: msg.player,
-	        role: null,
-	        finishedNight: false,
-	        killVotes: [],
-	        accusations: [],
-	        inHeaven: false,
-	        saved: false,
-	        identified: false,
-	        vote: null,
-	        voteSubmitted: false,
-	        accused: false,
-	        locked: false,
-	        winner: false
-	      }];
-	    } else if (msg.name === 'setRealName') {
-	      const playerJoinAudio = new Audio('./assets/death-bell.wav');
-	      playerJoinAudio.volume = 0.5;
-	      playerJoinAudio.play();
-	      let realName = msg.realName;
-	      const allNames = playersRef.current.map(player => player.realName);
-	      if (allNames.includes(realName)) {
-	        for (let i = 2; i <= MAX_PLAYERS; i++) {
-	          if (!allNames.includes(`${realName}${i}`)) {
-	            realName = `${realName}${i}`;
-	            break;
-	          }
+	  const continueToNudgePlayer = player => {
+	    setTimeout(() => {
+	      if (!playersNeedingConfirmationRef.current.includes(player)) {
+	        return;
+	      }
+	      for (let i = 0; i < playerStates.length; i++) {
+	        if (playerStates[i].gamername === player) {
+	          sendMessageToParent({
+	            to: 'one',
+	            player: player,
+	            name: "state update",
+	            state: playerStates[i]
+	          });
+	          break;
 	        }
 	      }
+	      continueToNudgePlayer(player);
+	    }, 200);
+	  };
+	  reactExports.useEffect(() => {
+	    for (let i = 0; i < playerStates.length; i++) {
 	      sendMessageToParent({
 	        to: 'one',
-	        name: 'realName',
-	        realName: realName,
-	        player: msg.player
+	        player: playerStates[i].gamername,
+	        name: "state update",
+	        state: playerStates[i]
 	      });
-	      const newPlayers = playersRef.current.map(player => {
-	        if (player.name === msg.player) {
-	          return {
-	            ...player,
-	            realName: realName
-	          };
-	        }
-	        return player;
-	      });
-	      setPlayers(newPlayers);
-	      playersRef.current = newPlayers;
-	      if (!newPlayers.find(player => player.realName === '')) {
-	        sendMessageToParent({
-	          to: 'all',
-	          name: 'everyoneReady'
-	        });
+	      if (!playersNeedingConfirmationRef.current.includes(playerStates[i].gamername)) {
+	        playersNeedingConfirmationRef.current.push(playerStates[i].gamername);
+	        continueToNudgePlayer(playerStates[i].gamername);
 	      }
-	    } else if (msg.name === 'start') {
-	      assignRoles(playersRef.current).then(newPlayers => {
-	        playersRef.current = newPlayers;
-	        setPlayers(newPlayers);
-	        messagePageRef.current = 'preparation';
+	    }
+	    playerStatesRef.current = playerStates;
+	  }, [playerStates]);
+	  function handleMessageFromParent(event) {
+	    const msg = event.data;
+	    if (msg.name === 'confirm state') {
+	      const playerState = playerStatesRef.current.find(player => player.gamername === msg.player);
+	      if (JSON.stringify(msg.state) !== JSON.stringify(playerState)) {
 	        sendMessageToParent({
-	          to: 'all',
-	          name: 'stateUpdate',
-	          players: newPlayers,
-	          page: 'preparation'
+	          to: 'one',
+	          player: msg.player,
+	          name: "state update",
+	          state: playerState
 	        });
-	        onStartGame();
-	      });
+	        if (!playersNeedingConfirmationRef.current.includes(msg.player)) {
+	          playersNeedingConfirmationRef.current.push(msg.player);
+	          continueToNudgePlayer(msg.player);
+	        }
+	      } else {
+	        playersNeedingConfirmationRef.current = playersNeedingConfirmationRef.current.filter(player => player !== msg.player);
+	      }
+	    } else if (msg.name === 'addPlayer') {
+	      handlePlayerJoin(msg.player);
+	      // sendMessageToParent({to: 'all', name: 'notEveryoneReady'});
+	      // if (pageRef.current !== WAITING_PLAYERS) return;
+	      // setPlayers(prevState => [
+	      //     ...prevState,
+	      //     {
+	      //         realName: '',
+	      //         name: msg.player,
+	      //         role: null,
+	      //         finishedNight: false,
+	      //         killVotes: [],
+	      //         accusations: [],
+	      //         inHeaven: false,
+	      //         saved: false,
+	      //         identified: false,
+	      //         vote: null,
+	      //         voteSubmitted: false,
+	      //         accused: false,
+	      //         locked: false,
+	      //         winner: false,
+	      //     }
+	      // ]);
+	      // playersRef.current = [
+	      //     ...playersRef.current,
+	      //     {
+	      //         realName: '',
+	      //         name: msg.player,
+	      //         role: null,
+	      //         finishedNight: false,
+	      //         killVotes: [],
+	      //         accusations: [],
+	      //         inHeaven: false,
+	      //         saved: false,
+	      //         identified: false,
+	      //         vote: null,
+	      //         voteSubmitted: false,
+	      //         accused: false,
+	      //         locked: false,
+	      //         winner: false,
+	      //     }
+	      // ];
+	    } else if (msg.name === 'setRealName') {
+	      const playerJoinAudio = new Audio('./assets/death-bell.wav');
+	      playerJoinAudio.volume = 0.25;
+	      playerJoinAudio.play();
+	      handleAddPlayerRealname(msg.player, msg.realName);
+	      // let realName = msg.realName;
+	      // const allNames = playersRef.current.map(player => player.realName);
+	      // if (allNames.includes(realName)) {
+	      //     for (let i = 2; i <= MAX_PLAYERS; i++) {
+	      //         if (!allNames.includes(`${realName}${i}`)) {
+	      //             realName = `${realName}${i}`;
+	      //             break;
+	      //         }
+	      //     }
+	      // }
+	      // sendMessageToParent({to: 'one', name: 'realName', realName: realName, player: msg.player});
+	      // const newPlayers = playersRef.current.map(player => {
+	      //     if (player.name === msg.player) {
+	      //         return {
+	      //             ...player,
+	      //             realName: realName,
+	      //         }
+	      //     }
+	      //     return player;
+	      // });
+	      // setPlayers(newPlayers);
+	      // playersRef.current = newPlayers;
+	      // if (!newPlayers.find(player => player.realName === '')) {
+	      //     // sendMessageToParent({to: 'all', name: 'everyoneReady'});
+	      // }
+	    } else if (msg.name === 'start') {
+	      handleStartGame(msg.player);
+	      // assignRoles(playersRef.current).then((newPlayers) => {
+	      //     playersRef.current = newPlayers;
+	      //     setPlayers(newPlayers);
+	      //     messagePageRef.current = 'preparation';
+	      //     // sendMessageToParent({to: 'all', name: 'stateUpdate', players: newPlayers, page: 'preparation'});
+	      //     onStartGame();
+	      // });
 	    } else if (msg.name === 'skip') {
-	      setStartNighttime(true);
+	      handleSkipInstructions(msg.player);
+	      // setStartNighttime(true);
 	    } else if (msg.name === 'protect') {
-	      setSavedPlayer(msg.target);
-	      const newPlayers = playersRef.current.map(player => {
-	        if (player.realName === msg.target) {
-	          return {
-	            ...player,
-	            saved: true
-	          };
-	        }
-	        return player;
-	      });
-	      setPlayers(newPlayers);
-	      playersRef.current = newPlayers;
-	      messagePageRef.current = null;
-	      sendMessageToParent({
-	        to: 'all',
-	        name: 'stateUpdate',
-	        players: newPlayers
-	      });
+	      handleAngelProtectPlayer(msg.player, msg.target);
+	      // setSavedPlayer(msg.target);
+	      // const newPlayers = playersRef.current.map(player => {
+	      //     if (player.realName === msg.target) {
+	      //         return {
+	      //             ...player,
+	      //             saved: true,
+	      //         }
+	      //     }
+	      //     return player;
+	      // });
+	      // setPlayers(newPlayers);
+	      // playersRef.current = newPlayers;
+	      // messagePageRef.current = null;
+	      // sendMessageToParent({to: 'all', name: 'stateUpdate', players: newPlayers});
 	    } else if (msg.name === 'identified') {
-	      const newPlayers = playersRef.current.map(player => {
-	        if (player.name === msg.target) {
-	          return {
-	            ...player,
-	            identified: true
-	          };
-	        }
-	        return player;
-	      });
-	      messagePageRef.current = null;
-	      sendMessageToParent({
-	        to: 'all',
-	        name: 'stateUpdate',
-	        players: newPlayers
-	      });
+	      handleDetectiveIdentifyPlayer(msg.player, msg.target);
+	      // const newPlayers = playersRef.current.map(player => {
+	      //     if (player.name === msg.target) {
+	      //         return {
+	      //             ...player,
+	      //             identified: true,
+	      //         }
+	      //     }
+	      //     return player;
+	      // });
+	      // messagePageRef.current = null;
+	      // sendMessageToParent({to: 'all', name: 'stateUpdate', players: newPlayers});
 	    } else if (msg.name === 'killVote') {
 	      const newPlayers = playersRef.current.map(player => {
 	        if (player.name === msg.target) {
@@ -63587,11 +64258,7 @@ Please use another name.` );
 	      setPlayers(newPlayers);
 	      playersRef.current = newPlayers;
 	      messagePageRef.current = null;
-	      sendMessageToParent({
-	        to: 'all',
-	        name: 'stateUpdate',
-	        players: newPlayers
-	      });
+	      // sendMessageToParent({to: 'all', name: 'stateUpdate', players: newPlayers});
 	    } else if (msg.name === 'changeKillVote') {
 	      const newPlayers = playersRef.current.map(player => {
 	        if (player.name === msg.oldTarget) {
@@ -63610,11 +64277,7 @@ Please use another name.` );
 	      setPlayers(newPlayers);
 	      playersRef.current = newPlayers;
 	      messagePageRef.current = null;
-	      sendMessageToParent({
-	        to: 'all',
-	        name: 'stateUpdate',
-	        players: newPlayers
-	      });
+	      // sendMessageToParent({to: 'all', name: 'stateUpdate', players: newPlayers});
 	    } else if (msg.name === 'finishedNight') {
 	      const newPlayers = playersRef.current.map(player => {
 	        if (player.name === msg.player) {
@@ -63668,11 +64331,7 @@ Please use another name.` );
 	        });
 	      } else {
 	        messagePageRef.current = null;
-	        sendMessageToParent({
-	          to: 'all',
-	          name: 'stateUpdate',
-	          players: newPlayers
-	        });
+	        // sendMessageToParent({to: 'all', name: 'stateUpdate', players: newPlayers});
 	      }
 	    } else if (msg.name === 'vote') {
 	      const newPlayers = playersRef.current.map(player => {
@@ -63721,12 +64380,7 @@ Please use another name.` );
 	        playersRef.current = newPlayers;
 	        setPlayers(newPlayers);
 	        messagePageRef.current = 'restart';
-	        sendMessageToParent({
-	          to: 'all',
-	          name: 'stateUpdate',
-	          players: newPlayers,
-	          page: 'restart'
-	        });
+	        // sendMessageToParent({to: 'all', name: 'stateUpdate', players: newPlayers, page: 'restart'});
 	        onStartGame();
 	      });
 	      setFirstNight(true);
@@ -63750,10 +64404,7 @@ Please use another name.` );
 	    } else if (msg.name === 'exit-press') {
 	      introAudio.current.loop = false;
 	      introAudio.current.pause();
-	      sendMessageToParent({
-	        to: 'all',
-	        name: 'exit'
-	      });
+	      // sendMessageToParent({to: 'all', name: 'exit'});
 	      // reset all props
 	      setPlayers([]);
 	      playersRef.current = [];
@@ -63778,21 +64429,9 @@ Please use another name.` );
 	      setKilledPlayer(null);
 	    } else if (msg.name === 'needsCurrentState' || msg.name === 'playerNeedsCurrentState') {
 	      if (pageRef.current === WAITING_PLAYERS) {
-	        if (playersRef.current.length >= MIN_PLAYERS) {
-	          sendMessageToParent({
-	            to: 'one',
-	            name: 'enoughPlayers',
-	            player: msg.player
-	          });
-	        }
+	        if (playersRef.current.length >= MIN_PLAYERS) ;
 	      }
-	      sendMessageToParent({
-	        to: 'one',
-	        name: 'stateUpdate',
-	        page: messagePageRef.current,
-	        players: playersRef.current,
-	        player: msg.player
-	      });
+	      // sendMessageToParent({to: 'one', name: 'stateUpdate', page: messagePageRef.current, players: playersRef.current, player: msg.player});
 	    }
 	  }
 	  const onStartGame = () => {
@@ -63808,11 +64447,7 @@ Please use another name.` );
 	        setPage(REVEAL_IDENTITY);
 	        pageRef.current = REVEAL_IDENTITY;
 	        messagePageRef.current = 'identityReveal';
-	        sendMessageToParent({
-	          to: 'all',
-	          name: 'stateUpdate',
-	          page: 'identityReveal'
-	        });
+	        // sendMessageToParent({to: 'all', name: 'stateUpdate', page: 'identityReveal'});
 	        setTimeout(() => {
 	          introAudio.current.loop = false;
 	          introAudio.current.currentTime = 1;
@@ -63823,11 +64458,7 @@ Please use another name.` );
 	            setPage(INSTRUCTIONS);
 	            pageRef.current = INSTRUCTIONS;
 	            messagePageRef.current = 'instructions';
-	            sendMessageToParent({
-	              to: 'all',
-	              name: 'stateUpdate',
-	              page: 'instructions'
-	            });
+	            // sendMessageToParent({to: 'all', name: 'stateUpdate', page: 'instructions'});
 	          }
 	        }, 19000);
 	      }, 10000);
@@ -63841,11 +64472,7 @@ Please use another name.` );
 	  const goToVotingTimer = () => {
 	    endNarrationAudio();
 	    messagePageRef.current = 'votingActive';
-	    sendMessageToParent({
-	      to: 'all',
-	      name: 'stateUpdate',
-	      page: 'votingActive'
-	    });
+	    // sendMessageToParent({to: 'all', name: 'stateUpdate', page: 'votingActive'});
 	    introAudio.current.loop = true;
 	    introAudio.current.currentTime = 0;
 	    introAudio.current.play();
@@ -63905,7 +64532,7 @@ Please use another name.` );
 	      setWinner('civilian');
 	      winnerRef.current = 'civilian';
 	      const winningRoles = ['civilian', 'angel', 'detective'];
-	      const newPlayers = playersRef.current.map(player => {
+	      playersRef.current.map(player => {
 	        if (winningRoles.includes(player.role)) {
 	          return {
 	            ...player,
@@ -63921,19 +64548,14 @@ Please use another name.` );
 	      introAudio.current.currentTime = 0;
 	      introAudio.current.play();
 	      messagePageRef.current = 'win';
-	      sendMessageToParent({
-	        to: 'all',
-	        name: 'stateUpdate',
-	        players: newPlayers,
-	        page: 'win'
-	      });
+	      // sendMessageToParent({to: 'all', name: 'stateUpdate', players: newPlayers, page: 'win'});
 	      setPage(GAME_OVER);
 	      pageRef.current = GAME_OVER;
 	      return true;
 	    } else if (mafiaLeft === livingPlayers.length || livingPlayers.length === 2) {
 	      setWinner('mafia');
 	      winnerRef.current = 'mafia';
-	      const newPlayers = playersRef.current.map(player => {
+	      playersRef.current.map(player => {
 	        if (player.role === 'mafia') {
 	          return {
 	            ...player,
@@ -63949,12 +64571,7 @@ Please use another name.` );
 	      introAudio.current.currentTime = 0;
 	      introAudio.current.play();
 	      messagePageRef.current = 'win';
-	      sendMessageToParent({
-	        to: 'all',
-	        name: 'stateUpdate',
-	        players: newPlayers,
-	        page: 'win'
-	      });
+	      // sendMessageToParent({to: 'all', name: 'stateUpdate', players: newPlayers, page: 'win'});
 	      setPage(GAME_OVER);
 	      pageRef.current = GAME_OVER;
 	      return true;
@@ -63983,12 +64600,7 @@ Please use another name.` );
 	      setPage(NIGHT_OVER);
 	      pageRef.current = NIGHT_OVER;
 	      messagePageRef.current = 'nightFinished';
-	      sendMessageToParent({
-	        to: 'all',
-	        name: 'stateUpdate',
-	        page: 'nightFinished',
-	        players: playersRef.current
-	      });
+	      // sendMessageToParent({to: 'all', name: 'stateUpdate', page: 'nightFinished', players: playersRef.current});
 	    }
 	  }, [nighttimeOver]);
 	  const moveToStory = () => {
@@ -64007,12 +64619,7 @@ Please use another name.` );
 	    setDayOver(false);
 	    resetPlayersForDay().then(newPlayers => {
 	      messagePageRef.current = 'day';
-	      sendMessageToParent({
-	        to: 'all',
-	        name: 'stateUpdate',
-	        players: newPlayers,
-	        page: 'day'
-	      });
+	      // sendMessageToParent({to: 'all', name: 'stateUpdate', players: newPlayers, page: 'day'});
 	    });
 	    dayAudio.current.loop = true;
 	    dayAudio.current.currentTime = 0;
@@ -64057,11 +64664,7 @@ Please use another name.` );
 	        return;
 	      }
 	      messagePageRef.current = null;
-	      sendMessageToParent({
-	        to: 'all',
-	        name: 'stateUpdate',
-	        players: newPlayers
-	      });
+	      // sendMessageToParent({to: 'all', name: 'stateUpdate', players: newPlayers});
 	      setDayOver(true);
 	    } else {
 	      setDayPaused(false);
@@ -64072,12 +64675,7 @@ Please use another name.` );
 	      pageRef.current = ACCUSATIONS;
 	      resetPlayersForDay(accused).then(newPlayers => {
 	        messagePageRef.current = 'day';
-	        sendMessageToParent({
-	          to: 'all',
-	          name: 'stateUpdate',
-	          players: newPlayers,
-	          page: 'day'
-	        });
+	        // sendMessageToParent({to: 'all', name: 'stateUpdate', players: newPlayers, page: 'day'});
 	      });
 	    }
 	  };
@@ -64099,12 +64697,7 @@ Please use another name.` );
 	    pageRef.current = NIGHTTIME_TIMER;
 	    resetPlayersForNight().then(newPlayers => {
 	      messagePageRef.current = 'night';
-	      sendMessageToParent({
-	        to: 'all',
-	        name: 'stateUpdate',
-	        players: newPlayers,
-	        page: 'night'
-	      });
+	      // sendMessageToParent({to: 'all', name: 'stateUpdate', players: newPlayers, page: 'night'});
 	    });
 	  };
 	  reactExports.useEffect(() => {
@@ -64123,9 +64716,9 @@ Please use another name.` );
 	  }, [players]);
 	  reactExports.useEffect(() => {
 	    window.addEventListener('message', handleMessageFromParent);
-	    sendMessageToParent({
-	      name: 'showCode'
-	    });
+
+	    // sendMessageToParent({name: 'showCode'});
+
 	    return () => {
 	      window.removeEventListener('message', handleMessageFromParent);
 	    };
@@ -64226,6 +64819,6 @@ Please use another name.` );
 	  return /*#__PURE__*/React.createElement(StandardPageBox, null, /*#__PURE__*/React.createElement(InnerPageBox, null, getPage(page)));
 	}
 
-	createRoot(document.querySelector('#root')).render( /*#__PURE__*/React.createElement(App, null));
+	createRoot(document.querySelector('#root')).render( /*#__PURE__*/React.createElement(GlobalProvider, null, /*#__PURE__*/React.createElement(App, null)));
 
 })();

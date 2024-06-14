@@ -1,13 +1,18 @@
-import React, {useEffect} from "react";
-import {InnerPageBox, SpaceBetweenRowBox} from "../components/boxes";
-import {Box} from "@mui/material";
-import {Text} from "../components/text";
+import React, {useEffect, useContext} from "react";
+import { Text } from "../components/text";
+import { GlobalContext } from "../contexts/global";
 
 export default function RevealIdentity() {
     const identityAudio = new Audio('./assets/identity.mp3');
 
+    const { handleAdvanceToInstructions } = useContext(GlobalContext);
+
     useEffect(() => {
         setTimeout(() => identityAudio.play(), 1000);
+
+        setTimeout(() => {
+            handleAdvanceToInstructions();
+        }, 19000);
         return () => identityAudio.pause();
     }, []);
 

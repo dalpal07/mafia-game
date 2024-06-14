@@ -1,11 +1,14 @@
 import {ConstrainedBox, InnerPageBox, SpaceBetweenRowBox} from "../components/boxes";
 import {Box} from "@mui/material";
 import {Text} from "../components/text";
-import React, {useEffect} from "react";
+import React, { useEffect, useContext } from "react";
+import { GlobalContext } from "../contexts/global";
 
 export default function Instructions({setStartNighttime}) {
     const instructions1Audio = new Audio('./assets/instructions1.mp3');
     const instructions2Audio = new Audio('./assets/instructions2.mp3');
+
+    const { handleAdvanceToNighttime } = useContext(GlobalContext);
 
     useEffect(() => {
         const timeout = setTimeout(() => instructions1Audio.play(), 1000);
@@ -15,7 +18,7 @@ export default function Instructions({setStartNighttime}) {
         }
 
         instructions2Audio.onended = () => {
-            setTimeout(() => setStartNighttime(true), 1000);
+            setTimeout(() => handleAdvanceToNighttime(), 1000);
         }
 
         return () => {

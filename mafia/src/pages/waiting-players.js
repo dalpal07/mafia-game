@@ -1,11 +1,13 @@
-import React, {useEffect} from "react";
+import React, {useContext, useEffect} from "react";
 import {Box} from "@mui/material";
 import {Text} from "../components/text";
 import {CoinColumnBox, CoinRowBox} from "../components/boxes";
 import Coin from "../components/coin";
-import {BannerIcon} from "../components/mafia-icon";
+import { BannerIcon } from "../components/mafia-icon";
+import {GlobalContext} from "../contexts/global";
 
-export default function WaitingPlayers({players}) {
+export default function WaitingPlayers({ players }) {
+    const { playerStates } = useContext(GlobalContext);
     const waitingRoomAudio = new Audio('./assets/waiting-room.mp3');
     waitingRoomAudio.volume = 0.75;
 
@@ -39,28 +41,28 @@ export default function WaitingPlayers({players}) {
             </Box>
             <CoinColumnBox>
                 <CoinRowBox>
-                    <Coin name={players.length > 0 ? players[0].realName : undefined} isHost={true}/>
-                    <Coin name={players.length > 1 ? players[1].realName : undefined}/>
-                    <Coin name={players.length > 2 ? players[2].realName : undefined}/>
-                    <Coin name={players.length > 3 ? players[3].realName : undefined}/>
-                    <Coin name={players.length > 4 ? players[4].realName : undefined}/>
-                    <Coin name={players.length > 5 ? players[5].realName : undefined}/>
+                    <Coin name={playerStates.length > 0 ? playerStates[0].realname : undefined} isHost={true}/>
+                    <Coin name={playerStates.length > 1 ? playerStates[1].realname : undefined}/>
+                    <Coin name={playerStates.length > 2 ? playerStates[2].realname : undefined}/>
+                    <Coin name={playerStates.length > 3 ? playerStates[3].realname : undefined}/>
+                    <Coin name={playerStates.length > 4 ? playerStates[4].realname : undefined}/>
+                    <Coin name={playerStates.length > 5 ? playerStates[5].realname : undefined}/>
                 </CoinRowBox>
                 <CoinRowBox>
-                    <Coin name={players.length > 6 ? players[6].realName : undefined}/>
-                    <Coin name={players.length > 7 ? players[7].realName : undefined}/>
-                    <Coin name={players.length > 8 ? players[8].realName : undefined}/>
-                    <Coin name={players.length > 9 ? players[9].realName : undefined}/>
-                    <Coin name={players.length > 10 ? players[10].realName : undefined}/>
-                    <Coin name={players.length > 11 ? players[11].realName : undefined}/>
+                    <Coin name={playerStates.length > 6 ? playerStates[6].realname : undefined}/>
+                    <Coin name={playerStates.length > 7 ? playerStates[7].realname : undefined}/>
+                    <Coin name={playerStates.length > 8 ? playerStates[8].realname : undefined}/>
+                    <Coin name={playerStates.length > 9 ? playerStates[9].realname : undefined}/>
+                    <Coin name={playerStates.length > 10 ? playerStates[10].realname : undefined}/>
+                    <Coin name={playerStates.length > 11 ? playerStates[11].realname : undefined}/>
                 </CoinRowBox>
                 <CoinRowBox>
-                    <Coin name={players.length > 12 ? players[12].realName : undefined}/>
-                    <Coin name={players.length > 13 ? players[13].realName : undefined}/>
-                    <Coin name={players.length > 14 ? players[14].realName : undefined}/>
-                    <Coin name={players.length > 15 ? players[15].realName : undefined}/>
-                    <Coin name={players.length > 16 ? players[16].realName : undefined}/>
-                    <Coin name={players.length > 17 ? players[17].realName : undefined}/>
+                    <Coin name={playerStates.length > 12 ? playerStates[12].realname : undefined}/>
+                    <Coin name={playerStates.length > 13 ? playerStates[13].realname : undefined}/>
+                    <Coin name={playerStates.length > 14 ? playerStates[14].realname : undefined}/>
+                    <Coin name={playerStates.length > 15 ? playerStates[15].realname : undefined}/>
+                    <Coin name={playerStates.length > 16 ? playerStates[16].realname : undefined}/>
+                    <Coin name={playerStates.length > 17 ? playerStates[17].realname : undefined}/>
                 </CoinRowBox>
             </CoinColumnBox>
         </>

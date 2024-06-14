@@ -61,3 +61,8 @@ export const getTriviaQuestions = (quantity) => {
     }
     return selectedQuestions;
 }
+
+export const getRandomTriviaQuestion = () => {
+    const randomIndex = Math.floor(Math.random() * questions.length);
+    return questions[randomIndex];
+}
