@@ -1,22 +1,22 @@
-import React, {useEffect, useContext} from "react";
+import React, { useEffect, useContext } from "react";
 import { Text } from "../components/text";
 
 export default function Voting() {
-    const liveOrDieAudio = new Audio('./assets/live-or-die.mp3');
+  const liveOrDieAudio = new Audio("./assets/live-or-die.mp3");
 
-    useEffect(() => {
-        liveOrDieAudio.play();
+  useEffect(() => {
+    liveOrDieAudio.play();
 
-        liveOrDieAudio.onended = () => () => { };
+    liveOrDieAudio.onended = () => () => {};
 
-        return () => liveOrDieAudio.pause();
-    }, []);
+    return () => liveOrDieAudio.pause();
+  }, []);
 
-    return (
-        <>
-            <Text size={56} opacity={0.75}>
-                will {"accused person"} live or die?
-            </Text>
-        </>
-    )
+  return (
+    <>
+      <Text size={56} opacity={0.75}>
+        will {"accused person"} live or die?
+      </Text>
+    </>
+  );
 }

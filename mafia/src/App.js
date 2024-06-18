@@ -1,5 +1,5 @@
-import React, {useContext} from 'react';
-import {InnerPageBox, StandardPageBox} from "./components/boxes";
+import React, { useContext } from "react";
+import { InnerPageBox, StandardPageBox } from "./components/boxes";
 import WaitingPlayers from "./pages/waiting-players";
 import Welcome from "./pages/welcome";
 import RevealIdentity from "./pages/reveal-identity";
@@ -15,7 +15,7 @@ import Voting from "./pages/voting";
 import VotingTimer from "./pages/voting-timer";
 import VotingResults from "./pages/voting-results";
 import GameOver from "./pages/game-over";
-import { VariableContext } from './contexts/variables';
+import { VariableContext } from "./contexts/variables";
 
 const WAITING_PLAYERS = 0;
 const WELCOME = 1;
@@ -35,59 +35,57 @@ const VOTING_RESULTS = 15;
 const GAME_OVER = 16;
 
 function App() {
-    const { page } = useContext(VariableContext);
+  const { page } = useContext(VariableContext);
 
-    function getPage(page) {
-        switch (page) {
-            case WELCOME:
-            case YOU_READY:
-                return <Welcome youReady={page === YOU_READY}/>;
-            case REVEAL_IDENTITY:
-                return <RevealIdentity/>;
-            case INSTRUCTIONS:
-                return <Instructions/>;
-            case NIGHTTIME:
-                return <Nighttime/>;
-            case NIGHTTIME_TIMER:
-                return <NighttimeTimer/>;
-            case NIGHT_OVER:
-                return <NightOver/>;
-            case STORY:
-                return <Story/>;
-            case POST_STORY_2:
-                return <PostStory2/>;
-            case ACCUSATIONS:
-                return <Accusations/>;
-            case ACCUSED:
-                return <Accused/>;
-            case VOTING:
-                return <Voting/>;
-            case VOTING_TIMER:
-                return <VotingTimer/>;
-            case VOTING_RESULTS:
-                return <VotingResults/>;
-            case GAME_OVER:
-                return <GameOver/>;
-            default:
-                return null;
-        }
+  function getPage(page) {
+    switch (page) {
+      case WELCOME:
+      case YOU_READY:
+        return <Welcome youReady={page === YOU_READY} />;
+      case REVEAL_IDENTITY:
+        return <RevealIdentity />;
+      case INSTRUCTIONS:
+        return <Instructions />;
+      case NIGHTTIME:
+        return <Nighttime />;
+      case NIGHTTIME_TIMER:
+        return <NighttimeTimer />;
+      case NIGHT_OVER:
+        return <NightOver />;
+      case STORY:
+        return <Story />;
+      case POST_STORY_2:
+        return <PostStory2 />;
+      case ACCUSATIONS:
+        return <Accusations />;
+      case ACCUSED:
+        return <Accused />;
+      case VOTING:
+        return <Voting />;
+      case VOTING_TIMER:
+        return <VotingTimer />;
+      case VOTING_RESULTS:
+        return <VotingResults />;
+      case GAME_OVER:
+        return <GameOver />;
+      default:
+        return null;
     }
+  }
 
-    if (page === WAITING_PLAYERS) {
-        return (
-            <StandardPageBox>
-                <WaitingPlayers/>
-            </StandardPageBox>
-        )
-    }
-
+  if (page === WAITING_PLAYERS) {
     return (
-        <StandardPageBox>
-            <InnerPageBox>
-                {getPage(page)}
-            </InnerPageBox>
-        </StandardPageBox>
-    )
+      <StandardPageBox>
+        <WaitingPlayers />
+      </StandardPageBox>
+    );
+  }
+
+  return (
+    <StandardPageBox>
+      <InnerPageBox>{getPage(page)}</InnerPageBox>
+    </StandardPageBox>
+  );
 }
 
 export default App;
