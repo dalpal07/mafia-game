@@ -41329,7 +41329,7 @@
     isPlainObject: isPlainObject,
   });
 
-  const _excluded$c = ["values", "unit", "step"];
+  const _excluded$9 = ["values", "unit", "step"];
   const sortBreakpointsValues = (values) => {
     const breakpointsAsArray =
       Object.keys(values).map((key) => ({
@@ -41366,7 +41366,7 @@
         unit = "px",
         step = 5,
       } = breakpoints,
-      other = _objectWithoutPropertiesLoose$1(breakpoints, _excluded$c);
+      other = _objectWithoutPropertiesLoose$1(breakpoints, _excluded$9);
     const sortedValues = sortBreakpointsValues(values);
     const keys = Object.keys(sortedValues);
     function up(key) {
@@ -41443,7 +41443,7 @@
 
   // The breakpoint **start** at this value.
   // For instance with the first breakpoint xs: [xs, sm[.
-  const values$1 = {
+  const values = {
     xs: 0,
     // phone
     sm: 600,
@@ -41458,7 +41458,7 @@
     // Sorted ASC by size. That's important.
     // It can't be configured as it's used statically for propTypes.
     keys: ["xs", "sm", "md", "lg", "xl"],
-    up: (key) => `@media (min-width:${values$1[key]}px)`,
+    up: (key) => `@media (min-width:${values[key]}px)`,
   };
   function handleBreakpoints(props, propValue, styleFromPropValue) {
     const theme = props.theme || {};
@@ -41475,9 +41475,8 @@
       return Object.keys(propValue).reduce((acc, breakpoint) => {
         // key is breakpoint
         if (
-          Object.keys(themeBreakpoints.values || values$1).indexOf(
-            breakpoint,
-          ) !== -1
+          Object.keys(themeBreakpoints.values || values).indexOf(breakpoint) !==
+          -1
         ) {
           const mediaKey = themeBreakpoints.up(breakpoint);
           acc[mediaKey] = styleFromPropValue(propValue[breakpoint], breakpoint);
@@ -42092,7 +42091,7 @@
           (_props$theme = _props$theme.breakpoints) == null ||
           (_props$theme = _props$theme.values) == null
             ? void 0
-            : _props$theme[propValue]) || values$1[propValue];
+            : _props$theme[propValue]) || values[propValue];
         if (!breakpoint) {
           return {
             maxWidth: sizingTransform(propValue),
@@ -42642,7 +42641,7 @@
     return {};
   }
 
-  const _excluded$b = ["breakpoints", "palette", "spacing", "shape"];
+  const _excluded$8 = ["breakpoints", "palette", "spacing", "shape"];
   function createTheme$2(options = {}, ...args) {
     const {
         breakpoints: breakpointsInput = {},
@@ -42650,7 +42649,7 @@
         spacing: spacingInput,
         shape: shapeInput = {},
       } = options,
-      other = _objectWithoutPropertiesLoose$1(options, _excluded$b);
+      other = _objectWithoutPropertiesLoose$1(options, _excluded$8);
     const breakpoints = createBreakpoints(breakpointsInput);
     const spacing = createSpacing(spacingInput);
     let muiTheme = deepmerge$1(
@@ -42711,7 +42710,7 @@
     return useTheme$1(defaultTheme);
   }
 
-  const _excluded$a = ["sx"];
+  const _excluded$7 = ["sx"];
   const splitProps = (props) => {
     var _props$theme$unstable, _props$theme;
     const result = {
@@ -42736,7 +42735,7 @@
   };
   function extendSxProp(props) {
     const { sx: inSx } = props,
-      other = _objectWithoutPropertiesLoose$1(props, _excluded$a);
+      other = _objectWithoutPropertiesLoose$1(props, _excluded$7);
     const { systemProps, otherProps } = splitProps(other);
     let finalSx;
     if (Array.isArray(inSx)) {
@@ -42802,7 +42801,7 @@
     return n;
   }
 
-  const _excluded$9 = ["className", "component"];
+  const _excluded$6 = ["className", "component"];
   function createBox(options = {}) {
     const {
       themeId,
@@ -42819,7 +42818,7 @@
         const theme = useTheme(defaultTheme);
         const _extendSxProp = extendSxProp(inProps),
           { className, component = "div" } = _extendSxProp,
-          other = _objectWithoutPropertiesLoose$1(_extendSxProp, _excluded$9);
+          other = _objectWithoutPropertiesLoose$1(_extendSxProp, _excluded$6);
         return /*#__PURE__*/ jsxRuntimeExports.jsx(
           BoxRoot,
           _extends$2(
@@ -43259,19 +43258,6 @@
     return mergedProps;
   }
 
-  /**
-   * A version of `React.useLayoutEffect` that does not show a warning when server-side rendering.
-   * This is useful for effects that are only needed for client-side rendering but not for SSR.
-   *
-   * Before you use this hook, make sure to read https://gist.github.com/gaearon/e7d97cdf38a2907924ea12e4ebdf3c85
-   * and confirm it doesn't apply to your use-case.
-   */
-  const useEnhancedEffect =
-    typeof window !== "undefined"
-      ? reactExports.useLayoutEffect
-      : reactExports.useEffect;
-  var useEnhancedEffect$1 = useEnhancedEffect;
-
   function clamp$1(
     val,
     min = Number.MIN_SAFE_INTEGER,
@@ -43284,332 +43270,6 @@
     __proto__: null,
     default: clamp$1,
   });
-
-  function chainPropTypes(propType1, propType2) {
-    return function validate(...args) {
-      return propType1(...args) || propType2(...args);
-    };
-  }
-
-  function isClassComponent(elementType) {
-    // elementType.prototype?.isReactComponent
-    const { prototype = {} } = elementType;
-    return Boolean(prototype.isReactComponent);
-  }
-  function elementTypeAcceptingRef(
-    props,
-    propName,
-    componentName,
-    location,
-    propFullName,
-  ) {
-    const propValue = props[propName];
-    const safePropName = propFullName || propName;
-    if (
-      propValue == null ||
-      // When server-side rendering React doesn't warn either.
-      // This is not an accurate check for SSR.
-      // This is only in place for emotion compat.
-      // TODO: Revisit once https://github.com/facebook/react/issues/20047 is resolved.
-      typeof window === "undefined"
-    ) {
-      return null;
-    }
-    let warningHint;
-
-    /**
-     * Blacklisting instead of whitelisting
-     *
-     * Blacklisting will miss some components, such as React.Fragment. Those will at least
-     * trigger a warning in React.
-     * We can't whitelist because there is no safe way to detect React.forwardRef
-     * or class components. "Safe" means there's no public API.
-     *
-     */
-    if (typeof propValue === "function" && !isClassComponent(propValue)) {
-      warningHint =
-        "Did you accidentally provide a plain function component instead?";
-    }
-    if (warningHint !== undefined) {
-      return new Error(
-        `Invalid ${location} \`${safePropName}\` supplied to \`${componentName}\`. ` +
-          `Expected an element type that can hold a ref. ${warningHint} ` +
-          "For more information see https://mui.com/r/caveat-with-refs-guide",
-      );
-    }
-    return null;
-  }
-  var elementTypeAcceptingRef$1 = chainPropTypes(
-    PropTypes.elementType,
-    elementTypeAcceptingRef,
-  );
-
-  const refType = PropTypes.oneOfType([PropTypes.func, PropTypes.object]);
-  var refType$1 = refType;
-
-  /**
-   * TODO v5: consider making it private
-   *
-   * passes {value} to {ref}
-   *
-   * WARNING: Be sure to only call this inside a callback that is passed as a ref.
-   * Otherwise, make sure to cleanup the previous {ref} if it changes. See
-   * https://github.com/mui/material-ui/issues/13539
-   *
-   * Useful if you want to expose the ref of an inner component to the public API
-   * while still using it inside the component.
-   * @param ref A ref callback or ref object. If anything falsy, this is a no-op.
-   */
-  function setRef(ref, value) {
-    if (typeof ref === "function") {
-      ref(value);
-    } else if (ref) {
-      ref.current = value;
-    }
-  }
-
-  /**
-   * Inspired by https://github.com/facebook/react/issues/14099#issuecomment-440013892
-   * See RFC in https://github.com/reactjs/rfcs/pull/220
-   */
-
-  function useEventCallback(fn) {
-    const ref = reactExports.useRef(fn);
-    useEnhancedEffect$1(() => {
-      ref.current = fn;
-    });
-    return reactExports.useRef((...args) =>
-      // @ts-expect-error hide `this`
-      (0, ref.current)(...args),
-    ).current;
-  }
-
-  function useForkRef(...refs) {
-    /**
-     * This will create a new function if the refs passed to this hook change and are all defined.
-     * This means react will call the old forkRef with `null` and the new forkRef
-     * with the ref. Cleanup naturally emerges from this behavior.
-     */
-    return reactExports.useMemo(() => {
-      if (refs.every((ref) => ref == null)) {
-        return null;
-      }
-      return (instance) => {
-        refs.forEach((ref) => {
-          setRef(ref, instance);
-        });
-      };
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, refs);
-  }
-
-  const UNINITIALIZED = {};
-
-  /**
-   * A React.useRef() that is initialized lazily with a function. Note that it accepts an optional
-   * initialization argument, so the initialization function doesn't need to be an inline closure.
-   *
-   * @usage
-   *   const ref = useLazyRef(sortColumns, columns)
-   */
-  function useLazyRef(init, initArg) {
-    const ref = reactExports.useRef(UNINITIALIZED);
-    if (ref.current === UNINITIALIZED) {
-      ref.current = init(initArg);
-    }
-    return ref;
-  }
-
-  const EMPTY = [];
-
-  /**
-   * A React.useEffect equivalent that runs once, when the component is mounted.
-   */
-  function useOnMount(fn) {
-    /* eslint-disable react-hooks/exhaustive-deps */
-    reactExports.useEffect(fn, EMPTY);
-    /* eslint-enable react-hooks/exhaustive-deps */
-  }
-
-  class Timeout {
-    constructor() {
-      this.currentId = 0;
-      this.clear = () => {
-        if (this.currentId !== 0) {
-          clearTimeout(this.currentId);
-          this.currentId = 0;
-        }
-      };
-      this.disposeEffect = () => {
-        return this.clear;
-      };
-    }
-    static create() {
-      return new Timeout();
-    }
-    /**
-     * Executes `fn` after `delay`, clearing any previously scheduled call.
-     */
-    start(delay, fn) {
-      this.clear();
-      this.currentId = setTimeout(() => {
-        this.currentId = 0;
-        fn();
-      }, delay);
-    }
-  }
-  function useTimeout() {
-    const timeout = useLazyRef(Timeout.create).current;
-    useOnMount(timeout.disposeEffect);
-    return timeout;
-  }
-
-  let hadKeyboardEvent = true;
-  let hadFocusVisibleRecently = false;
-  const hadFocusVisibleRecentlyTimeout = new Timeout();
-  const inputTypesWhitelist = {
-    text: true,
-    search: true,
-    url: true,
-    tel: true,
-    email: true,
-    password: true,
-    number: true,
-    date: true,
-    month: true,
-    week: true,
-    time: true,
-    datetime: true,
-    "datetime-local": true,
-  };
-
-  /**
-   * Computes whether the given element should automatically trigger the
-   * `focus-visible` class being added, i.e. whether it should always match
-   * `:focus-visible` when focused.
-   * @param {Element} node
-   * @returns {boolean}
-   */
-  function focusTriggersKeyboardModality(node) {
-    const { type, tagName } = node;
-    if (tagName === "INPUT" && inputTypesWhitelist[type] && !node.readOnly) {
-      return true;
-    }
-    if (tagName === "TEXTAREA" && !node.readOnly) {
-      return true;
-    }
-    if (node.isContentEditable) {
-      return true;
-    }
-    return false;
-  }
-
-  /**
-   * Keep track of our keyboard modality state with `hadKeyboardEvent`.
-   * If the most recent user interaction was via the keyboard;
-   * and the key press did not include a meta, alt/option, or control key;
-   * then the modality is keyboard. Otherwise, the modality is not keyboard.
-   * @param {KeyboardEvent} event
-   */
-  function handleKeyDown(event) {
-    if (event.metaKey || event.altKey || event.ctrlKey) {
-      return;
-    }
-    hadKeyboardEvent = true;
-  }
-
-  /**
-   * If at any point a user clicks with a pointing device, ensure that we change
-   * the modality away from keyboard.
-   * This avoids the situation where a user presses a key on an already focused
-   * element, and then clicks on a different element, focusing it with a
-   * pointing device, while we still think we're in keyboard modality.
-   */
-  function handlePointerDown() {
-    hadKeyboardEvent = false;
-  }
-  function handleVisibilityChange() {
-    if (this.visibilityState === "hidden") {
-      // If the tab becomes active again, the browser will handle calling focus
-      // on the element (Safari actually calls it twice).
-      // If this tab change caused a blur on an element with focus-visible,
-      // re-apply the class when the user switches back to the tab.
-      if (hadFocusVisibleRecently) {
-        hadKeyboardEvent = true;
-      }
-    }
-  }
-  function prepare(doc) {
-    doc.addEventListener("keydown", handleKeyDown, true);
-    doc.addEventListener("mousedown", handlePointerDown, true);
-    doc.addEventListener("pointerdown", handlePointerDown, true);
-    doc.addEventListener("touchstart", handlePointerDown, true);
-    doc.addEventListener("visibilitychange", handleVisibilityChange, true);
-  }
-  function isFocusVisible(event) {
-    const { target } = event;
-    try {
-      return target.matches(":focus-visible");
-    } catch (error) {
-      // Browsers not implementing :focus-visible will throw a SyntaxError.
-      // We use our own heuristic for those browsers.
-      // Rethrow might be better if it's not the expected error but do we really
-      // want to crash if focus-visible malfunctioned?
-    }
-
-    // No need for validFocusTarget check. The user does that by attaching it to
-    // focusable events only.
-    return hadKeyboardEvent || focusTriggersKeyboardModality(target);
-  }
-  function useIsFocusVisible() {
-    const ref = reactExports.useCallback((node) => {
-      if (node != null) {
-        prepare(node.ownerDocument);
-      }
-    }, []);
-    const isFocusVisibleRef = reactExports.useRef(false);
-
-    /**
-     * Should be called if a blur event is fired
-     */
-    function handleBlurVisible() {
-      // checking against potential state variable does not suffice if we focus and blur synchronously.
-      // React wouldn't have time to trigger a re-render so `focusVisible` would be stale.
-      // Ideally we would adjust `isFocusVisible(event)` to look at `relatedTarget` for blur events.
-      // This doesn't work in IE11 due to https://github.com/facebook/react/issues/3751
-      // TODO: check again if React releases their internal changes to focus event handling (https://github.com/facebook/react/pull/19186).
-      if (isFocusVisibleRef.current) {
-        // To detect a tab/window switch, we look for a blur event followed
-        // rapidly by a visibility change.
-        // If we don't see a visibility change within 100ms, it's probably a
-        // regular focus change.
-        hadFocusVisibleRecently = true;
-        hadFocusVisibleRecentlyTimeout.start(100, () => {
-          hadFocusVisibleRecently = false;
-        });
-        isFocusVisibleRef.current = false;
-        return true;
-      }
-      return false;
-    }
-
-    /**
-     * Should be called if a blur event is fired
-     */
-    function handleFocusVisible(event) {
-      if (isFocusVisible(event)) {
-        isFocusVisibleRef.current = true;
-        return true;
-      }
-      return false;
-    }
-    return {
-      isFocusVisibleRef,
-      onFocus: handleFocusVisible,
-      onBlur: handleBlurVisible,
-      ref,
-    };
-  }
 
   function composeClasses(slots, getUtilityClass, classes = undefined) {
     const output = {};
@@ -43684,7 +43344,7 @@
   Object.defineProperty(colorManipulator, "__esModule", {
     value: true,
   });
-  var alpha_1 = (colorManipulator.alpha = alpha);
+  colorManipulator.alpha = alpha;
   colorManipulator.blend = blend;
   colorManipulator.colorChannel = void 0;
   var darken_1 = (colorManipulator.darken = darken);
@@ -44085,7 +43745,7 @@ The following color spaces are supported: srgb, display-p3, a98-rgb, prophoto-rg
     });
   }
 
-  const _excluded$8 = ["mode", "contrastThreshold", "tonalOffset"];
+  const _excluded$5 = ["mode", "contrastThreshold", "tonalOffset"];
   const light = {
     // The colors used to style the text.
     text: {
@@ -44254,7 +43914,7 @@ The following color spaces are supported: srgb, display-p3, a98-rgb, prophoto-rg
         contrastThreshold = 3,
         tonalOffset = 0.2,
       } = palette,
-      other = _objectWithoutPropertiesLoose$1(palette, _excluded$8);
+      other = _objectWithoutPropertiesLoose$1(palette, _excluded$5);
     const primary = palette.primary || getDefaultPrimary(mode);
     const secondary = palette.secondary || getDefaultSecondary(mode);
     const error = palette.error || getDefaultError(mode);
@@ -44393,7 +44053,7 @@ const theme2 = createTheme({ palette: {
     return paletteOutput;
   }
 
-  const _excluded$7 = [
+  const _excluded$4 = [
     "fontFamily",
     "fontSize",
     "fontWeightLight",
@@ -44435,7 +44095,7 @@ const theme2 = createTheme({ palette: {
         allVariants,
         pxToRem: pxToRem2,
       } = _ref,
-      other = _objectWithoutPropertiesLoose$1(_ref, _excluded$7);
+      other = _objectWithoutPropertiesLoose$1(_ref, _excluded$4);
     {
       if (typeof fontSize !== "number") {
         console.error("MUI: `fontSize` is required to be a number.");
@@ -44555,7 +44215,7 @@ const theme2 = createTheme({ palette: {
   ];
   var shadows$1 = shadows;
 
-  const _excluded$6 = ["duration", "easing", "delay"];
+  const _excluded$3 = ["duration", "easing", "delay"];
   // Follow https://material.google.com/motion/duration-easing.html#duration-easing-natural-easing-curves
   // to learn the context in which each easing should be used.
   const easing = {
@@ -44606,7 +44266,7 @@ const theme2 = createTheme({ palette: {
           easing: easingOption = mergedEasing.easeInOut,
           delay = 0,
         } = options,
-        other = _objectWithoutPropertiesLoose$1(options, _excluded$6);
+        other = _objectWithoutPropertiesLoose$1(options, _excluded$3);
       {
         const isString = (value) => typeof value === "string";
         // IE11 support, replace with Number.isNaN
@@ -44674,7 +44334,7 @@ const theme2 = createTheme({ palette: {
   };
   var zIndex$1 = zIndex;
 
-  const _excluded$5 = [
+  const _excluded$2 = [
     "breakpoints",
     "mixins",
     "spacing",
@@ -44690,7 +44350,7 @@ const theme2 = createTheme({ palette: {
         transitions: transitionsInput = {},
         typography: typographyInput = {},
       } = options,
-      other = _objectWithoutPropertiesLoose$1(options, _excluded$5);
+      other = _objectWithoutPropertiesLoose$1(options, _excluded$2);
     if (options.vars) {
       throw new Error(`MUI: \`vars\` is a private field used for CSS variables support.
 Please use another name.`);
@@ -44895,7 +44555,7 @@ Please use another name.`);
   var _getDisplayName = _interopRequireDefault(require$$6);
   var _createTheme = _interopRequireDefault(require$$7);
   var _styleFunctionSx = _interopRequireDefault(require$$8);
-  const _excluded$4 = ["ownerState"],
+  const _excluded$1 = ["ownerState"],
     _excluded2 = ["variants"],
     _excluded3 = [
       "name",
@@ -44975,7 +44635,7 @@ Please use another name.`);
   }
   function processStyleArg(callableStyle, _ref) {
     let { ownerState } = _ref,
-      props = (0, _objectWithoutPropertiesLoose2.default)(_ref, _excluded$4);
+      props = (0, _objectWithoutPropertiesLoose2.default)(_ref, _excluded$1);
     const resolvedStylesArg =
       typeof callableStyle === "function"
         ? callableStyle(
@@ -45269,1418 +44929,6 @@ Please use another name.`);
   });
   var styled$1 = styled;
 
-  function _setPrototypeOf(o, p) {
-    _setPrototypeOf = Object.setPrototypeOf
-      ? Object.setPrototypeOf.bind()
-      : function _setPrototypeOf(o, p) {
-          o.__proto__ = p;
-          return o;
-        };
-    return _setPrototypeOf(o, p);
-  }
-
-  function _inheritsLoose(subClass, superClass) {
-    subClass.prototype = Object.create(superClass.prototype);
-    subClass.prototype.constructor = subClass;
-    _setPrototypeOf(subClass, superClass);
-  }
-
-  var TransitionGroupContext = /*#__PURE__*/ React.createContext(null);
-
-  function _assertThisInitialized(self) {
-    if (self === void 0) {
-      throw new ReferenceError(
-        "this hasn't been initialised - super() hasn't been called",
-      );
-    }
-    return self;
-  }
-
-  /**
-   * Given `this.props.children`, return an object mapping key to child.
-   *
-   * @param {*} children `this.props.children`
-   * @return {object} Mapping of key to child
-   */
-
-  function getChildMapping(children, mapFn) {
-    var mapper = function mapper(child) {
-      return mapFn && /*#__PURE__*/ reactExports.isValidElement(child)
-        ? mapFn(child)
-        : child;
-    };
-    var result = Object.create(null);
-    if (children)
-      reactExports.Children.map(children, function (c) {
-        return c;
-      }).forEach(function (child) {
-        // run the map function here instead so that the key is the computed one
-        result[child.key] = mapper(child);
-      });
-    return result;
-  }
-  /**
-   * When you're adding or removing children some may be added or removed in the
-   * same render pass. We want to show *both* since we want to simultaneously
-   * animate elements in and out. This function takes a previous set of keys
-   * and a new set of keys and merges them with its best guess of the correct
-   * ordering. In the future we may expose some of the utilities in
-   * ReactMultiChild to make this easy, but for now React itself does not
-   * directly have this concept of the union of prevChildren and nextChildren
-   * so we implement it here.
-   *
-   * @param {object} prev prev children as returned from
-   * `ReactTransitionChildMapping.getChildMapping()`.
-   * @param {object} next next children as returned from
-   * `ReactTransitionChildMapping.getChildMapping()`.
-   * @return {object} a key set that contains all keys in `prev` and all keys
-   * in `next` in a reasonable order.
-   */
-
-  function mergeChildMappings(prev, next) {
-    prev = prev || {};
-    next = next || {};
-    function getValueForKey(key) {
-      return key in next ? next[key] : prev[key];
-    } // For each key of `next`, the list of keys to insert before that key in
-    // the combined list
-
-    var nextKeysPending = Object.create(null);
-    var pendingKeys = [];
-    for (var prevKey in prev) {
-      if (prevKey in next) {
-        if (pendingKeys.length) {
-          nextKeysPending[prevKey] = pendingKeys;
-          pendingKeys = [];
-        }
-      } else {
-        pendingKeys.push(prevKey);
-      }
-    }
-    var i;
-    var childMapping = {};
-    for (var nextKey in next) {
-      if (nextKeysPending[nextKey]) {
-        for (i = 0; i < nextKeysPending[nextKey].length; i++) {
-          var pendingNextKey = nextKeysPending[nextKey][i];
-          childMapping[nextKeysPending[nextKey][i]] =
-            getValueForKey(pendingNextKey);
-        }
-      }
-      childMapping[nextKey] = getValueForKey(nextKey);
-    } // Finally, add the keys which didn't appear before any key in `next`
-
-    for (i = 0; i < pendingKeys.length; i++) {
-      childMapping[pendingKeys[i]] = getValueForKey(pendingKeys[i]);
-    }
-    return childMapping;
-  }
-  function getProp(child, prop, props) {
-    return props[prop] != null ? props[prop] : child.props[prop];
-  }
-  function getInitialChildMapping(props, onExited) {
-    return getChildMapping(props.children, function (child) {
-      return /*#__PURE__*/ reactExports.cloneElement(child, {
-        onExited: onExited.bind(null, child),
-        in: true,
-        appear: getProp(child, "appear", props),
-        enter: getProp(child, "enter", props),
-        exit: getProp(child, "exit", props),
-      });
-    });
-  }
-  function getNextChildMapping(nextProps, prevChildMapping, onExited) {
-    var nextChildMapping = getChildMapping(nextProps.children);
-    var children = mergeChildMappings(prevChildMapping, nextChildMapping);
-    Object.keys(children).forEach(function (key) {
-      var child = children[key];
-      if (!(/*#__PURE__*/ reactExports.isValidElement(child))) return;
-      var hasPrev = key in prevChildMapping;
-      var hasNext = key in nextChildMapping;
-      var prevChild = prevChildMapping[key];
-      var isLeaving =
-        /*#__PURE__*/ reactExports.isValidElement(prevChild) &&
-        !prevChild.props.in; // item is new (entering)
-
-      if (hasNext && (!hasPrev || isLeaving)) {
-        // console.log('entering', key)
-        children[key] = /*#__PURE__*/ reactExports.cloneElement(child, {
-          onExited: onExited.bind(null, child),
-          in: true,
-          exit: getProp(child, "exit", nextProps),
-          enter: getProp(child, "enter", nextProps),
-        });
-      } else if (!hasNext && hasPrev && !isLeaving) {
-        // item is old (exiting)
-        // console.log('leaving', key)
-        children[key] = /*#__PURE__*/ reactExports.cloneElement(child, {
-          in: false,
-        });
-      } else if (
-        hasNext &&
-        hasPrev &&
-        /*#__PURE__*/ reactExports.isValidElement(prevChild)
-      ) {
-        // item hasn't changed transition states
-        // copy over the last transition props;
-        // console.log('unchanged', key)
-        children[key] = /*#__PURE__*/ reactExports.cloneElement(child, {
-          onExited: onExited.bind(null, child),
-          in: prevChild.props.in,
-          exit: getProp(child, "exit", nextProps),
-          enter: getProp(child, "enter", nextProps),
-        });
-      }
-    });
-    return children;
-  }
-
-  var values =
-    Object.values ||
-    function (obj) {
-      return Object.keys(obj).map(function (k) {
-        return obj[k];
-      });
-    };
-  var defaultProps = {
-    component: "div",
-    childFactory: function childFactory(child) {
-      return child;
-    },
-  };
-  /**
-   * The `<TransitionGroup>` component manages a set of transition components
-   * (`<Transition>` and `<CSSTransition>`) in a list. Like with the transition
-   * components, `<TransitionGroup>` is a state machine for managing the mounting
-   * and unmounting of components over time.
-   *
-   * Consider the example below. As items are removed or added to the TodoList the
-   * `in` prop is toggled automatically by the `<TransitionGroup>`.
-   *
-   * Note that `<TransitionGroup>`  does not define any animation behavior!
-   * Exactly _how_ a list item animates is up to the individual transition
-   * component. This means you can mix and match animations across different list
-   * items.
-   */
-
-  var TransitionGroup = /*#__PURE__*/ (function (_React$Component) {
-    _inheritsLoose(TransitionGroup, _React$Component);
-    function TransitionGroup(props, context) {
-      var _this;
-      _this = _React$Component.call(this, props, context) || this;
-      var handleExited = _this.handleExited.bind(_assertThisInitialized(_this)); // Initial children should all be entering, dependent on appear
-
-      _this.state = {
-        contextValue: {
-          isMounting: true,
-        },
-        handleExited: handleExited,
-        firstRender: true,
-      };
-      return _this;
-    }
-    var _proto = TransitionGroup.prototype;
-    _proto.componentDidMount = function componentDidMount() {
-      this.mounted = true;
-      this.setState({
-        contextValue: {
-          isMounting: false,
-        },
-      });
-    };
-    _proto.componentWillUnmount = function componentWillUnmount() {
-      this.mounted = false;
-    };
-    TransitionGroup.getDerivedStateFromProps =
-      function getDerivedStateFromProps(nextProps, _ref) {
-        var prevChildMapping = _ref.children,
-          handleExited = _ref.handleExited,
-          firstRender = _ref.firstRender;
-        return {
-          children: firstRender
-            ? getInitialChildMapping(nextProps, handleExited)
-            : getNextChildMapping(nextProps, prevChildMapping, handleExited),
-          firstRender: false,
-        };
-      }; // node is `undefined` when user provided `nodeRef` prop
-    _proto.handleExited = function handleExited(child, node) {
-      var currentChildMapping = getChildMapping(this.props.children);
-      if (child.key in currentChildMapping) return;
-      if (child.props.onExited) {
-        child.props.onExited(node);
-      }
-      if (this.mounted) {
-        this.setState(function (state) {
-          var children = _extends$2({}, state.children);
-          delete children[child.key];
-          return {
-            children: children,
-          };
-        });
-      }
-    };
-    _proto.render = function render() {
-      var _this$props = this.props,
-        Component = _this$props.component,
-        childFactory = _this$props.childFactory,
-        props = _objectWithoutPropertiesLoose$1(_this$props, [
-          "component",
-          "childFactory",
-        ]);
-      var contextValue = this.state.contextValue;
-      var children = values(this.state.children).map(childFactory);
-      delete props.appear;
-      delete props.enter;
-      delete props.exit;
-      if (Component === null) {
-        return /*#__PURE__*/ React.createElement(
-          TransitionGroupContext.Provider,
-          {
-            value: contextValue,
-          },
-          children,
-        );
-      }
-      return /*#__PURE__*/ React.createElement(
-        TransitionGroupContext.Provider,
-        {
-          value: contextValue,
-        },
-        /*#__PURE__*/ React.createElement(Component, props, children),
-      );
-    };
-    return TransitionGroup;
-  })(React.Component);
-  TransitionGroup.propTypes = {
-    /**
-     * `<TransitionGroup>` renders a `<div>` by default. You can change this
-     * behavior by providing a `component` prop.
-     * If you use React v16+ and would like to avoid a wrapping `<div>` element
-     * you can pass in `component={null}`. This is useful if the wrapping div
-     * borks your css styles.
-     */
-    component: PropTypes.any,
-    /**
-     * A set of `<Transition>` components, that are toggled `in` and out as they
-     * leave. the `<TransitionGroup>` will inject specific transition props, so
-     * remember to spread them through if you are wrapping the `<Transition>` as
-     * with our `<Fade>` example.
-     *
-     * While this component is meant for multiple `Transition` or `CSSTransition`
-     * children, sometimes you may want to have a single transition child with
-     * content that you want to be transitioned out and in when you change it
-     * (e.g. routes, images etc.) In that case you can change the `key` prop of
-     * the transition child as you change its content, this will cause
-     * `TransitionGroup` to transition the child out and back in.
-     */
-    children: PropTypes.node,
-    /**
-     * A convenience prop that enables or disables appear animations
-     * for all children. Note that specifying this will override any defaults set
-     * on individual children Transitions.
-     */
-    appear: PropTypes.bool,
-    /**
-     * A convenience prop that enables or disables enter animations
-     * for all children. Note that specifying this will override any defaults set
-     * on individual children Transitions.
-     */
-    enter: PropTypes.bool,
-    /**
-     * A convenience prop that enables or disables exit animations
-     * for all children. Note that specifying this will override any defaults set
-     * on individual children Transitions.
-     */
-    exit: PropTypes.bool,
-    /**
-     * You may need to apply reactive updates to a child as it is exiting.
-     * This is generally done by using `cloneElement` however in the case of an exiting
-     * child the element has already been removed and not accessible to the consumer.
-     *
-     * If you do need to update a child as it leaves you can provide a `childFactory`
-     * to wrap every child, even the ones that are leaving.
-     *
-     * @type Function(child: ReactElement) -> ReactElement
-     */
-    childFactory: PropTypes.func,
-  };
-  TransitionGroup.defaultProps = defaultProps;
-  var TransitionGroup$1 = TransitionGroup;
-
-  function Ripple(props) {
-    const {
-      className,
-      classes,
-      pulsate = false,
-      rippleX,
-      rippleY,
-      rippleSize,
-      in: inProp,
-      onExited,
-      timeout,
-    } = props;
-    const [leaving, setLeaving] = reactExports.useState(false);
-    const rippleClassName = clsx(
-      className,
-      classes.ripple,
-      classes.rippleVisible,
-      pulsate && classes.ripplePulsate,
-    );
-    const rippleStyles = {
-      width: rippleSize,
-      height: rippleSize,
-      top: -(rippleSize / 2) + rippleY,
-      left: -(rippleSize / 2) + rippleX,
-    };
-    const childClassName = clsx(
-      classes.child,
-      leaving && classes.childLeaving,
-      pulsate && classes.childPulsate,
-    );
-    if (!inProp && !leaving) {
-      setLeaving(true);
-    }
-    reactExports.useEffect(() => {
-      if (!inProp && onExited != null) {
-        // react-transition-group#onExited
-        const timeoutId = setTimeout(onExited, timeout);
-        return () => {
-          clearTimeout(timeoutId);
-        };
-      }
-      return undefined;
-    }, [onExited, inProp, timeout]);
-    return /*#__PURE__*/ jsxRuntimeExports.jsx("span", {
-      className: rippleClassName,
-      style: rippleStyles,
-      children: /*#__PURE__*/ jsxRuntimeExports.jsx("span", {
-        className: childClassName,
-      }),
-    });
-  }
-  Ripple.propTypes = {
-    /**
-     * Override or extend the styles applied to the component.
-     */
-    classes: PropTypes.object.isRequired,
-    className: PropTypes.string,
-    /**
-     * @ignore - injected from TransitionGroup
-     */
-    in: PropTypes.bool,
-    /**
-     * @ignore - injected from TransitionGroup
-     */
-    onExited: PropTypes.func,
-    /**
-     * If `true`, the ripple pulsates, typically indicating the keyboard focus state of an element.
-     */
-    pulsate: PropTypes.bool,
-    /**
-     * Diameter of the ripple.
-     */
-    rippleSize: PropTypes.number,
-    /**
-     * Horizontal position of the ripple center.
-     */
-    rippleX: PropTypes.number,
-    /**
-     * Vertical position of the ripple center.
-     */
-    rippleY: PropTypes.number,
-    /**
-     * exit delay
-     */
-    timeout: PropTypes.number.isRequired,
-  };
-
-  const touchRippleClasses = generateUtilityClasses("MuiTouchRipple", [
-    "root",
-    "ripple",
-    "rippleVisible",
-    "ripplePulsate",
-    "child",
-    "childLeaving",
-    "childPulsate",
-  ]);
-  var touchRippleClasses$1 = touchRippleClasses;
-
-  const _excluded$3 = ["center", "classes", "className"];
-  let _ = (t) => t,
-    _t,
-    _t2,
-    _t3,
-    _t4;
-  const DURATION = 550;
-  const DELAY_RIPPLE = 80;
-  const enterKeyframe = keyframes(
-    _t ||
-      (_t = _`
-  0% {
-    transform: scale(0);
-    opacity: 0.1;
-  }
-
-  100% {
-    transform: scale(1);
-    opacity: 0.3;
-  }
-`),
-  );
-  const exitKeyframe = keyframes(
-    _t2 ||
-      (_t2 = _`
-  0% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0;
-  }
-`),
-  );
-  const pulsateKeyframe = keyframes(
-    _t3 ||
-      (_t3 = _`
-  0% {
-    transform: scale(1);
-  }
-
-  50% {
-    transform: scale(0.92);
-  }
-
-  100% {
-    transform: scale(1);
-  }
-`),
-  );
-  const TouchRippleRoot = styled$1("span", {
-    name: "MuiTouchRipple",
-    slot: "Root",
-  })({
-    overflow: "hidden",
-    pointerEvents: "none",
-    position: "absolute",
-    zIndex: 0,
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
-    borderRadius: "inherit",
-  });
-
-  // This `styled()` function invokes keyframes. `styled-components` only supports keyframes
-  // in string templates. Do not convert these styles in JS object as it will break.
-  const TouchRippleRipple = styled$1(Ripple, {
-    name: "MuiTouchRipple",
-    slot: "Ripple",
-  })(
-    _t4 ||
-      (_t4 = _`
-  opacity: 0;
-  position: absolute;
-
-  &.${0} {
-    opacity: 0.3;
-    transform: scale(1);
-    animation-name: ${0};
-    animation-duration: ${0}ms;
-    animation-timing-function: ${0};
-  }
-
-  &.${0} {
-    animation-duration: ${0}ms;
-  }
-
-  & .${0} {
-    opacity: 1;
-    display: block;
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    background-color: currentColor;
-  }
-
-  & .${0} {
-    opacity: 0;
-    animation-name: ${0};
-    animation-duration: ${0}ms;
-    animation-timing-function: ${0};
-  }
-
-  & .${0} {
-    position: absolute;
-    /* @noflip */
-    left: 0px;
-    top: 0;
-    animation-name: ${0};
-    animation-duration: 2500ms;
-    animation-timing-function: ${0};
-    animation-iteration-count: infinite;
-    animation-delay: 200ms;
-  }
-`),
-    touchRippleClasses$1.rippleVisible,
-    enterKeyframe,
-    DURATION,
-    ({ theme }) => theme.transitions.easing.easeInOut,
-    touchRippleClasses$1.ripplePulsate,
-    ({ theme }) => theme.transitions.duration.shorter,
-    touchRippleClasses$1.child,
-    touchRippleClasses$1.childLeaving,
-    exitKeyframe,
-    DURATION,
-    ({ theme }) => theme.transitions.easing.easeInOut,
-    touchRippleClasses$1.childPulsate,
-    pulsateKeyframe,
-    ({ theme }) => theme.transitions.easing.easeInOut,
-  );
-
-  /**
-   * @ignore - internal component.
-   *
-   * TODO v5: Make private
-   */
-  const TouchRipple = /*#__PURE__*/ reactExports.forwardRef(
-    function TouchRipple(inProps, ref) {
-      const props = useThemeProps({
-        props: inProps,
-        name: "MuiTouchRipple",
-      });
-      const { center: centerProp = false, classes = {}, className } = props,
-        other = _objectWithoutPropertiesLoose$1(props, _excluded$3);
-      const [ripples, setRipples] = reactExports.useState([]);
-      const nextKey = reactExports.useRef(0);
-      const rippleCallback = reactExports.useRef(null);
-      reactExports.useEffect(() => {
-        if (rippleCallback.current) {
-          rippleCallback.current();
-          rippleCallback.current = null;
-        }
-      }, [ripples]);
-
-      // Used to filter out mouse emulated events on mobile.
-      const ignoringMouseDown = reactExports.useRef(false);
-      // We use a timer in order to only show the ripples for touch "click" like events.
-      // We don't want to display the ripple for touch scroll events.
-      const startTimer = useTimeout();
-
-      // This is the hook called once the previous timeout is ready.
-      const startTimerCommit = reactExports.useRef(null);
-      const container = reactExports.useRef(null);
-      const startCommit = reactExports.useCallback(
-        (params) => {
-          const { pulsate, rippleX, rippleY, rippleSize, cb } = params;
-          setRipples((oldRipples) => [
-            ...oldRipples,
-            /*#__PURE__*/ jsxRuntimeExports.jsx(
-              TouchRippleRipple,
-              {
-                classes: {
-                  ripple: clsx(classes.ripple, touchRippleClasses$1.ripple),
-                  rippleVisible: clsx(
-                    classes.rippleVisible,
-                    touchRippleClasses$1.rippleVisible,
-                  ),
-                  ripplePulsate: clsx(
-                    classes.ripplePulsate,
-                    touchRippleClasses$1.ripplePulsate,
-                  ),
-                  child: clsx(classes.child, touchRippleClasses$1.child),
-                  childLeaving: clsx(
-                    classes.childLeaving,
-                    touchRippleClasses$1.childLeaving,
-                  ),
-                  childPulsate: clsx(
-                    classes.childPulsate,
-                    touchRippleClasses$1.childPulsate,
-                  ),
-                },
-                timeout: DURATION,
-                pulsate: pulsate,
-                rippleX: rippleX,
-                rippleY: rippleY,
-                rippleSize: rippleSize,
-              },
-              nextKey.current,
-            ),
-          ]);
-          nextKey.current += 1;
-          rippleCallback.current = cb;
-        },
-        [classes],
-      );
-      const start = reactExports.useCallback(
-        (event = {}, options = {}, cb = () => {}) => {
-          const {
-            pulsate = false,
-            center = centerProp || options.pulsate,
-            fakeElement = false, // For test purposes
-          } = options;
-          if (
-            (event == null ? void 0 : event.type) === "mousedown" &&
-            ignoringMouseDown.current
-          ) {
-            ignoringMouseDown.current = false;
-            return;
-          }
-          if ((event == null ? void 0 : event.type) === "touchstart") {
-            ignoringMouseDown.current = true;
-          }
-          const element = fakeElement ? null : container.current;
-          const rect = element
-            ? element.getBoundingClientRect()
-            : {
-                width: 0,
-                height: 0,
-                left: 0,
-                top: 0,
-              };
-
-          // Get the size of the ripple
-          let rippleX;
-          let rippleY;
-          let rippleSize;
-          if (
-            center ||
-            event === undefined ||
-            (event.clientX === 0 && event.clientY === 0) ||
-            (!event.clientX && !event.touches)
-          ) {
-            rippleX = Math.round(rect.width / 2);
-            rippleY = Math.round(rect.height / 2);
-          } else {
-            const { clientX, clientY } =
-              event.touches && event.touches.length > 0
-                ? event.touches[0]
-                : event;
-            rippleX = Math.round(clientX - rect.left);
-            rippleY = Math.round(clientY - rect.top);
-          }
-          if (center) {
-            rippleSize = Math.sqrt(
-              (2 * rect.width ** 2 + rect.height ** 2) / 3,
-            );
-
-            // For some reason the animation is broken on Mobile Chrome if the size is even.
-            if (rippleSize % 2 === 0) {
-              rippleSize += 1;
-            }
-          } else {
-            const sizeX =
-              Math.max(
-                Math.abs((element ? element.clientWidth : 0) - rippleX),
-                rippleX,
-              ) *
-                2 +
-              2;
-            const sizeY =
-              Math.max(
-                Math.abs((element ? element.clientHeight : 0) - rippleY),
-                rippleY,
-              ) *
-                2 +
-              2;
-            rippleSize = Math.sqrt(sizeX ** 2 + sizeY ** 2);
-          }
-
-          // Touche devices
-          if (event != null && event.touches) {
-            // check that this isn't another touchstart due to multitouch
-            // otherwise we will only clear a single timer when unmounting while two
-            // are running
-            if (startTimerCommit.current === null) {
-              // Prepare the ripple effect.
-              startTimerCommit.current = () => {
-                startCommit({
-                  pulsate,
-                  rippleX,
-                  rippleY,
-                  rippleSize,
-                  cb,
-                });
-              };
-              // Delay the execution of the ripple effect.
-              // We have to make a tradeoff with this delay value.
-              startTimer.start(DELAY_RIPPLE, () => {
-                if (startTimerCommit.current) {
-                  startTimerCommit.current();
-                  startTimerCommit.current = null;
-                }
-              });
-            }
-          } else {
-            startCommit({
-              pulsate,
-              rippleX,
-              rippleY,
-              rippleSize,
-              cb,
-            });
-          }
-        },
-        [centerProp, startCommit, startTimer],
-      );
-      const pulsate = reactExports.useCallback(() => {
-        start(
-          {},
-          {
-            pulsate: true,
-          },
-        );
-      }, [start]);
-      const stop = reactExports.useCallback(
-        (event, cb) => {
-          startTimer.clear();
-
-          // The touch interaction occurs too quickly.
-          // We still want to show ripple effect.
-          if (
-            (event == null ? void 0 : event.type) === "touchend" &&
-            startTimerCommit.current
-          ) {
-            startTimerCommit.current();
-            startTimerCommit.current = null;
-            startTimer.start(0, () => {
-              stop(event, cb);
-            });
-            return;
-          }
-          startTimerCommit.current = null;
-          setRipples((oldRipples) => {
-            if (oldRipples.length > 0) {
-              return oldRipples.slice(1);
-            }
-            return oldRipples;
-          });
-          rippleCallback.current = cb;
-        },
-        [startTimer],
-      );
-      reactExports.useImperativeHandle(
-        ref,
-        () => ({
-          pulsate,
-          start,
-          stop,
-        }),
-        [pulsate, start, stop],
-      );
-      return /*#__PURE__*/ jsxRuntimeExports.jsx(
-        TouchRippleRoot,
-        _extends$2(
-          {
-            className: clsx(touchRippleClasses$1.root, classes.root, className),
-            ref: container,
-          },
-          other,
-          {
-            children: /*#__PURE__*/ jsxRuntimeExports.jsx(TransitionGroup$1, {
-              component: null,
-              exit: true,
-              children: ripples,
-            }),
-          },
-        ),
-      );
-    },
-  );
-  TouchRipple.propTypes = {
-    /**
-     * If `true`, the ripple starts at the center of the component
-     * rather than at the point of interaction.
-     */
-    center: PropTypes.bool,
-    /**
-     * Override or extend the styles applied to the component.
-     */
-    classes: PropTypes.object,
-    /**
-     * @ignore
-     */
-    className: PropTypes.string,
-  };
-  var TouchRipple$1 = TouchRipple;
-
-  function getButtonBaseUtilityClass(slot) {
-    return generateUtilityClass("MuiButtonBase", slot);
-  }
-  const buttonBaseClasses = generateUtilityClasses("MuiButtonBase", [
-    "root",
-    "disabled",
-    "focusVisible",
-  ]);
-  var buttonBaseClasses$1 = buttonBaseClasses;
-
-  const _excluded$2 = [
-    "action",
-    "centerRipple",
-    "children",
-    "className",
-    "component",
-    "disabled",
-    "disableRipple",
-    "disableTouchRipple",
-    "focusRipple",
-    "focusVisibleClassName",
-    "LinkComponent",
-    "onBlur",
-    "onClick",
-    "onContextMenu",
-    "onDragLeave",
-    "onFocus",
-    "onFocusVisible",
-    "onKeyDown",
-    "onKeyUp",
-    "onMouseDown",
-    "onMouseLeave",
-    "onMouseUp",
-    "onTouchEnd",
-    "onTouchMove",
-    "onTouchStart",
-    "tabIndex",
-    "TouchRippleProps",
-    "touchRippleRef",
-    "type",
-  ];
-  const useUtilityClasses$2 = (ownerState) => {
-    const { disabled, focusVisible, focusVisibleClassName, classes } =
-      ownerState;
-    const slots = {
-      root: ["root", disabled && "disabled", focusVisible && "focusVisible"],
-    };
-    const composedClasses = composeClasses(
-      slots,
-      getButtonBaseUtilityClass,
-      classes,
-    );
-    if (focusVisible && focusVisibleClassName) {
-      composedClasses.root += ` ${focusVisibleClassName}`;
-    }
-    return composedClasses;
-  };
-  const ButtonBaseRoot = styled$1("button", {
-    name: "MuiButtonBase",
-    slot: "Root",
-    overridesResolver: (props, styles) => styles.root,
-  })({
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-    position: "relative",
-    boxSizing: "border-box",
-    WebkitTapHighlightColor: "transparent",
-    backgroundColor: "transparent",
-    // Reset default value
-    // We disable the focus ring for mouse, touch and keyboard users.
-    outline: 0,
-    border: 0,
-    margin: 0,
-    // Remove the margin in Safari
-    borderRadius: 0,
-    padding: 0,
-    // Remove the padding in Firefox
-    cursor: "pointer",
-    userSelect: "none",
-    verticalAlign: "middle",
-    MozAppearance: "none",
-    // Reset
-    WebkitAppearance: "none",
-    // Reset
-    textDecoration: "none",
-    // So we take precedent over the style of a native <a /> element.
-    color: "inherit",
-    "&::-moz-focus-inner": {
-      borderStyle: "none", // Remove Firefox dotted outline.
-    },
-    [`&.${buttonBaseClasses$1.disabled}`]: {
-      pointerEvents: "none",
-      // Disable link interactions
-      cursor: "default",
-    },
-    "@media print": {
-      colorAdjust: "exact",
-    },
-  });
-
-  /**
-   * `ButtonBase` contains as few styles as possible.
-   * It aims to be a simple building block for creating a button.
-   * It contains a load of style reset and some focus/ripple logic.
-   */
-  const ButtonBase = /*#__PURE__*/ reactExports.forwardRef(
-    function ButtonBase(inProps, ref) {
-      const props = useThemeProps({
-        props: inProps,
-        name: "MuiButtonBase",
-      });
-      const {
-          action,
-          centerRipple = false,
-          children,
-          className,
-          component = "button",
-          disabled = false,
-          disableRipple = false,
-          disableTouchRipple = false,
-          focusRipple = false,
-          LinkComponent = "a",
-          onBlur,
-          onClick,
-          onContextMenu,
-          onDragLeave,
-          onFocus,
-          onFocusVisible,
-          onKeyDown,
-          onKeyUp,
-          onMouseDown,
-          onMouseLeave,
-          onMouseUp,
-          onTouchEnd,
-          onTouchMove,
-          onTouchStart,
-          tabIndex = 0,
-          TouchRippleProps,
-          touchRippleRef,
-          type,
-        } = props,
-        other = _objectWithoutPropertiesLoose$1(props, _excluded$2);
-      const buttonRef = reactExports.useRef(null);
-      const rippleRef = reactExports.useRef(null);
-      const handleRippleRef = useForkRef(rippleRef, touchRippleRef);
-      const {
-        isFocusVisibleRef,
-        onFocus: handleFocusVisible,
-        onBlur: handleBlurVisible,
-        ref: focusVisibleRef,
-      } = useIsFocusVisible();
-      const [focusVisible, setFocusVisible] = reactExports.useState(false);
-      if (disabled && focusVisible) {
-        setFocusVisible(false);
-      }
-      reactExports.useImperativeHandle(
-        action,
-        () => ({
-          focusVisible: () => {
-            setFocusVisible(true);
-            buttonRef.current.focus();
-          },
-        }),
-        [],
-      );
-      const [mountedState, setMountedState] = reactExports.useState(false);
-      reactExports.useEffect(() => {
-        setMountedState(true);
-      }, []);
-      const enableTouchRipple = mountedState && !disableRipple && !disabled;
-      reactExports.useEffect(() => {
-        if (focusVisible && focusRipple && !disableRipple && mountedState) {
-          rippleRef.current.pulsate();
-        }
-      }, [disableRipple, focusRipple, focusVisible, mountedState]);
-      function useRippleHandler(
-        rippleAction,
-        eventCallback,
-        skipRippleAction = disableTouchRipple,
-      ) {
-        return useEventCallback((event) => {
-          if (eventCallback) {
-            eventCallback(event);
-          }
-          const ignore = skipRippleAction;
-          if (!ignore && rippleRef.current) {
-            rippleRef.current[rippleAction](event);
-          }
-          return true;
-        });
-      }
-      const handleMouseDown = useRippleHandler("start", onMouseDown);
-      const handleContextMenu = useRippleHandler("stop", onContextMenu);
-      const handleDragLeave = useRippleHandler("stop", onDragLeave);
-      const handleMouseUp = useRippleHandler("stop", onMouseUp);
-      const handleMouseLeave = useRippleHandler("stop", (event) => {
-        if (focusVisible) {
-          event.preventDefault();
-        }
-        if (onMouseLeave) {
-          onMouseLeave(event);
-        }
-      });
-      const handleTouchStart = useRippleHandler("start", onTouchStart);
-      const handleTouchEnd = useRippleHandler("stop", onTouchEnd);
-      const handleTouchMove = useRippleHandler("stop", onTouchMove);
-      const handleBlur = useRippleHandler(
-        "stop",
-        (event) => {
-          handleBlurVisible(event);
-          if (isFocusVisibleRef.current === false) {
-            setFocusVisible(false);
-          }
-          if (onBlur) {
-            onBlur(event);
-          }
-        },
-        false,
-      );
-      const handleFocus = useEventCallback((event) => {
-        // Fix for https://github.com/facebook/react/issues/7769
-        if (!buttonRef.current) {
-          buttonRef.current = event.currentTarget;
-        }
-        handleFocusVisible(event);
-        if (isFocusVisibleRef.current === true) {
-          setFocusVisible(true);
-          if (onFocusVisible) {
-            onFocusVisible(event);
-          }
-        }
-        if (onFocus) {
-          onFocus(event);
-        }
-      });
-      const isNonNativeButton = () => {
-        const button = buttonRef.current;
-        return (
-          component &&
-          component !== "button" &&
-          !(button.tagName === "A" && button.href)
-        );
-      };
-
-      /**
-       * IE11 shim for https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/repeat
-       */
-      const keydownRef = reactExports.useRef(false);
-      const handleKeyDown = useEventCallback((event) => {
-        // Check if key is already down to avoid repeats being counted as multiple activations
-        if (
-          focusRipple &&
-          !keydownRef.current &&
-          focusVisible &&
-          rippleRef.current &&
-          event.key === " "
-        ) {
-          keydownRef.current = true;
-          rippleRef.current.stop(event, () => {
-            rippleRef.current.start(event);
-          });
-        }
-        if (
-          event.target === event.currentTarget &&
-          isNonNativeButton() &&
-          event.key === " "
-        ) {
-          event.preventDefault();
-        }
-        if (onKeyDown) {
-          onKeyDown(event);
-        }
-
-        // Keyboard accessibility for non interactive elements
-        if (
-          event.target === event.currentTarget &&
-          isNonNativeButton() &&
-          event.key === "Enter" &&
-          !disabled
-        ) {
-          event.preventDefault();
-          if (onClick) {
-            onClick(event);
-          }
-        }
-      });
-      const handleKeyUp = useEventCallback((event) => {
-        // calling preventDefault in keyUp on a <button> will not dispatch a click event if Space is pressed
-        // https://codesandbox.io/p/sandbox/button-keyup-preventdefault-dn7f0
-        if (
-          focusRipple &&
-          event.key === " " &&
-          rippleRef.current &&
-          focusVisible &&
-          !event.defaultPrevented
-        ) {
-          keydownRef.current = false;
-          rippleRef.current.stop(event, () => {
-            rippleRef.current.pulsate(event);
-          });
-        }
-        if (onKeyUp) {
-          onKeyUp(event);
-        }
-
-        // Keyboard accessibility for non interactive elements
-        if (
-          onClick &&
-          event.target === event.currentTarget &&
-          isNonNativeButton() &&
-          event.key === " " &&
-          !event.defaultPrevented
-        ) {
-          onClick(event);
-        }
-      });
-      let ComponentProp = component;
-      if (ComponentProp === "button" && (other.href || other.to)) {
-        ComponentProp = LinkComponent;
-      }
-      const buttonProps = {};
-      if (ComponentProp === "button") {
-        buttonProps.type = type === undefined ? "button" : type;
-        buttonProps.disabled = disabled;
-      } else {
-        if (!other.href && !other.to) {
-          buttonProps.role = "button";
-        }
-        if (disabled) {
-          buttonProps["aria-disabled"] = disabled;
-        }
-      }
-      const handleRef = useForkRef(ref, focusVisibleRef, buttonRef);
-      {
-        // eslint-disable-next-line react-hooks/rules-of-hooks
-        reactExports.useEffect(() => {
-          if (enableTouchRipple && !rippleRef.current) {
-            console.error(
-              [
-                "MUI: The `component` prop provided to ButtonBase is invalid.",
-                "Please make sure the children prop is rendered in this custom component.",
-              ].join("\n"),
-            );
-          }
-        }, [enableTouchRipple]);
-      }
-      const ownerState = _extends$2({}, props, {
-        centerRipple,
-        component,
-        disabled,
-        disableRipple,
-        disableTouchRipple,
-        focusRipple,
-        tabIndex,
-        focusVisible,
-      });
-      const classes = useUtilityClasses$2(ownerState);
-      return /*#__PURE__*/ jsxRuntimeExports.jsxs(
-        ButtonBaseRoot,
-        _extends$2(
-          {
-            as: ComponentProp,
-            className: clsx(classes.root, className),
-            ownerState: ownerState,
-            onBlur: handleBlur,
-            onClick: onClick,
-            onContextMenu: handleContextMenu,
-            onFocus: handleFocus,
-            onKeyDown: handleKeyDown,
-            onKeyUp: handleKeyUp,
-            onMouseDown: handleMouseDown,
-            onMouseLeave: handleMouseLeave,
-            onMouseUp: handleMouseUp,
-            onDragLeave: handleDragLeave,
-            onTouchEnd: handleTouchEnd,
-            onTouchMove: handleTouchMove,
-            onTouchStart: handleTouchStart,
-            ref: handleRef,
-            tabIndex: disabled ? -1 : tabIndex,
-            type: type,
-          },
-          buttonProps,
-          other,
-          {
-            children: [
-              children,
-              enableTouchRipple /*#__PURE__*/
-                ? /* TouchRipple is only needed client-side, x2 boost on the server. */
-                  jsxRuntimeExports.jsx(
-                    TouchRipple$1,
-                    _extends$2(
-                      {
-                        ref: handleRippleRef,
-                        center: centerRipple,
-                      },
-                      TouchRippleProps,
-                    ),
-                  )
-                : null,
-            ],
-          },
-        ),
-      );
-    },
-  );
-  ButtonBase.propTypes /* remove-proptypes */ = {
-    // ┌────────────────────────────── Warning ──────────────────────────────┐
-    // │ These PropTypes are generated from the TypeScript type definitions. │
-    // │    To update them, edit the d.ts file and run `pnpm proptypes`.     │
-    // └─────────────────────────────────────────────────────────────────────┘
-    /**
-     * A ref for imperative actions.
-     * It currently only supports `focusVisible()` action.
-     */
-    action: refType$1,
-    /**
-     * If `true`, the ripples are centered.
-     * They won't start at the cursor interaction position.
-     * @default false
-     */
-    centerRipple: PropTypes.bool,
-    /**
-     * The content of the component.
-     */
-    children: PropTypes.node,
-    /**
-     * Override or extend the styles applied to the component.
-     */
-    classes: PropTypes.object,
-    /**
-     * @ignore
-     */
-    className: PropTypes.string,
-    /**
-     * The component used for the root node.
-     * Either a string to use a HTML element or a component.
-     */
-    component: elementTypeAcceptingRef$1,
-    /**
-     * If `true`, the component is disabled.
-     * @default false
-     */
-    disabled: PropTypes.bool,
-    /**
-     * If `true`, the ripple effect is disabled.
-     *
-     * ⚠️ Without a ripple there is no styling for :focus-visible by default. Be sure
-     * to highlight the element by applying separate styles with the `.Mui-focusVisible` class.
-     * @default false
-     */
-    disableRipple: PropTypes.bool,
-    /**
-     * If `true`, the touch ripple effect is disabled.
-     * @default false
-     */
-    disableTouchRipple: PropTypes.bool,
-    /**
-     * If `true`, the base button will have a keyboard focus ripple.
-     * @default false
-     */
-    focusRipple: PropTypes.bool,
-    /**
-     * This prop can help identify which element has keyboard focus.
-     * The class name will be applied when the element gains the focus through keyboard interaction.
-     * It's a polyfill for the [CSS :focus-visible selector](https://drafts.csswg.org/selectors-4/#the-focus-visible-pseudo).
-     * The rationale for using this feature [is explained here](https://github.com/WICG/focus-visible/blob/HEAD/explainer.md).
-     * A [polyfill can be used](https://github.com/WICG/focus-visible) to apply a `focus-visible` class to other components
-     * if needed.
-     */
-    focusVisibleClassName: PropTypes.string,
-    /**
-     * @ignore
-     */
-    href: PropTypes /* @typescript-to-proptypes-ignore */.any,
-    /**
-     * The component used to render a link when the `href` prop is provided.
-     * @default 'a'
-     */
-    LinkComponent: PropTypes.elementType,
-    /**
-     * @ignore
-     */
-    onBlur: PropTypes.func,
-    /**
-     * @ignore
-     */
-    onClick: PropTypes.func,
-    /**
-     * @ignore
-     */
-    onContextMenu: PropTypes.func,
-    /**
-     * @ignore
-     */
-    onDragLeave: PropTypes.func,
-    /**
-     * @ignore
-     */
-    onFocus: PropTypes.func,
-    /**
-     * Callback fired when the component is focused with a keyboard.
-     * We trigger a `onFocus` callback too.
-     */
-    onFocusVisible: PropTypes.func,
-    /**
-     * @ignore
-     */
-    onKeyDown: PropTypes.func,
-    /**
-     * @ignore
-     */
-    onKeyUp: PropTypes.func,
-    /**
-     * @ignore
-     */
-    onMouseDown: PropTypes.func,
-    /**
-     * @ignore
-     */
-    onMouseLeave: PropTypes.func,
-    /**
-     * @ignore
-     */
-    onMouseUp: PropTypes.func,
-    /**
-     * @ignore
-     */
-    onTouchEnd: PropTypes.func,
-    /**
-     * @ignore
-     */
-    onTouchMove: PropTypes.func,
-    /**
-     * @ignore
-     */
-    onTouchStart: PropTypes.func,
-    /**
-     * The system prop that allows defining system overrides as well as additional CSS styles.
-     */
-    sx: PropTypes.oneOfType([
-      PropTypes.arrayOf(
-        PropTypes.oneOfType([PropTypes.func, PropTypes.object, PropTypes.bool]),
-      ),
-      PropTypes.func,
-      PropTypes.object,
-    ]),
-    /**
-     * @default 0
-     */
-    tabIndex: PropTypes.number,
-    /**
-     * Props applied to the `TouchRipple` element.
-     */
-    TouchRippleProps: PropTypes.object,
-    /**
-     * A ref that points to the `TouchRipple` element.
-     */
-    touchRippleRef: PropTypes.oneOfType([
-      PropTypes.func,
-      PropTypes.shape({
-        current: PropTypes.shape({
-          pulsate: PropTypes.func.isRequired,
-          start: PropTypes.func.isRequired,
-          stop: PropTypes.func.isRequired,
-        }),
-      }),
-    ]),
-    /**
-     * @ignore
-     */
-    type: PropTypes.oneOfType([
-      PropTypes.oneOf(["button", "reset", "submit"]),
-      PropTypes.string,
-    ]),
-  };
-  var ButtonBase$1 = ButtonBase;
-
   function getTypographyUtilityClass(slot) {
     return generateUtilityClass("MuiTypography", slot);
   }
@@ -46709,7 +44957,7 @@ Please use another name.`);
     "paragraph",
   ]);
 
-  const _excluded$1 = [
+  const _excluded = [
     "align",
     "className",
     "component",
@@ -46719,7 +44967,7 @@ Please use another name.`);
     "variant",
     "variantMapping",
   ];
-  const useUtilityClasses$1 = (ownerState) => {
+  const useUtilityClasses = (ownerState) => {
     const { align, gutterBottom, noWrap, paragraph, variant, classes } =
       ownerState;
     const slots = {
@@ -46822,7 +45070,7 @@ Please use another name.`);
           variant = "body1",
           variantMapping = defaultVariantMapping,
         } = props,
-        other = _objectWithoutPropertiesLoose$1(props, _excluded$1);
+        other = _objectWithoutPropertiesLoose$1(props, _excluded);
       const ownerState = _extends$2({}, props, {
         align,
         color,
@@ -46840,7 +45088,7 @@ Please use another name.`);
           ? "p"
           : variantMapping[variant] || defaultVariantMapping[variant]) ||
         "span";
-      const classes = useUtilityClasses$1(ownerState);
+      const classes = useUtilityClasses(ownerState);
       return /*#__PURE__*/ jsxRuntimeExports.jsx(
         TypographyRoot,
         _extends$2(
@@ -46992,622 +45240,6 @@ Please use another name.`);
     ]),
   };
   var Box$1 = Box;
-
-  function getButtonUtilityClass(slot) {
-    return generateUtilityClass("MuiButton", slot);
-  }
-  const buttonClasses = generateUtilityClasses("MuiButton", [
-    "root",
-    "text",
-    "textInherit",
-    "textPrimary",
-    "textSecondary",
-    "textSuccess",
-    "textError",
-    "textInfo",
-    "textWarning",
-    "outlined",
-    "outlinedInherit",
-    "outlinedPrimary",
-    "outlinedSecondary",
-    "outlinedSuccess",
-    "outlinedError",
-    "outlinedInfo",
-    "outlinedWarning",
-    "contained",
-    "containedInherit",
-    "containedPrimary",
-    "containedSecondary",
-    "containedSuccess",
-    "containedError",
-    "containedInfo",
-    "containedWarning",
-    "disableElevation",
-    "focusVisible",
-    "disabled",
-    "colorInherit",
-    "textSizeSmall",
-    "textSizeMedium",
-    "textSizeLarge",
-    "outlinedSizeSmall",
-    "outlinedSizeMedium",
-    "outlinedSizeLarge",
-    "containedSizeSmall",
-    "containedSizeMedium",
-    "containedSizeLarge",
-    "sizeMedium",
-    "sizeSmall",
-    "sizeLarge",
-    "fullWidth",
-    "startIcon",
-    "endIcon",
-    "iconSizeSmall",
-    "iconSizeMedium",
-    "iconSizeLarge",
-  ]);
-  var buttonClasses$1 = buttonClasses;
-
-  /**
-   * @ignore - internal component.
-   */
-  const ButtonGroupContext = /*#__PURE__*/ reactExports.createContext({});
-  {
-    ButtonGroupContext.displayName = "ButtonGroupContext";
-  }
-  var ButtonGroupContext$1 = ButtonGroupContext;
-
-  /**
-   * @ignore - internal component.
-   */
-  const ButtonGroupButtonContext =
-    /*#__PURE__*/ reactExports.createContext(undefined);
-  {
-    ButtonGroupButtonContext.displayName = "ButtonGroupButtonContext";
-  }
-  var ButtonGroupButtonContext$1 = ButtonGroupButtonContext;
-
-  const _excluded = [
-    "children",
-    "color",
-    "component",
-    "className",
-    "disabled",
-    "disableElevation",
-    "disableFocusRipple",
-    "endIcon",
-    "focusVisibleClassName",
-    "fullWidth",
-    "size",
-    "startIcon",
-    "type",
-    "variant",
-  ];
-  const useUtilityClasses = (ownerState) => {
-    const { color, disableElevation, fullWidth, size, variant, classes } =
-      ownerState;
-    const slots = {
-      root: [
-        "root",
-        variant,
-        `${variant}${capitalize$1(color)}`,
-        `size${capitalize$1(size)}`,
-        `${variant}Size${capitalize$1(size)}`,
-        color === "inherit" && "colorInherit",
-        disableElevation && "disableElevation",
-        fullWidth && "fullWidth",
-      ],
-      label: ["label"],
-      startIcon: ["startIcon", `iconSize${capitalize$1(size)}`],
-      endIcon: ["endIcon", `iconSize${capitalize$1(size)}`],
-    };
-    const composedClasses = composeClasses(
-      slots,
-      getButtonUtilityClass,
-      classes,
-    );
-    return _extends$2({}, classes, composedClasses);
-  };
-  const commonIconStyles = (ownerState) =>
-    _extends$2(
-      {},
-      ownerState.size === "small" && {
-        "& > *:nth-of-type(1)": {
-          fontSize: 18,
-        },
-      },
-      ownerState.size === "medium" && {
-        "& > *:nth-of-type(1)": {
-          fontSize: 20,
-        },
-      },
-      ownerState.size === "large" && {
-        "& > *:nth-of-type(1)": {
-          fontSize: 22,
-        },
-      },
-    );
-  const ButtonRoot = styled$1(ButtonBase$1, {
-    shouldForwardProp: (prop) =>
-      rootShouldForwardProp(prop) || prop === "classes",
-    name: "MuiButton",
-    slot: "Root",
-    overridesResolver: (props, styles) => {
-      const { ownerState } = props;
-      return [
-        styles.root,
-        styles[ownerState.variant],
-        styles[`${ownerState.variant}${capitalize$1(ownerState.color)}`],
-        styles[`size${capitalize$1(ownerState.size)}`],
-        styles[`${ownerState.variant}Size${capitalize$1(ownerState.size)}`],
-        ownerState.color === "inherit" && styles.colorInherit,
-        ownerState.disableElevation && styles.disableElevation,
-        ownerState.fullWidth && styles.fullWidth,
-      ];
-    },
-  })(
-    ({ theme, ownerState }) => {
-      var _theme$palette$getCon, _theme$palette;
-      const inheritContainedBackgroundColor =
-        theme.palette.mode === "light"
-          ? theme.palette.grey[300]
-          : theme.palette.grey[800];
-      const inheritContainedHoverBackgroundColor =
-        theme.palette.mode === "light"
-          ? theme.palette.grey.A100
-          : theme.palette.grey[700];
-      return _extends$2(
-        {},
-        theme.typography.button,
-        {
-          minWidth: 64,
-          padding: "6px 16px",
-          borderRadius: (theme.vars || theme).shape.borderRadius,
-          transition: theme.transitions.create(
-            ["background-color", "box-shadow", "border-color", "color"],
-            {
-              duration: theme.transitions.duration.short,
-            },
-          ),
-          "&:hover": _extends$2(
-            {
-              textDecoration: "none",
-              backgroundColor: theme.vars
-                ? `rgba(${theme.vars.palette.text.primaryChannel} / ${theme.vars.palette.action.hoverOpacity})`
-                : alpha_1(
-                    theme.palette.text.primary,
-                    theme.palette.action.hoverOpacity,
-                  ),
-              // Reset on touch devices, it doesn't add specificity
-              "@media (hover: none)": {
-                backgroundColor: "transparent",
-              },
-            },
-            ownerState.variant === "text" &&
-              ownerState.color !== "inherit" && {
-                backgroundColor: theme.vars
-                  ? `rgba(${theme.vars.palette[ownerState.color].mainChannel} / ${theme.vars.palette.action.hoverOpacity})`
-                  : alpha_1(
-                      theme.palette[ownerState.color].main,
-                      theme.palette.action.hoverOpacity,
-                    ),
-                // Reset on touch devices, it doesn't add specificity
-                "@media (hover: none)": {
-                  backgroundColor: "transparent",
-                },
-              },
-            ownerState.variant === "outlined" &&
-              ownerState.color !== "inherit" && {
-                border: `1px solid ${(theme.vars || theme).palette[ownerState.color].main}`,
-                backgroundColor: theme.vars
-                  ? `rgba(${theme.vars.palette[ownerState.color].mainChannel} / ${theme.vars.palette.action.hoverOpacity})`
-                  : alpha_1(
-                      theme.palette[ownerState.color].main,
-                      theme.palette.action.hoverOpacity,
-                    ),
-                // Reset on touch devices, it doesn't add specificity
-                "@media (hover: none)": {
-                  backgroundColor: "transparent",
-                },
-              },
-            ownerState.variant === "contained" && {
-              backgroundColor: theme.vars
-                ? theme.vars.palette.Button.inheritContainedHoverBg
-                : inheritContainedHoverBackgroundColor,
-              boxShadow: (theme.vars || theme).shadows[4],
-              // Reset on touch devices, it doesn't add specificity
-              "@media (hover: none)": {
-                boxShadow: (theme.vars || theme).shadows[2],
-                backgroundColor: (theme.vars || theme).palette.grey[300],
-              },
-            },
-            ownerState.variant === "contained" &&
-              ownerState.color !== "inherit" && {
-                backgroundColor: (theme.vars || theme).palette[ownerState.color]
-                  .dark,
-                // Reset on touch devices, it doesn't add specificity
-                "@media (hover: none)": {
-                  backgroundColor: (theme.vars || theme).palette[
-                    ownerState.color
-                  ].main,
-                },
-              },
-          ),
-          "&:active": _extends$2(
-            {},
-            ownerState.variant === "contained" && {
-              boxShadow: (theme.vars || theme).shadows[8],
-            },
-          ),
-          [`&.${buttonClasses$1.focusVisible}`]: _extends$2(
-            {},
-            ownerState.variant === "contained" && {
-              boxShadow: (theme.vars || theme).shadows[6],
-            },
-          ),
-          [`&.${buttonClasses$1.disabled}`]: _extends$2(
-            {
-              color: (theme.vars || theme).palette.action.disabled,
-            },
-            ownerState.variant === "outlined" && {
-              border: `1px solid ${(theme.vars || theme).palette.action.disabledBackground}`,
-            },
-            ownerState.variant === "contained" && {
-              color: (theme.vars || theme).palette.action.disabled,
-              boxShadow: (theme.vars || theme).shadows[0],
-              backgroundColor: (theme.vars || theme).palette.action
-                .disabledBackground,
-            },
-          ),
-        },
-        ownerState.variant === "text" && {
-          padding: "6px 8px",
-        },
-        ownerState.variant === "text" &&
-          ownerState.color !== "inherit" && {
-            color: (theme.vars || theme).palette[ownerState.color].main,
-          },
-        ownerState.variant === "outlined" && {
-          padding: "5px 15px",
-          border: "1px solid currentColor",
-        },
-        ownerState.variant === "outlined" &&
-          ownerState.color !== "inherit" && {
-            color: (theme.vars || theme).palette[ownerState.color].main,
-            border: theme.vars
-              ? `1px solid rgba(${theme.vars.palette[ownerState.color].mainChannel} / 0.5)`
-              : `1px solid ${alpha_1(theme.palette[ownerState.color].main, 0.5)}`,
-          },
-        ownerState.variant === "contained" && {
-          color: theme.vars
-            ? // this is safe because grey does not change between default light/dark mode
-              theme.vars.palette.text.primary
-            : (_theme$palette$getCon = (_theme$palette = theme.palette)
-                  .getContrastText) == null
-              ? void 0
-              : _theme$palette$getCon.call(
-                  _theme$palette,
-                  theme.palette.grey[300],
-                ),
-          backgroundColor: theme.vars
-            ? theme.vars.palette.Button.inheritContainedBg
-            : inheritContainedBackgroundColor,
-          boxShadow: (theme.vars || theme).shadows[2],
-        },
-        ownerState.variant === "contained" &&
-          ownerState.color !== "inherit" && {
-            color: (theme.vars || theme).palette[ownerState.color].contrastText,
-            backgroundColor: (theme.vars || theme).palette[ownerState.color]
-              .main,
-          },
-        ownerState.color === "inherit" && {
-          color: "inherit",
-          borderColor: "currentColor",
-        },
-        ownerState.size === "small" &&
-          ownerState.variant === "text" && {
-            padding: "4px 5px",
-            fontSize: theme.typography.pxToRem(13),
-          },
-        ownerState.size === "large" &&
-          ownerState.variant === "text" && {
-            padding: "8px 11px",
-            fontSize: theme.typography.pxToRem(15),
-          },
-        ownerState.size === "small" &&
-          ownerState.variant === "outlined" && {
-            padding: "3px 9px",
-            fontSize: theme.typography.pxToRem(13),
-          },
-        ownerState.size === "large" &&
-          ownerState.variant === "outlined" && {
-            padding: "7px 21px",
-            fontSize: theme.typography.pxToRem(15),
-          },
-        ownerState.size === "small" &&
-          ownerState.variant === "contained" && {
-            padding: "4px 10px",
-            fontSize: theme.typography.pxToRem(13),
-          },
-        ownerState.size === "large" &&
-          ownerState.variant === "contained" && {
-            padding: "8px 22px",
-            fontSize: theme.typography.pxToRem(15),
-          },
-        ownerState.fullWidth && {
-          width: "100%",
-        },
-      );
-    },
-    ({ ownerState }) =>
-      ownerState.disableElevation && {
-        boxShadow: "none",
-        "&:hover": {
-          boxShadow: "none",
-        },
-        [`&.${buttonClasses$1.focusVisible}`]: {
-          boxShadow: "none",
-        },
-        "&:active": {
-          boxShadow: "none",
-        },
-        [`&.${buttonClasses$1.disabled}`]: {
-          boxShadow: "none",
-        },
-      },
-  );
-  const ButtonStartIcon = styled$1("span", {
-    name: "MuiButton",
-    slot: "StartIcon",
-    overridesResolver: (props, styles) => {
-      const { ownerState } = props;
-      return [
-        styles.startIcon,
-        styles[`iconSize${capitalize$1(ownerState.size)}`],
-      ];
-    },
-  })(({ ownerState }) =>
-    _extends$2(
-      {
-        display: "inherit",
-        marginRight: 8,
-        marginLeft: -4,
-      },
-      ownerState.size === "small" && {
-        marginLeft: -2,
-      },
-      commonIconStyles(ownerState),
-    ),
-  );
-  const ButtonEndIcon = styled$1("span", {
-    name: "MuiButton",
-    slot: "EndIcon",
-    overridesResolver: (props, styles) => {
-      const { ownerState } = props;
-      return [
-        styles.endIcon,
-        styles[`iconSize${capitalize$1(ownerState.size)}`],
-      ];
-    },
-  })(({ ownerState }) =>
-    _extends$2(
-      {
-        display: "inherit",
-        marginRight: -4,
-        marginLeft: 8,
-      },
-      ownerState.size === "small" && {
-        marginRight: -2,
-      },
-      commonIconStyles(ownerState),
-    ),
-  );
-  const Button = /*#__PURE__*/ reactExports.forwardRef(
-    function Button(inProps, ref) {
-      // props priority: `inProps` > `contextProps` > `themeDefaultProps`
-      const contextProps = reactExports.useContext(ButtonGroupContext$1);
-      const buttonGroupButtonContextPositionClassName = reactExports.useContext(
-        ButtonGroupButtonContext$1,
-      );
-      const resolvedProps = resolveProps(contextProps, inProps);
-      const props = useThemeProps({
-        props: resolvedProps,
-        name: "MuiButton",
-      });
-      const {
-          children,
-          color = "primary",
-          component = "button",
-          className,
-          disabled = false,
-          disableElevation = false,
-          disableFocusRipple = false,
-          endIcon: endIconProp,
-          focusVisibleClassName,
-          fullWidth = false,
-          size = "medium",
-          startIcon: startIconProp,
-          type,
-          variant = "text",
-        } = props,
-        other = _objectWithoutPropertiesLoose$1(props, _excluded);
-      const ownerState = _extends$2({}, props, {
-        color,
-        component,
-        disabled,
-        disableElevation,
-        disableFocusRipple,
-        fullWidth,
-        size,
-        type,
-        variant,
-      });
-      const classes = useUtilityClasses(ownerState);
-      const startIcon =
-        startIconProp &&
-        /*#__PURE__*/ jsxRuntimeExports.jsx(ButtonStartIcon, {
-          className: classes.startIcon,
-          ownerState: ownerState,
-          children: startIconProp,
-        });
-      const endIcon =
-        endIconProp &&
-        /*#__PURE__*/ jsxRuntimeExports.jsx(ButtonEndIcon, {
-          className: classes.endIcon,
-          ownerState: ownerState,
-          children: endIconProp,
-        });
-      const positionClassName = buttonGroupButtonContextPositionClassName || "";
-      return /*#__PURE__*/ jsxRuntimeExports.jsxs(
-        ButtonRoot,
-        _extends$2(
-          {
-            ownerState: ownerState,
-            className: clsx(
-              contextProps.className,
-              classes.root,
-              className,
-              positionClassName,
-            ),
-            component: component,
-            disabled: disabled,
-            focusRipple: !disableFocusRipple,
-            focusVisibleClassName: clsx(
-              classes.focusVisible,
-              focusVisibleClassName,
-            ),
-            ref: ref,
-            type: type,
-          },
-          other,
-          {
-            classes: classes,
-            children: [startIcon, children, endIcon],
-          },
-        ),
-      );
-    },
-  );
-  Button.propTypes /* remove-proptypes */ = {
-    // ┌────────────────────────────── Warning ──────────────────────────────┐
-    // │ These PropTypes are generated from the TypeScript type definitions. │
-    // │    To update them, edit the d.ts file and run `pnpm proptypes`.     │
-    // └─────────────────────────────────────────────────────────────────────┘
-    /**
-     * The content of the component.
-     */
-    children: PropTypes.node,
-    /**
-     * Override or extend the styles applied to the component.
-     */
-    classes: PropTypes.object,
-    /**
-     * @ignore
-     */
-    className: PropTypes.string,
-    /**
-     * The color of the component.
-     * It supports both default and custom theme colors, which can be added as shown in the
-     * [palette customization guide](https://mui.com/material-ui/customization/palette/#custom-colors).
-     * @default 'primary'
-     */
-    color: PropTypes /* @typescript-to-proptypes-ignore */.oneOfType([
-      PropTypes.oneOf([
-        "inherit",
-        "primary",
-        "secondary",
-        "success",
-        "error",
-        "info",
-        "warning",
-      ]),
-      PropTypes.string,
-    ]),
-    /**
-     * The component used for the root node.
-     * Either a string to use a HTML element or a component.
-     */
-    component: PropTypes.elementType,
-    /**
-     * If `true`, the component is disabled.
-     * @default false
-     */
-    disabled: PropTypes.bool,
-    /**
-     * If `true`, no elevation is used.
-     * @default false
-     */
-    disableElevation: PropTypes.bool,
-    /**
-     * If `true`, the  keyboard focus ripple is disabled.
-     * @default false
-     */
-    disableFocusRipple: PropTypes.bool,
-    /**
-     * If `true`, the ripple effect is disabled.
-     *
-     * ⚠️ Without a ripple there is no styling for :focus-visible by default. Be sure
-     * to highlight the element by applying separate styles with the `.Mui-focusVisible` class.
-     * @default false
-     */
-    disableRipple: PropTypes.bool,
-    /**
-     * Element placed after the children.
-     */
-    endIcon: PropTypes.node,
-    /**
-     * @ignore
-     */
-    focusVisibleClassName: PropTypes.string,
-    /**
-     * If `true`, the button will take up the full width of its container.
-     * @default false
-     */
-    fullWidth: PropTypes.bool,
-    /**
-     * The URL to link to when the button is clicked.
-     * If defined, an `a` element will be used as the root node.
-     */
-    href: PropTypes.string,
-    /**
-     * The size of the component.
-     * `small` is equivalent to the dense button styling.
-     * @default 'medium'
-     */
-    size: PropTypes /* @typescript-to-proptypes-ignore */.oneOfType([
-      PropTypes.oneOf(["small", "medium", "large"]),
-      PropTypes.string,
-    ]),
-    /**
-     * Element placed before the children.
-     */
-    startIcon: PropTypes.node,
-    /**
-     * The system prop that allows defining system overrides as well as additional CSS styles.
-     */
-    sx: PropTypes.oneOfType([
-      PropTypes.arrayOf(
-        PropTypes.oneOfType([PropTypes.func, PropTypes.object, PropTypes.bool]),
-      ),
-      PropTypes.func,
-      PropTypes.object,
-    ]),
-    /**
-     * @ignore
-     */
-    type: PropTypes.oneOfType([
-      PropTypes.oneOf(["button", "reset", "submit"]),
-      PropTypes.string,
-    ]),
-    /**
-     * The variant to use.
-     * @default 'text'
-     */
-    variant: PropTypes /* @typescript-to-proptypes-ignore */.oneOfType([
-      PropTypes.oneOf(["contained", "outlined", "text"]),
-      PropTypes.string,
-    ]),
-  };
-  var Button$1 = Button;
 
   styled$1(Box$1)({
     display: "flex",
@@ -48017,622 +45649,7 @@ Please use another name.`);
     );
   };
 
-  const ActionContext = /*#__PURE__*/ reactExports.createContext({
-    handlePlayerJoin: () => {},
-    handlePlayerLeave: () => {},
-    handlePlayerSubmitRealname: () => {},
-    handleHostStartGame: () => {},
-    handleHostSkipInstructions: () => {},
-    handleMafiaSelection: () => {},
-    handleMafiaVote: () => {},
-    handleDetectiveIdentification: () => {},
-    handleAngelProtection: () => {},
-    handleCivilianTriviaFinish: () => {},
-    handleAccusation: () => {},
-    handleLifeDeathSelection: () => {},
-    handleLifeDeathVote: () => {},
-    handleProgressToWelcomePage: () => {},
-    handleProgressToAreYouReadyPage: () => {},
-    handleProgressToLookAtYourPhonePage: () => {},
-    handleProgressToInstructionsPage: () => {},
-    handleProgressToNighttimePage: () => {},
-    handleProgressToNighttimeTimerPage: () => {},
-    handleProgressToNightOverPage: () => {},
-    handleProgressToStoryPage: () => {},
-    handleProgressToPostStoryPage: () => {},
-    handleProgressToAccusationTimerPage: () => {},
-    handleProgressToAccusedPage: () => {},
-    handleProgressToVotingPage: () => {},
-    handleProgressToVotingTimerPage: () => {},
-    handleProgressToVotingResultsPage: () => {},
-    handleTransitionFromVotingResultsPage: () => {},
-    handleProgressToGameOverPage: () => {},
-  });
-  const ActionProvider = ({ children }) => {
-    const {
-      setPage,
-      players,
-      setPlayers,
-      setMafia,
-      setDetective,
-      setAngel,
-      setCivilians,
-      currentMafiaSelections,
-      setCurrentMafiaSelections,
-      currentMafiaVotes,
-      setCurrentMafiaVotes,
-      detectiveIdentifications,
-      setDetectiveIdentifications,
-      setCurrentDetectiveIdentification,
-      currentAngelProtection,
-      setCurrentAngelProtection,
-      currentCivilianTriviaFinishes,
-      setCurrentCivilianTriviaFinishes,
-      currentAccusations,
-      setCurrentAccusations,
-      currentLifeDeathSelections,
-      setCurrentLifeDeathSelections,
-      currentLifeDeathVotes,
-      setCurrentLifeDeathVotes,
-      setNighttimeTimer,
-      setCurrentKill,
-      setAccusationTimer,
-      recentlyAccused,
-      setRecentlyAccused,
-      setVotingTimer,
-    } = reactExports.useContext(VariableContext);
-    const introAudioRef = reactExports.useRef(
-      new Audio("./assets/Introloop.wav"),
-    );
-    const handlePlayerJoin = (gamername) => {
-      // create a new player info object, with the gamername
-      const newPlayer = {
-        gamername,
-        realname: "",
-        role: "civilian",
-        isAlive: true,
-        isHost: players.length === 0,
-      };
-      // add the new player to the players array
-      setPlayers([...players, newPlayer]);
-    };
-    const handlePlayerLeave = () => {
-      // remove the player from the players array
-      // TODO
-      // evaluate if the game is over
-      // TODO
-    };
-    const handlePlayerSubmitRealname = (gamername, realname) => {
-      const bellAudio = new Audio("./assets/death-bell.wav");
-      bellAudio.volume = 0.25;
-      bellAudio.play();
-      // if realname is already taken, add a number to the end of the realname
-      const realnames = players.map((player) => player.realname);
-      if (realnames.includes(realname)) {
-        let i = 1;
-        while (realnames.includes(realname + i)) {
-          i++;
-        }
-        realname += i;
-      }
-      // update the player's realname
-      const newPlayers = players.map((player) => {
-        if (player.gamername === gamername) {
-          player.realname = realname;
-        }
-        return player;
-      });
-      setPlayers(newPlayers);
-    };
-    const handleHostStartGame = () => {
-      // assign roles
-      const roles = getRoles(players.length);
-      // keep track of the roles
-      const mafia = [];
-      let detective = null;
-      let angel = null;
-      const civilians = [];
-      // assign the roles to the players
-      const newPlayers = players.map((player, index) => {
-        player.role = roles[index];
-        if (player.role === "mafia") {
-          mafia.push(player);
-        } else if (player.role === "detective") {
-          detective = player;
-        } else if (player.role === "angel") {
-          angel = player;
-        } else {
-          civilians.push(player);
-        }
-        return player;
-      });
-      setPlayers(newPlayers);
-      setMafia(mafia);
-      setDetective(detective);
-      setAngel(angel);
-      setCivilians(civilians);
-      // advance to welcome page
-      handleProgressToWelcomePage();
-    };
-    const handleHostSkipInstructions = () => {
-      // advance to nighttime page
-      handleProgressToNighttimePage();
-    };
-    const handleMafiaSelection = (mafiaGamername, targetGamername) => {
-      const mafiaPlayer = players.find(
-        (player) => player.gamername === mafiaGamername,
-      );
-      const targetPlayer = players.find(
-        (player) => player.gamername === targetGamername,
-      );
-      if (!mafiaPlayer || !targetPlayer) {
-        return;
-      }
-      const currentMafiaSelection = currentMafiaSelections.find(
-        (selection) => selection.player === mafiaPlayer,
-      );
-      // if mafia member has not selected a target, add the target to the currentMafiaSelections array
-      if (!currentMafiaSelection) {
-        setCurrentMafiaSelections([
-          ...currentMafiaSelections,
-          {
-            player: mafiaPlayer,
-            target: targetPlayer,
-          },
-        ]);
-      }
-      // if mafia member has selected a target and this target is different from the previous target, update the target in the currentMafiaSelections array
-      else if (currentMafiaSelection.target !== targetPlayer) {
-        setCurrentMafiaSelections(
-          currentMafiaSelections.map((selection) => {
-            if (selection.player === mafiaPlayer) {
-              selection.target = targetPlayer;
-            }
-            return selection;
-          }),
-        );
-      }
-      // if mafia member has selected a target and this target is the same as the previous target, remove the target from the currentMafiaSelections array
-      else {
-        setCurrentMafiaSelections(
-          currentMafiaSelections.filter(
-            (selection) => selection.player !== mafiaPlayer,
-          ),
-        );
-      }
-    };
-    const handleMafiaVote = (mafiaGamername, targetGamername) => {
-      const mafiaPlayer = players.find(
-        (player) => player.gamername === mafiaGamername,
-      );
-      const targetPlayer = players.find(
-        (player) => player.gamername === targetGamername,
-      );
-      if (!mafiaPlayer || !targetPlayer) {
-        return;
-      }
-      const currentMafiaVote = currentMafiaVotes.find(
-        (selection) => selection.player === mafiaPlayer,
-      );
-      // if mafia member has not voted, add the vote to the currentMafiaVotes array
-      if (!currentMafiaVote) {
-        setCurrentMafiaVotes([
-          ...currentMafiaVotes,
-          {
-            player: mafiaPlayer,
-            target: targetPlayer,
-          },
-        ]);
-      }
-      // remove the vote from the currentMafiaSelections array
-      setCurrentMafiaSelections(
-        currentMafiaSelections.filter(
-          (selection) => selection.player !== mafiaPlayer,
-        ),
-      );
-      // TODO: check if night is over
-    };
-    const handleDetectiveIdentification = (targetGamername) => {
-      // find the detective
-      const detective = players.find((player) => player.role === "detective");
-      // find the target
-      const target = players.find(
-        (player) => player.gamername === targetGamername,
-      );
-      // if the detective and target are found, add the identification to the detectiveIdentifications array
-      if (!detective || !target) {
-        return;
-      }
-      setDetectiveIdentifications([
-        ...detectiveIdentifications,
-        {
-          player: detective,
-          target,
-        },
-      ]);
-      setCurrentDetectiveIdentification({
-        player: detective,
-        target,
-      });
-      // TODO: check if night is over
-    };
-    const handleAngelProtection = (targetGamername) => {
-      // find the angel
-      const angel = players.find((player) => player.role === "angel");
-      // find the target
-      const target = players.find(
-        (player) => player.gamername === targetGamername,
-      );
-      // if the angel and target are found, update the currentAngelProtection
-      if (!angel || !target) {
-        return;
-      }
-      setCurrentAngelProtection({
-        player: angel,
-        target,
-      });
-      // TODO: check if night is over
-    };
-    const handleCivilianTriviaFinish = (gamername) => {
-      // find the player
-      const player = players.find((player) => player.gamername === gamername);
-      // if the player is found, add the player to the currentCivilianTriviaFinishes array
-      if (!player) {
-        return;
-      }
-      setCurrentCivilianTriviaFinishes([
-        ...currentCivilianTriviaFinishes,
-        player,
-      ]);
-      // TODO: check if night is over
-    };
-    const handleAccusation = (accuserGamername, targetGamername) => {
-      // find the accuser
-      const accuser = players.find(
-        (player) => player.gamername === accuserGamername,
-      );
-      // find the target
-      const target = players.find(
-        (player) => player.gamername === targetGamername,
-      );
-      // if the accuser and target are found, add the accusation to the currentAccusations array
-      if (!accuser || !target) {
-        return;
-      }
-      setCurrentAccusations([
-        ...currentAccusations,
-        {
-          player: accuser,
-          target,
-        },
-      ]);
-      // TODO: check if accusations are over
-    };
-    const handleLifeDeathSelection = (voterGamername, vote) => {
-      // find the voter
-      const voter = players.find(
-        (player) => player.gamername === voterGamername,
-      );
-      // if the voter is found, add the vote to the currentLifeDeathSelections array
-      if (!voter) {
-        return;
-      }
-      // get the current vote
-      const currentVote = currentLifeDeathSelections.find(
-        (vote) => vote.player === voter,
-      );
-      // if the voter has not voted, add the vote to the currentLifeDeathSelections array
-      if (!currentVote) {
-        setCurrentLifeDeathSelections([
-          ...currentLifeDeathSelections,
-          {
-            player: voter,
-            vote,
-          },
-        ]);
-      }
-      // if the voter has voted and this vote is different from the previous vote, update the vote in the currentLifeDeathSelections array
-      else if (currentVote.vote !== vote) {
-        setCurrentLifeDeathSelections(
-          currentLifeDeathSelections.map((playerVote) => {
-            if (playerVote.player === voter) {
-              playerVote.vote = vote;
-            }
-            return playerVote;
-          }),
-        );
-      }
-      // if the voter has voted and this vote is the same as the previous vote, remove the vote from the currentLifeDeathSelections array
-      else {
-        setCurrentLifeDeathSelections(
-          currentLifeDeathSelections.filter(
-            (playerVote) => playerVote.player !== voter,
-          ),
-        );
-      }
-    };
-    const handleLifeDeathVote = (voterGamername, vote) => {
-      // find the voter
-      const voter = players.find(
-        (player) => player.gamername === voterGamername,
-      );
-      // if the voter is found, add the vote to the currentLifeDeathVotes array
-      if (!voter) {
-        return;
-      }
-      // get the current vote
-      const currentVote = currentLifeDeathVotes.find(
-        (vote) => vote.player === voter,
-      );
-      // if the voter has not voted, add the vote to the currentLifeDeathVotes array
-      if (!currentVote) {
-        setCurrentLifeDeathVotes([
-          ...currentLifeDeathVotes,
-          {
-            player: voter,
-            vote,
-          },
-        ]);
-      }
-      // remove the vote from the currentLifeDeathSelections array
-      setCurrentLifeDeathSelections(
-        currentLifeDeathSelections.filter(
-          (playerVote) => playerVote.player !== voter,
-        ),
-      );
-    };
-    const handleProgressToWelcomePage = () => {
-      // play the intro audio
-      introAudioRef.current.play();
-      // set the page to WELCOME
-      setPage(WELCOME$1);
-    };
-    const handleProgressToAreYouReadyPage = () => {
-      // set the page to YOU_READY
-      setPage(YOU_READY$1);
-    };
-    const handleProgressToLookAtYourPhonePage = () => {
-      // set the page to REVEAL_IDENTITY
-      setPage(REVEAL_IDENTITY$1);
-    };
-    const handleProgressToInstructionsPage = () => {
-      // stop the intro audio
-      introAudioRef.current.pause();
-      // reset the intro audio
-      introAudioRef.current.currentTime = 0;
-      // play the intro audio again
-      introAudioRef.current.play();
-      // set the page to INSTRUCTIONS
-      setPage(INSTRUCTIONS$1);
-    };
-    const handleProgressToNighttimePage = () => {
-      // pause the intro audio
-      introAudioRef.current.pause();
-      // reset the currentMafiaSelections array
-      setCurrentMafiaSelections([]);
-      // reset the currentMafiaVotes array
-      setCurrentMafiaVotes([]);
-      // reset the currentKill
-      setCurrentKill(null);
-      // reset the currentDetectiveIdentification
-      setCurrentDetectiveIdentification(null);
-      // reset the currentAngelProtection
-      setCurrentAngelProtection(null);
-      // reset the currentCivilianTriviaFinishes array
-      setCurrentCivilianTriviaFinishes([]);
-      // set the page to NIGHTTIME
-      setPage(NIGHTTIME$1);
-    };
-    const handleProgressToNighttimeTimerPage = () => {
-      // reset the nighttimeTimer
-      setNighttimeTimer(120);
-      // set the page to NIGHTTIME_TIMER
-      setPage(NIGHTTIME_TIMER$1);
-    };
-    const handleProgressToNightOverPage = () => {
-      // set the page to NIGHT_OVER
-      setPage(NIGHT_OVER$1);
-    };
-    const handleProgressToStoryPage = () => {
-      // decide on the player to die
-      // this is determined by the mafia votes
-      // whoever has the most votes dies
-      // if there is a tie, select randomly from the tied players
-      const voteCounts = {};
-      currentMafiaVotes.forEach((vote) => {
-        voteCounts[vote.target.gamername] =
-          (voteCounts[vote.target.gamername] || 0) + 1;
-      });
-      const maxVotes = Math.max(...Object.values(voteCounts));
-      const playersWithMaxVotes = Object.keys(voteCounts).filter(
-        (gamername) => voteCounts[gamername] === maxVotes,
-      );
-      const randomIndex = Math.floor(
-        Math.random() * playersWithMaxVotes.length,
-      );
-      const playerToDie = players.find(
-        (player) => player.gamername === playersWithMaxVotes[randomIndex],
-      );
-      if (!playerToDie) {
-        return;
-      }
-      // update the player's isAlive status
-      if (playerToDie) {
-        playerToDie.isAlive = false;
-      }
-      // set the currentKill
-      setCurrentKill(playerToDie);
-      // set the page to STORY
-      setPage(STORY$1);
-    };
-    const handleProgressToPostStoryPage = () => {
-      // reset the accusationTimer
-      setAccusationTimer(300);
-      // reset the recentlyAccused
-      setRecentlyAccused(null);
-      // set the page to POST_STORY_2
-      setPage(POST_STORY_2$1);
-    };
-    const handleProgressToAccusationTimerPage = () => {
-      // reset currentAccusations
-      setCurrentAccusations([]);
-      // reset currentLifeDeathSelections
-      setCurrentLifeDeathSelections([]);
-      // reset currentLifeDeathVotes
-      setCurrentLifeDeathVotes([]);
-    };
-    const handleProgressToAccusedPage = () => {
-      // set the page to ACCUSED
-      setPage(ACCUSED$1);
-    };
-    const handleProgressToVotingPage = () => {
-      // set the page to VOTING
-      setPage(VOTING$1);
-    };
-    const handleProgressToVotingTimerPage = () => {
-      // reset the votingTimer
-      setVotingTimer(300);
-      // set the page to VOTING_TIMER
-      setPage(VOTING_TIMER$1);
-    };
-    const handleProgressToVotingResultsPage = () => {
-      // set the page to VOTING_RESULTS
-      setPage(VOTING_RESULTS$1);
-    };
-    const handleTransitionFromVotingResultsPage = () => {
-      // check if player lives or dies
-      const votesToLive = currentLifeDeathVotes.filter(
-        (vote) => vote.vote === "live",
-      ).length;
-      const votesToDie = currentLifeDeathVotes.filter(
-        (vote) => vote.vote === "die",
-      ).length;
-      if (votesToDie > votesToLive) {
-        // the player dies
-        const newPlayers = players.map((player) => {
-          if (player.gamername === recentlyAccused?.gamername) {
-            player.isAlive = false;
-          }
-          return player;
-        });
-        setPlayers(newPlayers);
-        // TODO: check if game is over
-      } else {
-        handleProgressToAccusationTimerPage();
-      }
-    };
-    const handleProgressToGameOverPage = () => {
-      // set the page to GAME_OVER
-      setPage(GAME_OVER$1);
-    };
-    const actions = reactExports.useMemo(
-      () => ({
-        handlePlayerJoin,
-        handlePlayerLeave,
-        handlePlayerSubmitRealname,
-        handleHostStartGame,
-        handleHostSkipInstructions,
-        handleMafiaSelection,
-        handleMafiaVote,
-        handleDetectiveIdentification,
-        handleAngelProtection,
-        handleCivilianTriviaFinish,
-        handleAccusation,
-        handleLifeDeathSelection,
-        handleLifeDeathVote,
-        handleProgressToWelcomePage,
-        handleProgressToAreYouReadyPage,
-        handleProgressToLookAtYourPhonePage,
-        handleProgressToInstructionsPage,
-        handleProgressToNighttimePage,
-        handleProgressToNighttimeTimerPage,
-        handleProgressToNightOverPage,
-        handleProgressToStoryPage,
-        handleProgressToPostStoryPage,
-        handleProgressToAccusationTimerPage,
-        handleProgressToAccusedPage,
-        handleProgressToVotingPage,
-        handleProgressToVotingTimerPage,
-        handleProgressToVotingResultsPage,
-        handleTransitionFromVotingResultsPage,
-        handleProgressToGameOverPage,
-      }),
-      [
-        handlePlayerJoin,
-        handlePlayerLeave,
-        handlePlayerSubmitRealname,
-        handleHostStartGame,
-        handleHostSkipInstructions,
-        handleMafiaSelection,
-        handleMafiaVote,
-        handleDetectiveIdentification,
-        handleAngelProtection,
-        handleCivilianTriviaFinish,
-        handleAccusation,
-        handleLifeDeathSelection,
-        handleLifeDeathVote,
-        handleProgressToWelcomePage,
-        handleProgressToAreYouReadyPage,
-        handleProgressToLookAtYourPhonePage,
-        handleProgressToInstructionsPage,
-        handleProgressToNighttimePage,
-        handleProgressToNighttimeTimerPage,
-        handleProgressToNightOverPage,
-        handleProgressToStoryPage,
-        handleProgressToPostStoryPage,
-        handleProgressToAccusationTimerPage,
-        handleProgressToAccusedPage,
-        handleProgressToVotingPage,
-        handleProgressToVotingTimerPage,
-        handleProgressToVotingResultsPage,
-        handleTransitionFromVotingResultsPage,
-        handleProgressToGameOverPage,
-      ],
-    );
-    return /*#__PURE__*/ React.createElement(
-      ActionContext.Provider,
-      {
-        value: actions,
-      },
-      children,
-    );
-  };
-  const getRoles = (numPlayers) => {
-    const roles = [];
-    for (let i = 0; i < numPlayers; i++) {
-      if (i === 0) {
-        roles.push("detective");
-      } else if (i === 1) {
-        roles.push("angel");
-      } else if (i % 4 === 2) {
-        roles.push("mafia");
-      } else {
-        roles.push("civilian");
-      }
-    }
-    return shuffle(roles);
-  };
-  const shuffle = (array) => {
-    let currentIndex = array.length,
-      randomIndex;
-    while (currentIndex !== 0) {
-      randomIndex = Math.floor(Math.random() * currentIndex);
-      currentIndex--;
-      [array[currentIndex], array[randomIndex]] = [
-        array[randomIndex],
-        array[currentIndex],
-      ];
-    }
-    return array;
-  };
-
   function WaitingPlayers() {
-    const {
-      handlePlayerJoin,
-      handlePlayerSubmitRealname,
-      handleHostStartGame,
-    } = reactExports.useContext(ActionContext); // TODO: remove this line
-
     const { players } = reactExports.useContext(VariableContext);
     const waitingRoomAudio = new Audio("./assets/waiting-room.mp3");
     waitingRoomAudio.volume = 0.75;
@@ -48644,75 +45661,6 @@ Please use another name.`);
     return /*#__PURE__*/ React.createElement(
       React.Fragment,
       null,
-      /*#__PURE__*/ React.createElement(
-        Button$1,
-        {
-          style: {
-            position: "absolute",
-            top: 20,
-            right: 20,
-            zIndex: 100,
-          },
-          onClick: () => {
-            handlePlayerJoin("player" + players.length);
-          },
-        },
-        /*#__PURE__*/ React.createElement(
-          Text,
-          {
-            size: 24,
-            color: "#fff",
-          },
-          "Add Player (TODO: remove this button)",
-        ),
-      ),
-      /*#__PURE__*/ React.createElement(
-        Button$1,
-        {
-          style: {
-            position: "absolute",
-            top: 50,
-            right: 20,
-            zIndex: 100,
-          },
-          onClick: () => {
-            handlePlayerSubmitRealname(
-              "player" + (players.length - 1),
-              "Real Name",
-            );
-          },
-        },
-        /*#__PURE__*/ React.createElement(
-          Text,
-          {
-            size: 24,
-            color: "#fff",
-          },
-          "Submit real name (TODO: remove this button)",
-        ),
-      ),
-      /*#__PURE__*/ React.createElement(
-        Button$1,
-        {
-          style: {
-            position: "absolute",
-            top: 80,
-            right: 20,
-            zIndex: 100,
-          },
-          onClick: () => {
-            handleHostStartGame();
-          },
-        },
-        /*#__PURE__*/ React.createElement(
-          Text,
-          {
-            size: 24,
-            color: "#fff",
-          },
-          "Host start game (TODO: remove this button)",
-        ),
-      ),
       /*#__PURE__*/ React.createElement(
         Box$1,
         {
@@ -80565,6 +77513,615 @@ Please use another name.`);
   };
   var LottiePlayer = makeLottiePlayer(lottie);
 
+  const ActionContext = /*#__PURE__*/ reactExports.createContext({
+    handlePlayerJoin: () => {},
+    handlePlayerLeave: () => {},
+    handlePlayerSubmitRealname: () => {},
+    handleHostStartGame: () => {},
+    handleHostSkipInstructions: () => {},
+    handleMafiaSelection: () => {},
+    handleMafiaVote: () => {},
+    handleDetectiveIdentification: () => {},
+    handleAngelProtection: () => {},
+    handleCivilianTriviaFinish: () => {},
+    handleAccusation: () => {},
+    handleLifeDeathSelection: () => {},
+    handleLifeDeathVote: () => {},
+    handleProgressToWelcomePage: () => {},
+    handleProgressToAreYouReadyPage: () => {},
+    handleProgressToLookAtYourPhonePage: () => {},
+    handleProgressToInstructionsPage: () => {},
+    handleProgressToNighttimePage: () => {},
+    handleProgressToNighttimeTimerPage: () => {},
+    handleProgressToNightOverPage: () => {},
+    handleProgressToStoryPage: () => {},
+    handleProgressToPostStoryPage: () => {},
+    handleProgressToAccusationTimerPage: () => {},
+    handleProgressToAccusedPage: () => {},
+    handleProgressToVotingPage: () => {},
+    handleProgressToVotingTimerPage: () => {},
+    handleProgressToVotingResultsPage: () => {},
+    handleTransitionFromVotingResultsPage: () => {},
+    handleProgressToGameOverPage: () => {},
+  });
+  const ActionProvider = ({ children }) => {
+    const {
+      setPage,
+      players,
+      setPlayers,
+      setMafia,
+      setDetective,
+      setAngel,
+      setCivilians,
+      currentMafiaSelections,
+      setCurrentMafiaSelections,
+      currentMafiaVotes,
+      setCurrentMafiaVotes,
+      detectiveIdentifications,
+      setDetectiveIdentifications,
+      setCurrentDetectiveIdentification,
+      currentAngelProtection,
+      setCurrentAngelProtection,
+      currentCivilianTriviaFinishes,
+      setCurrentCivilianTriviaFinishes,
+      currentAccusations,
+      setCurrentAccusations,
+      currentLifeDeathSelections,
+      setCurrentLifeDeathSelections,
+      currentLifeDeathVotes,
+      setCurrentLifeDeathVotes,
+      setNighttimeTimer,
+      setCurrentKill,
+      setAccusationTimer,
+      recentlyAccused,
+      setRecentlyAccused,
+      setVotingTimer,
+    } = reactExports.useContext(VariableContext);
+    const introAudioRef = reactExports.useRef(
+      new Audio("./assets/Introloop.wav"),
+    );
+    const handlePlayerJoin = (gamername) => {
+      // create a new player info object, with the gamername
+      const newPlayer = {
+        gamername,
+        realname: "",
+        role: "civilian",
+        isAlive: true,
+        isHost: players.length === 0,
+      };
+      // add the new player to the players array
+      setPlayers([...players, newPlayer]);
+    };
+    const handlePlayerLeave = () => {
+      // remove the player from the players array
+      // TODO
+      // evaluate if the game is over
+      // TODO
+    };
+    const handlePlayerSubmitRealname = (gamername, realname) => {
+      const bellAudio = new Audio("./assets/death-bell.wav");
+      bellAudio.volume = 0.25;
+      bellAudio.play();
+      // if realname is already taken, add a number to the end of the realname
+      const realnames = players.map((player) => player.realname);
+      if (realnames.includes(realname)) {
+        let i = 1;
+        while (realnames.includes(realname + i)) {
+          i++;
+        }
+        realname += i;
+      }
+      // update the player's realname
+      const newPlayers = players.map((player) => {
+        if (player.gamername === gamername) {
+          player.realname = realname;
+        }
+        return player;
+      });
+      setPlayers(newPlayers);
+    };
+    const handleHostStartGame = () => {
+      // assign roles
+      const roles = getRoles(players.length);
+      // keep track of the roles
+      const mafia = [];
+      let detective = null;
+      let angel = null;
+      const civilians = [];
+      // assign the roles to the players
+      const newPlayers = players.map((player, index) => {
+        player.role = roles[index];
+        if (player.role === "mafia") {
+          mafia.push(player);
+        } else if (player.role === "detective") {
+          detective = player;
+        } else if (player.role === "angel") {
+          angel = player;
+        } else {
+          civilians.push(player);
+        }
+        return player;
+      });
+      setPlayers(newPlayers);
+      setMafia(mafia);
+      setDetective(detective);
+      setAngel(angel);
+      setCivilians(civilians);
+      // advance to welcome page
+      handleProgressToWelcomePage();
+    };
+    const handleHostSkipInstructions = () => {
+      // advance to nighttime page
+      handleProgressToNighttimePage();
+    };
+    const handleMafiaSelection = (mafiaGamername, targetGamername) => {
+      const mafiaPlayer = players.find(
+        (player) => player.gamername === mafiaGamername,
+      );
+      const targetPlayer = players.find(
+        (player) => player.gamername === targetGamername,
+      );
+      if (!mafiaPlayer || !targetPlayer) {
+        return;
+      }
+      const currentMafiaSelection = currentMafiaSelections.find(
+        (selection) => selection.player === mafiaPlayer,
+      );
+      // if mafia member has not selected a target, add the target to the currentMafiaSelections array
+      if (!currentMafiaSelection) {
+        setCurrentMafiaSelections([
+          ...currentMafiaSelections,
+          {
+            player: mafiaPlayer,
+            target: targetPlayer,
+          },
+        ]);
+      }
+      // if mafia member has selected a target and this target is different from the previous target, update the target in the currentMafiaSelections array
+      else if (currentMafiaSelection.target !== targetPlayer) {
+        setCurrentMafiaSelections(
+          currentMafiaSelections.map((selection) => {
+            if (selection.player === mafiaPlayer) {
+              selection.target = targetPlayer;
+            }
+            return selection;
+          }),
+        );
+      }
+      // if mafia member has selected a target and this target is the same as the previous target, remove the target from the currentMafiaSelections array
+      else {
+        setCurrentMafiaSelections(
+          currentMafiaSelections.filter(
+            (selection) => selection.player !== mafiaPlayer,
+          ),
+        );
+      }
+    };
+    const handleMafiaVote = (mafiaGamername, targetGamername) => {
+      const mafiaPlayer = players.find(
+        (player) => player.gamername === mafiaGamername,
+      );
+      const targetPlayer = players.find(
+        (player) => player.gamername === targetGamername,
+      );
+      if (!mafiaPlayer || !targetPlayer) {
+        return;
+      }
+      const currentMafiaVote = currentMafiaVotes.find(
+        (selection) => selection.player === mafiaPlayer,
+      );
+      // if mafia member has not voted, add the vote to the currentMafiaVotes array
+      if (!currentMafiaVote) {
+        setCurrentMafiaVotes([
+          ...currentMafiaVotes,
+          {
+            player: mafiaPlayer,
+            target: targetPlayer,
+          },
+        ]);
+      }
+      // remove the vote from the currentMafiaSelections array
+      setCurrentMafiaSelections(
+        currentMafiaSelections.filter(
+          (selection) => selection.player !== mafiaPlayer,
+        ),
+      );
+      // TODO: check if night is over
+    };
+    const handleDetectiveIdentification = (targetGamername) => {
+      // find the detective
+      const detective = players.find((player) => player.role === "detective");
+      // find the target
+      const target = players.find(
+        (player) => player.gamername === targetGamername,
+      );
+      // if the detective and target are found, add the identification to the detectiveIdentifications array
+      if (!detective || !target) {
+        return;
+      }
+      setDetectiveIdentifications([
+        ...detectiveIdentifications,
+        {
+          player: detective,
+          target,
+        },
+      ]);
+      setCurrentDetectiveIdentification({
+        player: detective,
+        target,
+      });
+      // TODO: check if night is over
+    };
+    const handleAngelProtection = (targetGamername) => {
+      // find the angel
+      const angel = players.find((player) => player.role === "angel");
+      // find the target
+      const target = players.find(
+        (player) => player.gamername === targetGamername,
+      );
+      // if the angel and target are found, update the currentAngelProtection
+      if (!angel || !target) {
+        return;
+      }
+      setCurrentAngelProtection({
+        player: angel,
+        target,
+      });
+      // TODO: check if night is over
+    };
+    const handleCivilianTriviaFinish = (gamername) => {
+      // find the player
+      const player = players.find((player) => player.gamername === gamername);
+      // if the player is found, add the player to the currentCivilianTriviaFinishes array
+      if (!player) {
+        return;
+      }
+      setCurrentCivilianTriviaFinishes([
+        ...currentCivilianTriviaFinishes,
+        player,
+      ]);
+      // TODO: check if night is over
+    };
+    const handleAccusation = (accuserGamername, targetGamername) => {
+      // find the accuser
+      const accuser = players.find(
+        (player) => player.gamername === accuserGamername,
+      );
+      // find the target
+      const target = players.find(
+        (player) => player.gamername === targetGamername,
+      );
+      // if the accuser and target are found, add the accusation to the currentAccusations array
+      if (!accuser || !target) {
+        return;
+      }
+      setCurrentAccusations([
+        ...currentAccusations,
+        {
+          player: accuser,
+          target,
+        },
+      ]);
+      // TODO: check if accusations are over
+    };
+    const handleLifeDeathSelection = (voterGamername, vote) => {
+      // find the voter
+      const voter = players.find(
+        (player) => player.gamername === voterGamername,
+      );
+      // if the voter is found, add the vote to the currentLifeDeathSelections array
+      if (!voter) {
+        return;
+      }
+      // get the current vote
+      const currentVote = currentLifeDeathSelections.find(
+        (vote) => vote.player === voter,
+      );
+      // if the voter has not voted, add the vote to the currentLifeDeathSelections array
+      if (!currentVote) {
+        setCurrentLifeDeathSelections([
+          ...currentLifeDeathSelections,
+          {
+            player: voter,
+            vote,
+          },
+        ]);
+      }
+      // if the voter has voted and this vote is different from the previous vote, update the vote in the currentLifeDeathSelections array
+      else if (currentVote.vote !== vote) {
+        setCurrentLifeDeathSelections(
+          currentLifeDeathSelections.map((playerVote) => {
+            if (playerVote.player === voter) {
+              playerVote.vote = vote;
+            }
+            return playerVote;
+          }),
+        );
+      }
+      // if the voter has voted and this vote is the same as the previous vote, remove the vote from the currentLifeDeathSelections array
+      else {
+        setCurrentLifeDeathSelections(
+          currentLifeDeathSelections.filter(
+            (playerVote) => playerVote.player !== voter,
+          ),
+        );
+      }
+    };
+    const handleLifeDeathVote = (voterGamername, vote) => {
+      // find the voter
+      const voter = players.find(
+        (player) => player.gamername === voterGamername,
+      );
+      // if the voter is found, add the vote to the currentLifeDeathVotes array
+      if (!voter) {
+        return;
+      }
+      // get the current vote
+      const currentVote = currentLifeDeathVotes.find(
+        (vote) => vote.player === voter,
+      );
+      // if the voter has not voted, add the vote to the currentLifeDeathVotes array
+      if (!currentVote) {
+        setCurrentLifeDeathVotes([
+          ...currentLifeDeathVotes,
+          {
+            player: voter,
+            vote,
+          },
+        ]);
+      }
+      // remove the vote from the currentLifeDeathSelections array
+      setCurrentLifeDeathSelections(
+        currentLifeDeathSelections.filter(
+          (playerVote) => playerVote.player !== voter,
+        ),
+      );
+    };
+    const handleProgressToWelcomePage = () => {
+      // play the intro audio
+      introAudioRef.current.play();
+      // set the page to WELCOME
+      setPage(WELCOME$1);
+    };
+    const handleProgressToAreYouReadyPage = () => {
+      // set the page to YOU_READY
+      setPage(YOU_READY$1);
+    };
+    const handleProgressToLookAtYourPhonePage = () => {
+      // set the page to REVEAL_IDENTITY
+      setPage(REVEAL_IDENTITY$1);
+    };
+    const handleProgressToInstructionsPage = () => {
+      // stop the intro audio
+      introAudioRef.current.pause();
+      // reset the intro audio
+      introAudioRef.current.currentTime = 0;
+      // play the intro audio again
+      introAudioRef.current.play();
+      // set the page to INSTRUCTIONS
+      setPage(INSTRUCTIONS$1);
+    };
+    const handleProgressToNighttimePage = () => {
+      // pause the intro audio
+      introAudioRef.current.pause();
+      // reset the currentMafiaSelections array
+      setCurrentMafiaSelections([]);
+      // reset the currentMafiaVotes array
+      setCurrentMafiaVotes([]);
+      // reset the currentKill
+      setCurrentKill(null);
+      // reset the currentDetectiveIdentification
+      setCurrentDetectiveIdentification(null);
+      // reset the currentAngelProtection
+      setCurrentAngelProtection(null);
+      // reset the currentCivilianTriviaFinishes array
+      setCurrentCivilianTriviaFinishes([]);
+      // set the page to NIGHTTIME
+      setPage(NIGHTTIME$1);
+    };
+    const handleProgressToNighttimeTimerPage = () => {
+      // reset the nighttimeTimer
+      setNighttimeTimer(120);
+      // set the page to NIGHTTIME_TIMER
+      setPage(NIGHTTIME_TIMER$1);
+    };
+    const handleProgressToNightOverPage = () => {
+      // set the page to NIGHT_OVER
+      setPage(NIGHT_OVER$1);
+    };
+    const handleProgressToStoryPage = () => {
+      // decide on the player to die
+      // this is determined by the mafia votes
+      // whoever has the most votes dies
+      // if there is a tie, select randomly from the tied players
+      const voteCounts = {};
+      currentMafiaVotes.forEach((vote) => {
+        voteCounts[vote.target.gamername] =
+          (voteCounts[vote.target.gamername] || 0) + 1;
+      });
+      const maxVotes = Math.max(...Object.values(voteCounts));
+      const playersWithMaxVotes = Object.keys(voteCounts).filter(
+        (gamername) => voteCounts[gamername] === maxVotes,
+      );
+      const randomIndex = Math.floor(
+        Math.random() * playersWithMaxVotes.length,
+      );
+      const playerToDie = players.find(
+        (player) => player.gamername === playersWithMaxVotes[randomIndex],
+      );
+      if (!playerToDie) {
+        return;
+      }
+      // update the player's isAlive status
+      if (playerToDie) {
+        playerToDie.isAlive = false;
+      }
+      // set the currentKill
+      setCurrentKill(playerToDie);
+      // set the page to STORY
+      setPage(STORY$1);
+    };
+    const handleProgressToPostStoryPage = () => {
+      // reset the accusationTimer
+      setAccusationTimer(300);
+      // reset the recentlyAccused
+      setRecentlyAccused(null);
+      // set the page to POST_STORY_2
+      setPage(POST_STORY_2$1);
+    };
+    const handleProgressToAccusationTimerPage = () => {
+      // reset currentAccusations
+      setCurrentAccusations([]);
+      // reset currentLifeDeathSelections
+      setCurrentLifeDeathSelections([]);
+      // reset currentLifeDeathVotes
+      setCurrentLifeDeathVotes([]);
+    };
+    const handleProgressToAccusedPage = () => {
+      // set the page to ACCUSED
+      setPage(ACCUSED$1);
+    };
+    const handleProgressToVotingPage = () => {
+      // set the page to VOTING
+      setPage(VOTING$1);
+    };
+    const handleProgressToVotingTimerPage = () => {
+      // reset the votingTimer
+      setVotingTimer(300);
+      // set the page to VOTING_TIMER
+      setPage(VOTING_TIMER$1);
+    };
+    const handleProgressToVotingResultsPage = () => {
+      // set the page to VOTING_RESULTS
+      setPage(VOTING_RESULTS$1);
+    };
+    const handleTransitionFromVotingResultsPage = () => {
+      // check if player lives or dies
+      const votesToLive = currentLifeDeathVotes.filter(
+        (vote) => vote.vote === "live",
+      ).length;
+      const votesToDie = currentLifeDeathVotes.filter(
+        (vote) => vote.vote === "die",
+      ).length;
+      if (votesToDie > votesToLive) {
+        // the player dies
+        const newPlayers = players.map((player) => {
+          if (player.gamername === recentlyAccused?.gamername) {
+            player.isAlive = false;
+          }
+          return player;
+        });
+        setPlayers(newPlayers);
+        // TODO: check if game is over
+      } else {
+        handleProgressToAccusationTimerPage();
+      }
+    };
+    const handleProgressToGameOverPage = () => {
+      // set the page to GAME_OVER
+      setPage(GAME_OVER$1);
+    };
+    const actions = reactExports.useMemo(
+      () => ({
+        handlePlayerJoin,
+        handlePlayerLeave,
+        handlePlayerSubmitRealname,
+        handleHostStartGame,
+        handleHostSkipInstructions,
+        handleMafiaSelection,
+        handleMafiaVote,
+        handleDetectiveIdentification,
+        handleAngelProtection,
+        handleCivilianTriviaFinish,
+        handleAccusation,
+        handleLifeDeathSelection,
+        handleLifeDeathVote,
+        handleProgressToWelcomePage,
+        handleProgressToAreYouReadyPage,
+        handleProgressToLookAtYourPhonePage,
+        handleProgressToInstructionsPage,
+        handleProgressToNighttimePage,
+        handleProgressToNighttimeTimerPage,
+        handleProgressToNightOverPage,
+        handleProgressToStoryPage,
+        handleProgressToPostStoryPage,
+        handleProgressToAccusationTimerPage,
+        handleProgressToAccusedPage,
+        handleProgressToVotingPage,
+        handleProgressToVotingTimerPage,
+        handleProgressToVotingResultsPage,
+        handleTransitionFromVotingResultsPage,
+        handleProgressToGameOverPage,
+      }),
+      [
+        handlePlayerJoin,
+        handlePlayerLeave,
+        handlePlayerSubmitRealname,
+        handleHostStartGame,
+        handleHostSkipInstructions,
+        handleMafiaSelection,
+        handleMafiaVote,
+        handleDetectiveIdentification,
+        handleAngelProtection,
+        handleCivilianTriviaFinish,
+        handleAccusation,
+        handleLifeDeathSelection,
+        handleLifeDeathVote,
+        handleProgressToWelcomePage,
+        handleProgressToAreYouReadyPage,
+        handleProgressToLookAtYourPhonePage,
+        handleProgressToInstructionsPage,
+        handleProgressToNighttimePage,
+        handleProgressToNighttimeTimerPage,
+        handleProgressToNightOverPage,
+        handleProgressToStoryPage,
+        handleProgressToPostStoryPage,
+        handleProgressToAccusationTimerPage,
+        handleProgressToAccusedPage,
+        handleProgressToVotingPage,
+        handleProgressToVotingTimerPage,
+        handleProgressToVotingResultsPage,
+        handleTransitionFromVotingResultsPage,
+        handleProgressToGameOverPage,
+      ],
+    );
+    return /*#__PURE__*/ React.createElement(
+      ActionContext.Provider,
+      {
+        value: actions,
+      },
+      children,
+    );
+  };
+  const getRoles = (numPlayers) => {
+    const roles = [];
+    for (let i = 0; i < numPlayers; i++) {
+      if (i === 0) {
+        roles.push("detective");
+      } else if (i === 1) {
+        roles.push("angel");
+      } else if (i % 4 === 2) {
+        roles.push("mafia");
+      } else {
+        roles.push("civilian");
+      }
+    }
+    return shuffle(roles);
+  };
+  const shuffle = (array) => {
+    let currentIndex = array.length,
+      randomIndex;
+    while (currentIndex !== 0) {
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex--;
+      [array[currentIndex], array[randomIndex]] = [
+        array[randomIndex],
+        array[currentIndex],
+      ];
+    }
+    return array;
+  };
+
   function Welcome({ youReady }) {
     const {
       handleProgressToAreYouReadyPage,
@@ -80653,9 +78210,8 @@ Please use another name.`);
   }
 
   function Instructions() {
-    const { handleProgressToNighttimePage, handleHostSkipInstructions } =
-      reactExports.useContext(ActionContext); // TODO: remove handleHostSkipInstructions
-
+    const { handleProgressToNighttimePage } =
+      reactExports.useContext(ActionContext);
     const instructions1Audio = new Audio("./assets/instructions1.mp3");
     const instructions2Audio = new Audio("./assets/instructions2.mp3");
     reactExports.useEffect(() => {
@@ -80675,28 +78231,6 @@ Please use another name.`);
     return /*#__PURE__*/ React.createElement(
       React.Fragment,
       null,
-      /*#__PURE__*/ React.createElement(
-        Button$1,
-        {
-          style: {
-            position: "absolute",
-            top: 20,
-            right: 20,
-            zIndex: 100,
-          },
-          onClick: () => {
-            handleHostSkipInstructions();
-          },
-        },
-        /*#__PURE__*/ React.createElement(
-          Text,
-          {
-            size: 24,
-            color: "#fff",
-          },
-          "Skip instructions (TODO: remove this button)",
-        ),
-      ),
       /*#__PURE__*/ React.createElement(
         Text,
         {

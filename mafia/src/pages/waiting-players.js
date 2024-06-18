@@ -1,16 +1,12 @@
 import React, { useContext, useEffect } from "react";
-import { Box, Button } from "@mui/material";
+import { Box } from "@mui/material";
 import { Text } from "../components/text";
 import { CoinColumnBox, CoinRowBox } from "../components/boxes";
 import Coin from "../components/coin";
 import { BannerIcon } from "../components/mafia-icon";
 import { VariableContext } from "../contexts/variables";
-import { ActionContext } from "../contexts/actions";
 
 export default function WaitingPlayers() {
-  const { handlePlayerJoin, handlePlayerSubmitRealname, handleHostStartGame } =
-    useContext(ActionContext); // TODO: remove this line
-
   const { players } = useContext(VariableContext);
 
   const waitingRoomAudio = new Audio("./assets/waiting-room.mp3");
@@ -24,54 +20,6 @@ export default function WaitingPlayers() {
 
   return (
     <>
-      <Button
-        style={{
-          position: "absolute",
-          top: 20,
-          right: 20,
-          zIndex: 100,
-        }}
-        onClick={() => {
-          handlePlayerJoin("player" + players.length);
-        }}
-      >
-        <Text size={24} color={"#fff"}>
-          Add Player (TODO: remove this button)
-        </Text>
-      </Button>
-      <Button
-        style={{
-          position: "absolute",
-          top: 50,
-          right: 20,
-          zIndex: 100,
-        }}
-        onClick={() => {
-          handlePlayerSubmitRealname(
-            "player" + (players.length - 1),
-            "Real Name",
-          );
-        }}
-      >
-        <Text size={24} color={"#fff"}>
-          Submit real name (TODO: remove this button)
-        </Text>
-      </Button>
-      <Button
-        style={{
-          position: "absolute",
-          top: 80,
-          right: 20,
-          zIndex: 100,
-        }}
-        onClick={() => {
-          handleHostStartGame();
-        }}
-      >
-        <Text size={24} color={"#fff"}>
-          Host start game (TODO: remove this button)
-        </Text>
-      </Button>
       <Box
         style={{
           position: "absolute",
