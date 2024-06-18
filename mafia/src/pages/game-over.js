@@ -1,11 +1,10 @@
 import React, {useEffect} from "react";
-import {InnerPageBox, SpaceBetweenRowBox} from "../components/boxes";
-import {Box} from "@mui/material";
 import {Text} from "../components/text";
 
-export default function GameOver({winner}) {
+export default function GameOver() {
     const mafiaWinAudio = new Audio('./assets/mafia-win.mp3');
     const civiliansWinAudio = new Audio('./assets/civilians-win.mp3');
+    const winner = 'mafia';
 
     useEffect(() => {
         if (!winner) return;

@@ -1,51 +1,31 @@
-import React, {useEffect, useState} from "react";
-import {InnerPageBox, SpaceBetweenRowBox} from "../components/boxes";
-import {Box} from "@mui/material";
+import React, {useEffect, useState, useContext} from "react";
 import {Text} from "../components/text";
-import {getStory} from "../stories";
 
-export default function Story({targetedName, died, setPlayers, setStoryOver, sendMessageToParent, checkEndOfGame, playersRef, playDeathAudio, endDeathAudio}) {
+export default function Story() {
     const [reveal, setReveal] = useState(false);
-    const [story, setStory] = useState(null);
     const playerMurderedAudio = new Audio('./assets/player-murdered.mp3');
     const playerAlmostMurderedAudio = new Audio('./assets/player-almost-murdered.mp3');
+    const deathAudio = new Audio('./assets/Deathloop.wav');
+
+    const targetedPlayer = playerStates.find(player => player.isTargeted);
+    const saved = targetedPlayer && targetedPlayer.isProtected;
 
     useEffect(() => {
-        setStory(getStory());
-        if (died) {
-            const deadPlayer = playersRef.current.find(player => player.realName === targetedName);
-            sendMessageToParent({to: 'one', name: 'female-scream', player: deadPlayer.name});
-        }
+        if (!saved) { }        
         setTimeout(() => {
             setReveal(true)
-            playDeathAudio();
+            deathAudio.play();
             setTimeout(() => {
-                if (died) {
-                    const newPlayers = playersRef.current.map(player => {
-                        if (player.realName === targetedName) {
-                            return {
-                                ...player,
-                                inHeaven: true,
-                            }
-                        }
-                        return player;
-                    });
-                    if (checkEndOfGame(newPlayers)) {
-                        endDeathAudio();
-                        return;
-                    }
-                    setPlayers(newPlayers);
-                    playersRef.current = newPlayers;
-                    sendMessageToParent({to: 'all', name: 'stateUpdate', players: newPlayers});
+                if (!saved) {
                     playerMurderedAudio.play();
                     playerMurderedAudio.onended = () => {
-                        setStoryOver(true);
+                        () => { };
                     }
                 }
                 else {
                     playerAlmostMurderedAudio.play();
                     playerAlmostMurderedAudio.onended = () => {
-                        setStoryOver(true);
+                        () => { };
                     }
                 }
             }, 10000);
@@ -60,11 +40,11 @@ export default function Story({targetedName, died, setPlayers, setStoryOver, sen
     if (!reveal) {
         return null;
     }
-    if (died) {
+    if (!saved) {
         return (
             <>
                 <Text size={56} color={'var(--Main-Red)'} weight={700}>
-                    {targetedName}
+                    {targetedPlayer.realname}
                 </Text>
                 <Text size={36} opacity={0.5}>
                     was killed by the mafia
@@ -80,7 +60,7 @@ export default function Story({targetedName, died, setPlayers, setStoryOver, sen
     return (
         <>
             <Text size={56} weight={700}>
-                {targetedName}
+                {targetedPlayer.realname}
             </Text>
             <Text size={36} opacity={0.5}>
                 survived

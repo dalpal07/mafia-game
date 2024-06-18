@@ -1,18 +1,21 @@
 import {Text} from "../components/text";
-import React, {useEffect} from "react";
+import React, { useEffect, useContext } from "react";
+import { ActionContext } from "../contexts/actions";
 
-export default function Nighttime({moveToNighttimeTimer, firstNight}) {
+export default function Nighttime() {
+    const { handleProgressToNighttimeTimerPage } = useContext(ActionContext);
+
     const nighttimeSeePhonesAudio = new Audio('./assets/nighttime-see-phones.mp3');
     const nighttimeAgainAudio = new Audio('./assets/nighttime-again.mp3');
     const narrationAudio = new Audio('./assets/narration.mp3');
 
     useEffect(() => {
         narrationAudio.play();
-        if (firstNight) {
+        if (!false) {
             setTimeout(() => nighttimeSeePhonesAudio.play(), 1000);
 
             nighttimeSeePhonesAudio.onended = () => {
-                setTimeout(() => moveToNighttimeTimer(), 1000);
+                setTimeout(() => handleProgressToNighttimeTimerPage(), 1000);
             }
 
             return () => {
@@ -24,7 +27,7 @@ export default function Nighttime({moveToNighttimeTimer, firstNight}) {
             setTimeout(() => nighttimeAgainAudio.play(), 1000);
 
             nighttimeAgainAudio.onended = () => {
-                setTimeout(() => moveToNighttimeTimer(), 1000);
+                setTimeout(() => handleProgressToNighttimeTimerPage(), 1000);
             }
 
             return () => {

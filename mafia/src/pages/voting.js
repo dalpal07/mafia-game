@@ -1,13 +1,13 @@
-import React, {useEffect} from "react";
-import {Text} from "../components/text";
+import React, {useEffect, useContext} from "react";
+import { Text } from "../components/text";
 
-export default function Voting({accused, goToVotingTimer}) {
+export default function Voting() {
     const liveOrDieAudio = new Audio('./assets/live-or-die.mp3');
 
     useEffect(() => {
         liveOrDieAudio.play();
 
-        liveOrDieAudio.onended = () => goToVotingTimer();
+        liveOrDieAudio.onended = () => () => { };
 
         return () => liveOrDieAudio.pause();
     }, []);
@@ -15,7 +15,7 @@ export default function Voting({accused, goToVotingTimer}) {
     return (
         <>
             <Text size={56} opacity={0.75}>
-                will {accused} live or die?
+                will {"accused person"} live or die?
             </Text>
         </>
     )

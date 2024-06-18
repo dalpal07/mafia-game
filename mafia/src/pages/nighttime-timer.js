@@ -1,34 +1,17 @@
-import React, {useEffect, useState} from "react";
-import {InnerPageBox, SpaceBetweenRowBox} from "../components/boxes";
-import {Box} from "@mui/material";
+import React, {useContext, useEffect} from "react";
 import {Text} from "../components/text";
 import Timer from "../components/timer";
+import { VariableContext } from "../contexts/variables";
 
-export default function NighttimeTimer({nighttimeOver, setNighttimeOver}) {
-    const [timer, setTimer] = useState(120);
-
-    useEffect(() => {
-        if (nighttimeOver) {
-            setTimer(120);
-            return;
-        }
-        if (timer > 0) {
-            const timeout = setTimeout(() => {
-                setTimer(timer - 1);
-            }, 1000);
-            return () => clearTimeout(timeout);
-        }
-        else {
-            setNighttimeOver(true);
-        }
-    }, [timer, nighttimeOver]);
+export default function NighttimeTimer() {
+    const { nighttimeTimer, setNighttimeTimer } = useContext(VariableContext); 
 
     return (
         <>
             <Text size={36} opacity={0.5}>
                 night will end in:
             </Text>
-            <Timer time={timer}/>
+            <Timer timer={nighttimeTimer} setTimer={setNighttimeTimer} />
         </>
     )
 }

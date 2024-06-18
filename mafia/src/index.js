@@ -3,10 +3,16 @@ import { createRoot } from 'react-dom/client'
 import './index.css';
 
 import App from './App';
-import { GlobalProvider } from './contexts/global';
+import { CommunicationProvider } from './contexts/communications';
+import { VariableProvider } from './contexts/variables';
+import { ActionProvider } from './contexts/actions';
 
 createRoot(document.querySelector('#root')).render(
-    <GlobalProvider>
-        <App />
-    </GlobalProvider>
+    <VariableProvider>
+        <ActionProvider>
+            <CommunicationProvider>
+                <App />
+            </CommunicationProvider>
+        </ActionProvider>
+    </VariableProvider>
 );

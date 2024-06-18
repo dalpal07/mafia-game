@@ -1,7 +1,7 @@
 import {Text} from "../components/text";
-import React, {useEffect} from "react";
+import React, { useEffect, useContext } from "react";
 
-export default function NightOver({moveToStory}) {
+export default function NightOver() {
     const nightOverAudio = new Audio('./assets/night-over.mp3');
     const narrationAudio = new Audio('./assets/narration.mp3');
     narrationAudio.volume = 0.5;
@@ -11,7 +11,7 @@ export default function NightOver({moveToStory}) {
         setTimeout(() => nightOverAudio.play(), 1000);
 
         nightOverAudio.addEventListener('ended', () => {
-            setTimeout(() => moveToStory(), 1000);
+            setTimeout(() => () => { }, 1000);
         });
 
         return () => {

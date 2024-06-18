@@ -8,43 +8,25 @@ import {
 import {Text} from "../components/text";
 import Timer from "../components/timer";
 
-export default function VotingTimer({accused, players, votingOver, setVotingOver}) {
-    const [timer, setTimer] = useState(300);
-
-    const liveVotes = players.filter(player => player.vote === 'live');
+export default function VotingTimer() {
+    const liveVotes = [] // players.filter(player => player.vote === 'live');
     const first4LiveVotes = liveVotes.slice(0, 4);
     const second4LiveVotes = liveVotes.slice(4, 8);
     const third4LiveVotes = liveVotes.slice(8, 12);
     const fourth4LiveVotes = liveVotes.slice(12, 16);
     const fifth4LiveVotes = liveVotes.slice(16, 20);
-    const dieVotes = players.filter(player => player.vote === 'die');
+    const dieVotes = [] // players.filter(player => player.vote === 'die');
     const first4DieVotes = dieVotes.slice(0, 4);
     const second4DieVotes = dieVotes.slice(4, 8);
     const third4DieVotes = dieVotes.slice(8, 12);
     const fourth4DieVotes = dieVotes.slice(12, 16);
     const fifth4DieVotes = dieVotes.slice(16, 20);
 
-    useEffect(() => {
-        if (votingOver) {
-            setTimer(300);
-            return;
-        }
-        if (timer > 0) {
-            const timeout = setTimeout(() => {
-                setTimer(timer - 1);
-            }, 1000);
-            return () => clearTimeout(timeout);
-        }
-        else {
-            setVotingOver(true);
-        }
-    }, [timer, votingOver]);
-
     return (
         <>
-            <Timer time={timer}/>
+            <Timer/>
             <Text size={56} opacity={0.75}>
-                what will {accused}'s fate be?
+                what will {"accused person"}'s fate be?
             </Text>
             <VotesContainer>
                 <VotesBox>

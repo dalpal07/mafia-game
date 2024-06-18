@@ -1,0 +1,16 @@
+export const WAITING_PLAYERS = 0;
+export const WELCOME = 1;
+export const YOU_READY = 2;
+export const REVEAL_IDENTITY = 3;
+export const INSTRUCTIONS = 4;
+export const NIGHTTIME = 5;
+export const NIGHTTIME_TIMER = 6;
+export const NIGHT_OVER = 7;
+export const STORY = 8;
+export const POST_STORY_2 = 10;
+export const ACCUSATIONS = 11;
+export const ACCUSED = 12;
+export const VOTING = 13;
+export const VOTING_TIMER = 14;
+export const VOTING_RESULTS = 15;
+export const GAME_OVER = 16;

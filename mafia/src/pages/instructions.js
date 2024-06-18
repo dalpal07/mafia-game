@@ -1,14 +1,13 @@
-import {ConstrainedBox, InnerPageBox, SpaceBetweenRowBox} from "../components/boxes";
-import {Box} from "@mui/material";
 import {Text} from "../components/text";
 import React, { useEffect, useContext } from "react";
-import { GlobalContext } from "../contexts/global";
+import { ActionContext } from "../contexts/actions";
+import { Button } from "@mui/material";
 
-export default function Instructions({setStartNighttime}) {
+export default function Instructions() {
+    const { handleProgressToNighttimePage, handleHostSkipInstructions } = useContext(ActionContext); // TODO: remove handleHostSkipInstructions
+
     const instructions1Audio = new Audio('./assets/instructions1.mp3');
     const instructions2Audio = new Audio('./assets/instructions2.mp3');
-
-    const { handleAdvanceToNighttime } = useContext(GlobalContext);
 
     useEffect(() => {
         const timeout = setTimeout(() => instructions1Audio.play(), 1000);
@@ -18,7 +17,7 @@ export default function Instructions({setStartNighttime}) {
         }
 
         instructions2Audio.onended = () => {
-            setTimeout(() => handleAdvanceToNighttime(), 1000);
+            setTimeout(() => handleProgressToNighttimePage(), 1000);
         }
 
         return () => {
@@ -30,6 +29,21 @@ export default function Instructions({setStartNighttime}) {
 
     return (
         <>
+            <Button
+                style={{
+                    position: 'absolute',
+                    top: 20,
+                    right: 20,
+                    zIndex: 100,
+                }}
+                onClick={() => {
+                    handleHostSkipInstructions();
+                }}
+            >
+                <Text size={24} color={'#fff'}>
+                    Skip instructions (TODO: remove this button)
+                </Text>
+            </Button>
             <Text size={56} opacity={0.75}>
                 nighttime roles
             </Text>

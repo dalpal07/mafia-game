@@ -1,17 +1,17 @@
 import React, {useEffect, useContext} from "react";
 import { Text } from "../components/text";
-import { GlobalContext } from "../contexts/global";
+import { ActionContext } from "../contexts/actions";
 
 export default function RevealIdentity() {
-    const identityAudio = new Audio('./assets/identity.mp3');
+    const { handleProgressToInstructionsPage } = useContext(ActionContext);
 
-    const { handleAdvanceToInstructions } = useContext(GlobalContext);
+    const identityAudio = new Audio('./assets/identity.mp3');
 
     useEffect(() => {
         setTimeout(() => identityAudio.play(), 1000);
 
         setTimeout(() => {
-            handleAdvanceToInstructions();
+            handleProgressToInstructionsPage();
         }, 19000);
         return () => identityAudio.pause();
     }, []);

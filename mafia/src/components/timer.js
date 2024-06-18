@@ -10,7 +10,7 @@ function getStringifiedTime(time) {
     return `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
 }
 
-export default function Timer({time}) {
+export default function Timer({ timer, setTimer}) {
     const timerAudio = new Audio('./assets/timer.mp3');
     timerAudio.volume = 0.5;
 
@@ -20,6 +20,16 @@ export default function Timer({time}) {
 
         return () => timerAudio.pause();
     }, []);
+
+    useEffect(() => {
+        if (timer === 0) {
+            timerAudio.pause();
+            return;
+        }
+        else {
+            setTimeout(() => setTimer(timer - 1), 1000);
+        }
+    }, [timer]);
 
     return (
         <Box style={{
@@ -31,7 +41,7 @@ export default function Timer({time}) {
             alignItems: "center",
         }}>
             <Text size={72} color={"var(--Main-Red)"} weight={600} style={{position: 'absolute'}}>
-                {getStringifiedTime(time)}
+                {getStringifiedTime(timer)}
             </Text>
             <Lottie
                 loop
