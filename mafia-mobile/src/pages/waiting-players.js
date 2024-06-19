@@ -7,13 +7,12 @@ import lottieJson from "../assets/welcome-banner.json";
 import { VariableContext } from "../contexts/variables";
 import { ActionContext } from "../contexts/actions";
 
-export default function WaitingPlayers({
-  screenHeight,
-  minPlayers,
-}) {
+export default function WaitingPlayers({ screenHeight, minPlayers }) {
   const { players, self } = useContext(VariableContext);
   const { handleHostStart } = useContext(ActionContext);
-  const ready = players.every((player) => player.realname && player.realname.length > 0);
+  const ready = players.every(
+    (player) => player.realname && player.realname.length > 0,
+  );
 
   const [bannerShown, setBannerShown] = useState(false);
 
@@ -88,7 +87,10 @@ export default function WaitingPlayers({
             ? "press start once all players are in "
             : `requires ${minPlayers} players to start`}
         </Text>
-        <TheButton disabled={players.length < minPlayers || !ready} onClick={handleHostStart}>
+        <TheButton
+          disabled={players.length < minPlayers || !ready}
+          onClick={handleHostStart}
+        >
           <Text size={18} weight={700}>
             Start
           </Text>

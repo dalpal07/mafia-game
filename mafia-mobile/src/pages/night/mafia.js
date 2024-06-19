@@ -1,7 +1,5 @@
 import React, { useContext, useEffect } from "react";
-import {
-  ScrollableFlexColumnBox,
-} from "../../components/boxes";
+import { ScrollableFlexColumnBox } from "../../components/boxes";
 import { Text } from "../../components/text";
 import { NameButton, TheButton } from "../../components/button";
 import { useState } from "react";
@@ -11,7 +9,8 @@ import { VariableContext } from "../../contexts/variables";
 import { ActionContext } from "../../contexts/actions";
 
 export default function NightMafia() {
-  const { players, self, currentMafiaSelections, currentMafiaVotes } = useContext(VariableContext);
+  const { players, self, currentMafiaSelections, currentMafiaVotes } =
+    useContext(VariableContext);
   const { handleMafiaSelection, handleMafiaVote } = useContext(ActionContext);
 
   const [mySelection, setMySelection] = useState(null);
@@ -25,24 +24,36 @@ export default function NightMafia() {
   };
 
   useEffect(() => {
-    const mySelection = currentMafiaSelections.find((selection) => selection.player.gamername === self.gamername);
+    const mySelection = currentMafiaSelections.find(
+      (selection) => selection.player.gamername === self.gamername,
+    );
     if (mySelection) {
       setMySelection(mySelection.target);
     } else {
       setMySelection(null);
     }
-    const myVote = currentMafiaVotes.find((vote) => vote.player.gamername === self.gamername);
+    const myVote = currentMafiaVotes.find(
+      (vote) => vote.player.gamername === self.gamername,
+    );
     if (myVote) {
       setMyVote(myVote.target);
-    }
-    else {
+    } else {
       setMyVote(null);
     }
-    const otherSelections = currentMafiaSelections.filter((selection) => selection.player.gamername !== self.gamername);
-    const otherVotes = currentMafiaVotes.filter((vote) => vote.player.gamername !== self.gamername);
-    const otherSelectionsTargets = otherSelections.map((selection) => selection.target);
+    const otherSelections = currentMafiaSelections.filter(
+      (selection) => selection.player.gamername !== self.gamername,
+    );
+    const otherVotes = currentMafiaVotes.filter(
+      (vote) => vote.player.gamername !== self.gamername,
+    );
+    const otherSelectionsTargets = otherSelections.map(
+      (selection) => selection.target,
+    );
     const otherVotesTargets = otherVotes.map((vote) => vote.target);
-    setOtherSelectionsAndVotes([...otherSelectionsTargets, ...otherVotesTargets]);
+    setOtherSelectionsAndVotes([
+      ...otherSelectionsTargets,
+      ...otherVotesTargets,
+    ]);
   }, [currentMafiaSelections, currentMafiaVotes]);
 
   return (
@@ -53,8 +64,12 @@ export default function NightMafia() {
       </Text>
       <ScrollableFlexColumnBox>
         {playersToList.map((player, index) => {
-          const iVoted = mySelection?.gamername === player.gamername || myVote?.gamername === player.gamername;
-          const otherKillVotes = otherSelectionsAndVotes.filter((target) => target.gamername === player.gamername).length;
+          const iVoted =
+            mySelection?.gamername === player.gamername ||
+            myVote?.gamername === player.gamername;
+          const otherKillVotes = otherSelectionsAndVotes.filter(
+            (target) => target.gamername === player.gamername,
+          ).length;
           return (
             <NameButton
               key={index}

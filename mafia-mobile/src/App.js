@@ -30,6 +30,11 @@ import {
   VOTING,
   ACCUSATIONS,
   NIGHTTIME_TIMER,
+  NIGHT_OVER,
+  STORY,
+  POST_STORY_2,
+  ACCUSED,
+  VOTING_TIMER,
 } from "./pages";
 import Night from "./pages/night";
 
@@ -49,26 +54,62 @@ function App() {
     }
   }, []);
 
+  useEffect(() => {
+    if (!self.isAlive) return;
+    if (page === NIGHT_OVER) {
+      setHeaderTime("day");
+      setTimeout(() => {
+        setBgColor("var(--Main-Gray)");
+        setImage("url(./assets/day-clouds.png)");
+      }, 1250);
+    }
+  }, [page]);
+
+  useEffect(() => {
+    if (self.isAlive) return;
+    setBgColor("var(--Heaven-White)");
+    setImage("url(./assets/heaven-clouds.png)");
+    setHeaderColor("var(--Main-Black)");
+  }, [self.isAlive]);
+
   function getPage(page) {
+    if (!self.isAlive) {
+      return null;
+    }
     switch (page) {
       case WAITING_PLAYERS:
         if (!self.realname || self.realname.length === 0) {
           return <EnterName />;
-        }
-        else {
-          return <WaitingPlayers screenHeight={screenHeight} minPlayers={MIN_PLAYERS} />;
+        } else {
+          return (
+            <WaitingPlayers
+              screenHeight={screenHeight}
+              minPlayers={MIN_PLAYERS}
+            />
+          );
         }
       case WELCOME:
       case YOU_READY:
         return <Preparation />;
       case REVEAL_IDENTITY:
-        return <IdentityReveal screenHeight={screenHeight}/>;
+        return <IdentityReveal screenHeight={screenHeight} />;
       case INSTRUCTIONS:
         return <Instructions />;
       case NIGHTTIME:
         return <Night />;
       case NIGHTTIME_TIMER:
         return <Night timerStarted={true} />;
+      case NIGHT_OVER:
+      case STORY:
+      case POST_STORY_2:
+        return <NightFinished />;
+      case ACCUSATIONS:
+        return <Day />;
+      case ACCUSED:
+      case VOTING:
+        return null;
+      case VOTING_TIMER:
+        return <Voting />;
       // case NIGHT:
       //   switch (role) {
       //     case "mafia":
@@ -162,7 +203,7 @@ function App() {
         }}
       >
         <StandardPageBox>
-          <Header/>
+          <Header />
           {getPage(page)}
         </StandardPageBox>
       </Box>

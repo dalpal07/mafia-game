@@ -24,15 +24,15 @@ const InputBox = styled(Input)({
 export default function EnterName() {
   const { self } = useContext(VariableContext);
   const { handleSetRealname } = useContext(ActionContext);
-  const [realName, setRealName] = useState(self.gamername || "");
+  const [realname, setRealName] = useState(self.gamername || "");
   const [fitsRequiredLength, setFitsRequiredLength] = useState(true);
 
   const handleSubmit = () => {
-    if (realName.length < 1 || realName.length > 13) {
+    if (realname.length < 1 || realname.length > 13) {
       setFitsRequiredLength(false);
       return;
     }
-    handleSetRealname(realName);
+    handleSetRealname(realname);
   };
 
   return (
@@ -45,7 +45,7 @@ export default function EnterName() {
       </Text>
       <InputBox
         placeholder={"Mafia name"}
-        value={realName}
+        value={realname}
         onChange={(e) => setRealName(e.target.value)}
         disableUnderline={true}
       />
@@ -54,7 +54,7 @@ export default function EnterName() {
           name must be between 1-13 characters
         </Text>
       ) : null}
-      <TheButton onClick={handleSubmit} disabled={realName.length === 0}>
+      <TheButton onClick={handleSubmit} disabled={realname.length === 0}>
         <Text size={18} weight={600} color={"var(--Main-White)"}>
           join
         </Text>

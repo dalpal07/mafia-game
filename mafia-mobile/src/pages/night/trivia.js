@@ -1,12 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { Text } from "../../components/text";
 import { ScrollableFlexColumnBox } from "../../components/boxes";
 import { NameButton, TheButton } from "../../components/button";
 import { Box } from "@mui/material";
+import { ActionContext } from "../../contexts/actions";
 import { getTriviaQuestions } from "../../trivia";
 
-export default function NightTrivia({ sendMessageToParent = () => {}, name = "trivia" }) {
-  const [questions, setQuestions] = useState(getTriviaQuestions(3));
+export default function NightTrivia() {
+  const { handleCivilianFinishTrivia } = useContext(ActionContext);
+
+  const [questions, setQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
 
@@ -14,15 +17,17 @@ export default function NightTrivia({ sendMessageToParent = () => {}, name = "tr
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
+    setQuestions(getTriviaQuestions(3));
+  }, []);
+
+  useEffect(() => {
     if (submitted) {
       if (currentQuestion === questions.length - 1) {
-        if (sendMessageToParent !== undefined) {
-          sendMessageToParent({ name: "finishedNight", player: name });
-        }
+        handleCivilianFinishTrivia();
       }
       setTimeout(() => {
         handleNextQuestion();
-      }, 1500);
+      }, 1000);
     }
   }, [submitted]);
 
@@ -39,14 +44,6 @@ export default function NightTrivia({ sendMessageToParent = () => {}, name = "tr
     setAnswer(null);
   };
 
-  const handlePlayAgain = () => {
-    setQuestions(getTriviaQuestions(5));
-    setCurrentQuestion(0);
-    setScore(0);
-    setAnswer(null);
-    setSubmitted(false);
-  };
-
   if (currentQuestion === questions.length) {
     return (
       <>
@@ -54,12 +51,6 @@ export default function NightTrivia({ sendMessageToParent = () => {}, name = "tr
         <Text weight={700} opacity={0.75}>
           {score}/{currentQuestion}
         </Text>
-        <Box style={{ flex: 1 }} />
-        <TheButton onClick={handlePlayAgain}>
-          <Text size={18} weight={700}>
-            play again
-          </Text>
-        </TheButton>
       </>
     );
   }

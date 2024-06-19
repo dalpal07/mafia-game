@@ -19523,13 +19523,13 @@ Please use another name.` );
 	}));
 	const NameButton = styled$1(TheButton)(({
 	  selected = false,
-	  selectedColor = "var(--Main-White)",
+	  selectedcolor = "var(--Main-White)",
 	  borderColor = "var(--Main-White)"
 	}) => ({
-	  backgroundColor: selected ? selectedColor : "transparent",
+	  backgroundColor: selected ? selectedcolor : "transparent",
 	  border: `1px solid ${borderColor}`,
 	  "&:hover": {
-	    backgroundColor: selected ? selectedColor : "transparent"
+	    backgroundColor: selected ? selectedcolor : "transparent"
 	  }
 	}));
 
@@ -21575,17 +21575,17 @@ Please use another name.` );
 	};
 	var LottiePlayer = makeLottiePlayer(lottie);
 
-	var v$2 = "5.9.0";
-	var fr$2 = 30;
-	var ip$2 = 0;
-	var op$2 = 60;
-	var w$2 = 277;
-	var h$2 = 630;
-	var nm$2 = "MafiaBanner3";
-	var ddd$2 = 0;
-	var assets$2 = [
+	var v$3 = "5.9.0";
+	var fr$3 = 30;
+	var ip$3 = 0;
+	var op$3 = 60;
+	var w$3 = 277;
+	var h$3 = 630;
+	var nm$3 = "MafiaBanner3";
+	var ddd$3 = 0;
+	var assets$3 = [
 	];
-	var layers$2 = [
+	var layers$3 = [
 		{
 			ddd: 0,
 			ind: 1,
@@ -43312,20 +43312,20 @@ Please use another name.` );
 			bm: 0
 		}
 	];
-	var markers$2 = [
+	var markers$3 = [
 	];
-	var lottieJson$1 = {
-		v: v$2,
-		fr: fr$2,
-		ip: ip$2,
-		op: op$2,
-		w: w$2,
-		h: h$2,
-		nm: nm$2,
-		ddd: ddd$2,
-		assets: assets$2,
-		layers: layers$2,
-		markers: markers$2
+	var lottieJson$2 = {
+		v: v$3,
+		fr: fr$3,
+		ip: ip$3,
+		op: op$3,
+		w: w$3,
+		h: h$3,
+		nm: nm$3,
+		ddd: ddd$3,
+		assets: assets$3,
+		layers: layers$3,
+		markers: markers$3
 	};
 
 	const WAITING_PLAYERS = 0;
@@ -43335,6 +43335,13 @@ Please use another name.` );
 	const INSTRUCTIONS = 4;
 	const NIGHTTIME = 5;
 	const NIGHTTIME_TIMER = 6;
+	const NIGHT_OVER = 7;
+	const STORY = 8;
+	const POST_STORY_2 = 10;
+	const ACCUSATIONS = 11;
+	const ACCUSED = 12;
+	const VOTING = 13;
+	const VOTING_TIMER = 14;
 	const GAME_OVER = 16;
 
 	const VariableContext = /*#__PURE__*/reactExports.createContext({
@@ -43540,7 +43547,13 @@ Please use another name.` );
 	  handleHostStart: () => {},
 	  handleHostSkip: () => {},
 	  handleMafiaSelection: () => {},
-	  handleMafiaVote: () => {}
+	  handleMafiaVote: () => {},
+	  handleDetectiveIdentification: () => {},
+	  handleAngelProtection: () => {},
+	  handleCivilianFinishTrivia: () => {},
+	  handleAccuse: () => {},
+	  handleLifeDeathSelection: () => {},
+	  handleLifeDeathVote: () => {}
 	});
 	const ActionProvider = ({
 	  children
@@ -43576,15 +43589,56 @@ Please use another name.` );
 	      vote: gamername
 	    }));
 	  };
+	  const handleDetectiveIdentification = gamername => {
+	    sendMessageToParent(JSON.stringify({
+	      name: "DetectiveIdentification",
+	      identification: gamername
+	    }));
+	  };
+	  const handleAngelProtection = gamername => {
+	    sendMessageToParent(JSON.stringify({
+	      name: "AngelProtection",
+	      protection: gamername
+	    }));
+	  };
+	  const handleCivilianFinishTrivia = () => {
+	    sendMessageToParent(JSON.stringify({
+	      name: "CivilianFinishTrivia"
+	    }));
+	  };
+	  const handleAccuse = gamername => {
+	    sendMessageToParent(JSON.stringify({
+	      name: "Accuse",
+	      accusation: gamername
+	    }));
+	  };
+	  const handleLifeDeathSelection = vote => {
+	    sendMessageToParent(JSON.stringify({
+	      name: "LifeDeathSelection",
+	      vote
+	    }));
+	  };
+	  const handleLifeDeathVote = vote => {
+	    sendMessageToParent(JSON.stringify({
+	      name: "LifeDeathVote",
+	      vote
+	    }));
+	  };
 	  const actions = reactExports.useMemo(() => {
 	    return {
 	      handleSetRealname,
 	      handleHostStart,
 	      handleHostSkip,
 	      handleMafiaSelection,
-	      handleMafiaVote
+	      handleMafiaVote,
+	      handleDetectiveIdentification,
+	      handleAngelProtection,
+	      handleCivilianFinishTrivia,
+	      handleAccuse,
+	      handleLifeDeathSelection,
+	      handleLifeDeathVote
 	    };
-	  }, [handleSetRealname, handleHostStart, handleHostSkip, handleMafiaSelection, handleMafiaVote]);
+	  }, [handleSetRealname, handleHostStart, handleHostSkip, handleMafiaSelection, handleMafiaVote, handleDetectiveIdentification, handleAngelProtection, handleCivilianFinishTrivia, handleAccuse, handleLifeDeathSelection, handleLifeDeathVote]);
 	  return /*#__PURE__*/React.createElement(ActionContext.Provider, {
 	    value: actions
 	  }, children);
@@ -43611,7 +43665,7 @@ Please use another name.` );
 	  if (!self.isHost) {
 	    return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(LottiePlayer, {
 	      loop: false,
-	      animationData: lottieJson$1,
+	      animationData: lottieJson$2,
 	      play: true,
 	      style: {
 	        height: screenHeight - 221
@@ -43649,7 +43703,7 @@ Please use another name.` );
 	  }
 	  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(LottiePlayer, {
 	    loop: false,
-	    animationData: lottieJson$1,
+	    animationData: lottieJson$2,
 	    play: true,
 	    style: {
 	      height: screenHeight - 221
@@ -43829,6 +43883,249 @@ Please use another name.` );
 	  }, "skip")) : null);
 	}
 
+	function NightAngel() {
+	  const {
+	    players
+	  } = reactExports.useContext(VariableContext);
+	  const {
+	    handleAngelProtection
+	  } = reactExports.useContext(ActionContext);
+	  const [selectedPlayer, setSelectedPlayer] = reactExports.useState(null);
+	  const [confirmed, setConfirmed] = reactExports.useState(false);
+	  const playersToList = players.filter(player => player.isAlive);
+	  const handleConfirmation = () => {
+	    setConfirmed(true);
+	    handleAngelProtection(selectedPlayer.gamername);
+	  };
+	  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Text, null, "who will you protect?"), /*#__PURE__*/React.createElement(ScrollableFlexColumnBox, null, playersToList.map((player, index) => {
+	    return /*#__PURE__*/React.createElement(NameButton, {
+	      key: index,
+	      selected: player.gamername === selectedPlayer?.gamername,
+	      selectedcolor: "var(--Main-Yellow)",
+	      onClick: () => {
+	        if (selectedPlayer?.gamername === player.gamername) {
+	          setSelectedPlayer(null);
+	          return;
+	        }
+	        setSelectedPlayer(player);
+	      },
+	      disabled: player.role === "angel" || confirmed
+	    }, /*#__PURE__*/React.createElement(Text, {
+	      size: 18
+	    }, player.realname));
+	  })), /*#__PURE__*/React.createElement(Box$1, {
+	    style: {
+	      flex: 1
+	    }
+	  }), /*#__PURE__*/React.createElement(TheButton, {
+	    disabled: selectedPlayer === null || confirmed,
+	    onClick: handleConfirmation
+	  }, /*#__PURE__*/React.createElement(Text, {
+	    size: 18,
+	    weight: 700
+	  }, confirmed ? "protected" : "protect")));
+	}
+
+	function NightDetective() {
+	  const {
+	    players,
+	    detectiveIdentifications
+	  } = reactExports.useContext(VariableContext);
+	  const {
+	    handleDetectiveIdentification
+	  } = reactExports.useContext(ActionContext);
+	  const [selectedPlayer, setSelectedPlayer] = reactExports.useState(null);
+	  const [confirmed, setConfirmed] = reactExports.useState(false);
+	  const playersToList = players.filter(player => player.isAlive);
+	  const handleConfirmation = () => {
+	    setConfirmed(true);
+	    handleDetectiveIdentification(selectedPlayer.gamername);
+	  };
+	  if (confirmed) {
+	    return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Text, null, selectedPlayer.realname), /*#__PURE__*/React.createElement(Text, {
+	      size: 18,
+	      opacity: 0.75
+	    }, "is a", selectedPlayer.role === "angel" ? "n" : null), /*#__PURE__*/React.createElement(Text, {
+	      size: 42,
+	      weight: 700
+	    }, selectedPlayer.role));
+	  }
+	  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Text, null, "who will you identify?"), /*#__PURE__*/React.createElement(ScrollableFlexColumnBox, null, playersToList.map((player, index) => {
+	    const knownRole = detectiveIdentifications.find(identification => identification.target.gamername === player.gamername)?.role;
+	    return /*#__PURE__*/React.createElement(NameButton, {
+	      key: index,
+	      selected: player.gamername === selectedPlayer?.gamername,
+	      selectedcolor: "var(--Main-Blue)",
+	      onClick: () => {
+	        if (selectedPlayer?.gamername === player.gamername) {
+	          setSelectedPlayer(null);
+	          return;
+	        }
+	        setSelectedPlayer(player);
+	      },
+	      disabled: knownRole || player.role === "detective"
+	    }, /*#__PURE__*/React.createElement(Text, {
+	      size: 18
+	    }, player.realname, knownRole || player.role === "detective" ? ` (${player.role})` : ""));
+	  })), /*#__PURE__*/React.createElement(Box$1, {
+	    style: {
+	      flex: 1
+	    }
+	  }), /*#__PURE__*/React.createElement(TheButton, {
+	    disabled: selectedPlayer === null,
+	    onClick: handleConfirmation
+	  }, /*#__PURE__*/React.createElement(Text, {
+	    size: 18,
+	    weight: 700
+	  }, "identify")));
+	}
+
+	const questions = [{
+	  question: 'who is known as the "Queen of Pop"?',
+	  options: ["Madonna", "Beyonce", "Rihanna", "Taylor Swift"],
+	  answer: "Madonna"
+	}, {
+	  question: "which country won the FIFA World Cup in 2018?",
+	  options: ["Croatia", "Belgium", "France", "England"],
+	  answer: "France"
+	}, {
+	  question: "what was considered to be the first video game ever created?",
+	  options: ["Space Invaders", "Pacman", "Tetris", "Pong"],
+	  answer: "Pong"
+	}, {
+	  question: "where does the game Mafia Originate From?",
+	  options: ["Italy", "Soviet Union", "USA", "Russia"],
+	  answer: "Soviet Union"
+	}, {
+	  question: "during the mid-20th century, the Mafia played a significant role in the development of which American city?",
+	  options: ["New York", "Chicago", "Los Angeles", "Las Vegas"],
+	  answer: "Las Vegas"
+	}, {
+	  question: "what term is commonly used to describe the Mafia's code of silence and refusal to cooperate with law enforcement?",
+	  options: ["Omerta", "Cosa Nostra", "Capo", "Consigliere"],
+	  answer: "Omerta"
+	}, {
+	  question: "what former Mafia member became a high-profile informant, helping the FBI dismantle the American Mafia in the 1980s?",
+	  options: ["John Junior Gotti", 'Salvatore "Sammy the Bull" Gravano', 'Vincent "The Chin" Gigante', 'Joseph "Joe Bananas" Bonanno'],
+	  answer: 'Salvatore "Sammy the Bull" Gravano'
+	}, {
+	  question: "what city is often considered the birthplace of the real-life Mafia, where criminal organizations like the Sicilian Mafia first emerged?",
+	  options: ["Rome", "Naples", "Palermo", "Venice"],
+	  answer: "Palermo"
+	}, {
+	  question: "what is the name of the Italian-American Mafia that emerged in the United States during the late 19th century?",
+	  options: ["Cosa Nostra", "La Cosa Nostra", "The Mob", "The Outfit"],
+	  answer: "Cosa Nostra"
+	}, {
+	  question: "which country doesn't border the Caspian Sea?",
+	  options: ["Azerbaijan", "Uzbekistan", "Kazakhstan", "Iran"],
+	  answer: "Uzbekistan"
+	}];
+	const getTriviaQuestions = quantity => {
+	  const questionsCopy = [...questions];
+	  const selectedQuestions = [];
+	  for (let i = 0; i < quantity; i++) {
+	    const randomIndex = Math.floor(Math.random() * questionsCopy.length);
+	    selectedQuestions.push(questionsCopy[randomIndex]);
+	    questionsCopy.splice(randomIndex, 1);
+	  }
+	  return selectedQuestions;
+	};
+
+	function NightTrivia() {
+	  const {
+	    handleCivilianFinishTrivia
+	  } = reactExports.useContext(ActionContext);
+	  const [questions, setQuestions] = reactExports.useState([]);
+	  const [currentQuestion, setCurrentQuestion] = reactExports.useState(0);
+	  const [score, setScore] = reactExports.useState(0);
+	  const [answer, setAnswer] = reactExports.useState(null);
+	  const [submitted, setSubmitted] = reactExports.useState(false);
+	  reactExports.useEffect(() => {
+	    setQuestions(getTriviaQuestions(3));
+	  }, []);
+	  reactExports.useEffect(() => {
+	    if (submitted) {
+	      if (currentQuestion === questions.length - 1) {
+	        handleCivilianFinishTrivia();
+	      }
+	      setTimeout(() => {
+	        handleNextQuestion();
+	      }, 1000);
+	    }
+	  }, [submitted]);
+	  const handleSubmission = () => {
+	    setSubmitted(true);
+	    if (answer === questions[currentQuestion].answer) {
+	      setScore(score + 1);
+	    }
+	  };
+	  const handleNextQuestion = () => {
+	    setCurrentQuestion(currentQuestion + 1);
+	    setSubmitted(false);
+	    setAnswer(null);
+	  };
+	  if (currentQuestion === questions.length) {
+	    return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Text, {
+	      opacity: 0.75
+	    }, "final results"), /*#__PURE__*/React.createElement(Text, {
+	      weight: 700,
+	      opacity: 0.75
+	    }, score, "/", currentQuestion));
+	  }
+	  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Text, null, questions[currentQuestion].question), /*#__PURE__*/React.createElement(ScrollableFlexColumnBox, null, questions[currentQuestion].options.map((option, index) => {
+	    return /*#__PURE__*/React.createElement(NameButton, {
+	      key: index,
+	      selected: answer === option,
+	      onClick: () => setAnswer(option),
+	      disabled: submitted
+	    }, /*#__PURE__*/React.createElement(Text, {
+	      size: 18,
+	      color: answer === option ? "var(--Main-Black)" : "var(--Main-White)"
+	    }, option));
+	  })), submitted ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Box$1, {
+	    style: {
+	      height: 12
+	    }
+	  }), /*#__PURE__*/React.createElement(Text, {
+	    size: 28,
+	    weight: 700,
+	    color: answer === questions[currentQuestion].answer ? "var(--Main-White)" : "var(--Main-Red)"
+	  }, answer === questions[currentQuestion].answer ? "correct" : "incorrect"), /*#__PURE__*/React.createElement(Text, {
+	    weight: 700,
+	    opacity: 0.75
+	  }, score, "/", currentQuestion + 1)) : null, /*#__PURE__*/React.createElement(Box$1, {
+	    style: {
+	      flex: 1
+	    }
+	  }), submitted ? null : /*#__PURE__*/React.createElement(TheButton, {
+	    disabled: answer === null,
+	    onClick: handleSubmission
+	  }, /*#__PURE__*/React.createElement(Text, {
+	    size: 18,
+	    weight: 700
+	  }, "submit")));
+	}
+
+	function NightCivilian() {
+	  const [answeringTrivia, setAnsweringTrivia] = reactExports.useState(false);
+	  reactExports.useEffect(() => {
+	    setTimeout(() => {
+	      setAnsweringTrivia(true);
+	    }, 3000);
+	  }, []);
+	  if (answeringTrivia) {
+	    return /*#__PURE__*/React.createElement(NightTrivia, null);
+	  }
+	  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Text, null, "trivia"), /*#__PURE__*/React.createElement(Text, {
+	    size: 18,
+	    opacity: 0.5
+	  }, "answer your trivia questions or"), /*#__PURE__*/React.createElement(Text, {
+	    weight: 700,
+	    color: "var(--Main-Red)"
+	  }, "you could risk death"));
+	}
+
 	const Skull = ({
 	  color = "var(--Main-White)"
 	}) => {
@@ -43842,6 +44139,36 @@ Please use another name.` );
 	    id: "Vector",
 	    d: "M13.9051 7.01586C13.9051 7.01586 13.9279 2.85911 10.255 1.3625C6.58209 -0.134103 -0.738744 0.862172 0.143714 8.0136C0.1618 8.16038 0.348504 9.08302 0.45542 9.60627C0.502761 9.83937 0.457016 10.0803 0.3251 10.2846C0.120842 10.6021 1.57192 12.5239 1.7448 13.1057C1.79905 13.2885 1.87406 13.3997 1.95118 13.466C2.16874 13.6533 2.30598 13.9059 2.31289 14.18L2.36023 16.1491C2.36395 16.2974 2.40279 16.4437 2.47779 16.5753C3.63897 18.6205 5.39378 19.0799 6.07358 19.1823C6.22677 19.2057 6.38315 19.1935 6.53369 19.157C7.13263 19.0126 7.89753 19.1745 7.89753 19.1745C9.61883 19.529 11.0763 17.2215 11.4673 16.5358C11.5348 16.4173 11.5752 16.2871 11.5859 16.154L11.7486 14.1219C11.7662 13.9044 11.8572 13.6948 12.0194 13.5353C12.4183 13.1437 13.137 11.276 13.4295 10.7566C13.5763 10.4958 13.5934 10.3373 13.5609 10.2407C13.5056 10.0739 13.5146 9.89399 13.5678 9.72672C13.8301 8.89869 13.9056 7.01586 13.9056 7.01586H13.9051ZM3.65812 10.2714C2.40385 10.6611 2.01927 9.41804 2.01927 9.41804C2.01927 9.41804 1.4932 8.10089 1.89799 7.43329C2.30278 6.7657 3.71876 6.35753 4.8725 6.69157C6.0257 7.02562 5.82357 8.71338 5.82357 8.71338C5.92464 9.04742 4.91292 9.8818 3.65865 10.2714H3.65812ZM7.74541 12.2659C7.74541 12.2659 7.08955 12.4308 6.92571 11.5198C6.94593 11.8836 6.87199 12.4888 6.08634 12.1816C4.99377 11.7549 6.65284 9.084 6.65284 9.084C6.65284 9.084 6.65816 8.78702 6.92891 8.8431C7.19965 8.89918 7.21987 8.89869 7.30072 9.14008C7.38157 9.38147 8.85872 11.4784 7.74594 12.2664L7.74541 12.2659ZM11.8933 9.71502C11.8933 9.71502 11.1651 10.8839 9.48585 9.87302C9.48585 9.87302 8.15073 9.28247 8.08956 8.4598C8.02892 7.63762 8.67627 6.58331 9.40447 6.57259C10.1327 6.56186 11.4279 6.80276 11.8933 7.26652C12.3588 7.73027 11.8933 9.71502 11.8933 9.71502Z",
 	    fill: color
+	  }));
+	};
+	const Finger = ({
+	  color = "var(--Main-White)"
+	}) => {
+	  return /*#__PURE__*/React.createElement("svg", {
+	    width: "15",
+	    height: "22",
+	    viewBox: "0 0 15 22",
+	    fill: "none",
+	    xmlns: "http://www.w3.org/2000/svg"
+	  }, /*#__PURE__*/React.createElement("path", {
+	    fillRule: "evenodd",
+	    clipRule: "evenodd",
+	    d: "M3.74833 0.260466C2.87675 0.260466 2.17019 0.967025 2.17019 1.83861V8.85263C2.15991 8.86806 0.416748 11.4849 0.416748 12.1842C0.416748 12.8856 1.81954 14.9898 1.81954 14.9898L2.20715 15.4743C2.42275 16.8737 3.5576 17.9699 4.9756 18.1268V20.9516C4.9756 20.9516 6.72909 21.3023 8.48258 21.127C10.2361 20.9516 11.6389 20.0749 11.6389 20.0749V18.1244C13.023 17.952 14.0942 16.7714 14.0942 15.3405V9.37862C14.0942 8.60388 13.4662 7.97583 12.6914 7.97583C11.9241 7.97583 11.3006 8.59196 11.2888 9.35651V9.02792C11.2888 8.25318 10.6607 7.62513 9.88601 7.62513C9.11127 7.62513 8.48322 8.25318 8.48322 9.02792V16.7433H8.4831V8.85257C8.4831 7.98099 7.77655 7.27443 6.90497 7.27443C6.03338 7.27443 5.32683 7.98099 5.32683 8.85257V16.7433H5.32647V1.83861C5.32647 0.967023 4.61991 0.260466 3.74833 0.260466Z",
+	    fill: color
+	  }));
+	};
+	const Lock = () => {
+	  return /*#__PURE__*/React.createElement("svg", {
+	    xmlns: "http://www.w3.org/2000/svg",
+	    width: "16",
+	    height: "22",
+	    viewBox: "0 0 16 22",
+	    fill: "none"
+	  }, /*#__PURE__*/React.createElement("path", {
+	    fillRule: "evenodd",
+	    clipRule: "evenodd",
+	    d: "M13.8286 6.28571C13.8286 4.61864 13.1663 3.01984 11.9875 1.84104C10.8087 0.662243 9.20993 0 7.54286 0C5.87578 0 4.27699 0.662243 3.09819 1.84104C1.91939 3.01984 1.25714 4.61864 1.25714 6.28571V10.0571H0V22H15.0857V10.0571H13.8286V6.28571ZM11.3143 6.28571H11.3141C11.3141 4.20281 9.62558 2.51429 7.54268 2.51429C5.4598 2.51429 3.7713 4.20276 3.77125 6.28562L3.77143 6.28571V10.0571H11.3143V6.28571Z",
+	    fill: "#BB3737"
 	  }));
 	};
 	const FullLogo = () => {
@@ -43968,6 +44295,722 @@ Please use another name.` );
 	    size: 18,
 	    weight: 700
 	  }, myVote === null ? "confirm vote" : "vote confirmed")));
+	}
+
+	function NightFinished() {
+	  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(ConstrainedBox, {
+	    width: 289
+	  }, /*#__PURE__*/React.createElement(Text, {
+	    size: 18,
+	    opacity: 0.75
+	  }, "see screen to learn what happened during the night")));
+	}
+
+	var v$2 = "5.9.0";
+	var fr$2 = 30;
+	var ip$2 = 0;
+	var op$2 = 60;
+	var w$2 = 20;
+	var h$2 = 35;
+	var nm$2 = "FinalHand";
+	var ddd$2 = 0;
+	var assets$2 = [
+	];
+	var layers$2 = [
+		{
+			ddd: 0,
+			ind: 1,
+			ty: 4,
+			nm: "Layer 1/Group 17 Outlines",
+			sr: 1,
+			ks: {
+				o: {
+					a: 0,
+					k: 100,
+					ix: 11
+				},
+				r: {
+					a: 0,
+					k: 0,
+					ix: 10
+				},
+				p: {
+					a: 0,
+					k: [
+						10,
+						17.5,
+						0
+					],
+					ix: 2,
+					l: 2
+				},
+				a: {
+					a: 0,
+					k: [
+						20,
+						30.5,
+						0
+					],
+					ix: 1,
+					l: 2
+				},
+				s: {
+					a: 1,
+					k: [
+						{
+							i: {
+								x: [
+									0.833,
+									0.833,
+									0.833
+								],
+								y: [
+									0.833,
+									0.833,
+									0.833
+								]
+							},
+							o: {
+								x: [
+									0.167,
+									0.167,
+									0.167
+								],
+								y: [
+									0.167,
+									0.167,
+									0.167
+								]
+							},
+							t: 0,
+							s: [
+								34,
+								34,
+								100
+							]
+						},
+						{
+							i: {
+								x: [
+									0.833,
+									0.833,
+									0.833
+								],
+								y: [
+									0.833,
+									0.833,
+									0.833
+								]
+							},
+							o: {
+								x: [
+									0.167,
+									0.167,
+									0.167
+								],
+								y: [
+									0.167,
+									0.167,
+									0.167
+								]
+							},
+							t: 30,
+							s: [
+								47,
+								47,
+								100
+							]
+						},
+						{
+							t: 60,
+							s: [
+								34,
+								34,
+								100
+							]
+						}
+					],
+					ix: 6,
+					l: 2
+				}
+			},
+			ao: 0,
+			shapes: [
+				{
+					ty: "gr",
+					it: [
+						{
+							ind: 0,
+							ty: "sh",
+							ix: 1,
+							ks: {
+								a: 0,
+								k: {
+									i: [
+										[
+											2.485,
+											0
+										],
+										[
+											0,
+											-2.485
+										],
+										[
+											0,
+											0
+										],
+										[
+											0,
+											-2
+										],
+										[
+											0,
+											0
+										],
+										[
+											0,
+											0
+										],
+										[
+											-4.044,
+											-0.447
+										],
+										[
+											0,
+											0
+										],
+										[
+											-5,
+											0.5
+										],
+										[
+											0,
+											0
+										],
+										[
+											0,
+											0
+										],
+										[
+											0,
+											4.08
+										],
+										[
+											0,
+											0
+										],
+										[
+											2.209,
+											0
+										],
+										[
+											0,
+											-2.209
+										],
+										[
+											0,
+											0
+										],
+										[
+											2.209,
+											0
+										],
+										[
+											0,
+											-2.209
+										],
+										[
+											0,
+											0
+										],
+										[
+											2.485,
+											0
+										],
+										[
+											0,
+											-2.485
+										],
+										[
+											0,
+											0
+										]
+									],
+									o: [
+										[
+											-2.485,
+											0
+										],
+										[
+											0,
+											0
+										],
+										[
+											0,
+											0
+										],
+										[
+											0,
+											2
+										],
+										[
+											0,
+											0
+										],
+										[
+											0.615,
+											3.99
+										],
+										[
+											0,
+											0
+										],
+										[
+											0,
+											0
+										],
+										[
+											5,
+											-0.5
+										],
+										[
+											0,
+											0
+										],
+										[
+											3.946,
+											-0.492
+										],
+										[
+											0,
+											0
+										],
+										[
+											0,
+											-2.209
+										],
+										[
+											-2.209,
+											0
+										],
+										[
+											0,
+											0
+										],
+										[
+											0,
+											-2.209
+										],
+										[
+											-2.209,
+											0
+										],
+										[
+											0,
+											0
+										],
+										[
+											0,
+											-2.485
+										],
+										[
+											-2.485,
+											0
+										],
+										[
+											0,
+											0
+										],
+										[
+											0,
+											-2.485
+										]
+									],
+									v: [
+										[
+											-10,
+											-30
+										],
+										[
+											-14.5,
+											-25.5
+										],
+										[
+											-14.5,
+											-5.5
+										],
+										[
+											-19.5,
+											4
+										],
+										[
+											-15.5,
+											12
+										],
+										[
+											-14.395,
+											13.382
+										],
+										[
+											-6.5,
+											20.945
+										],
+										[
+											-6.5,
+											29
+										],
+										[
+											3.5,
+											29.5
+										],
+										[
+											12.5,
+											26.5
+										],
+										[
+											12.5,
+											20.938
+										],
+										[
+											19.5,
+											13
+										],
+										[
+											19.5,
+											-4
+										],
+										[
+											15.5,
+											-8
+										],
+										[
+											11.5,
+											-4
+										],
+										[
+											11.5,
+											-5
+										],
+										[
+											7.5,
+											-9
+										],
+										[
+											3.5,
+											-5
+										],
+										[
+											3.5,
+											-5.5
+										],
+										[
+											-1,
+											-10
+										],
+										[
+											-5.5,
+											-5.5
+										],
+										[
+											-5.5,
+											-25.5
+										]
+									],
+									c: true
+								},
+								ix: 2
+							},
+							nm: "Path 1",
+							mn: "ADBE Vector Shape - Group",
+							hd: false
+						},
+						{
+							ty: "fl",
+							c: {
+								a: 0,
+								k: [
+									0.733333333333,
+									0.215686289469,
+									0.215686289469,
+									1
+								],
+								ix: 4
+							},
+							o: {
+								a: 0,
+								k: 100,
+								ix: 5
+							},
+							r: 1,
+							bm: 0,
+							nm: "Fill 1",
+							mn: "ADBE Vector Graphic - Fill",
+							hd: false
+						},
+						{
+							ty: "tr",
+							p: {
+								a: 0,
+								k: [
+									19.75,
+									30.25
+								],
+								ix: 2
+							},
+							a: {
+								a: 0,
+								k: [
+									0,
+									0
+								],
+								ix: 1
+							},
+							s: {
+								a: 0,
+								k: [
+									100,
+									100
+								],
+								ix: 3
+							},
+							r: {
+								a: 0,
+								k: 0,
+								ix: 6
+							},
+							o: {
+								a: 0,
+								k: 100,
+								ix: 7
+							},
+							sk: {
+								a: 0,
+								k: 0,
+								ix: 4
+							},
+							sa: {
+								a: 0,
+								k: 0,
+								ix: 5
+							},
+							nm: "Transform"
+						}
+					],
+					nm: "Group 1",
+					np: 2,
+					cix: 2,
+					bm: 0,
+					ix: 1,
+					mn: "ADBE Vector Group",
+					hd: false
+				}
+			],
+			ip: 0,
+			op: 60,
+			st: 0,
+			bm: 0
+		}
+	];
+	var markers$2 = [
+	];
+	var lottieJson$1 = {
+		v: v$2,
+		fr: fr$2,
+		ip: ip$2,
+		op: op$2,
+		w: w$2,
+		h: h$2,
+		nm: nm$2,
+		ddd: ddd$2,
+		assets: assets$2,
+		layers: layers$2,
+		markers: markers$2
+	};
+
+	function Day() {
+	  const {
+	    self,
+	    players,
+	    currentAccusations,
+	    recentlyAccused,
+	    detectiveIdentifications
+	  } = reactExports.useContext(VariableContext);
+	  const {
+	    handleAccuse
+	  } = reactExports.useContext(ActionContext);
+	  const [selectedPlayer, setSelectedPlayer] = reactExports.useState(null);
+	  const playersToList = players.filter(player => player.isAlive);
+	  const beingAccused = currentAccusations.find(accusation => accusation.target.gamername === self.gamername) ? true : false;
+	  const myAccusation = currentAccusations.find(accusation => accusation.player.gamername === self.gamername);
+	  const knownPlayerRoles = self.role === "detective" ? detectiveIdentifications.map(identification => identification.target.gamername) : [];
+	  const handleSubmitAccuse = () => {
+	    handleAccuse(selectedPlayer.gamername);
+	    setSelectedPlayer(null);
+	  };
+	  return /*#__PURE__*/React.createElement(React.Fragment, null, beingAccused ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Text, {
+	    weight: 700,
+	    color: "var(--Main-Red)",
+	    size: 24
+	  }, "you are being accused"), /*#__PURE__*/React.createElement(Text, {
+	    size: 18,
+	    opacity: 0.75
+	  }, "defend yourself")) : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Text, null, "who will you accuse?"), /*#__PURE__*/React.createElement(Text, {
+	    size: 18,
+	    opacity: 0.75
+	  }, "2+ accusations are required")), /*#__PURE__*/React.createElement(ScrollableFlexColumnBox, null, playersToList.map((player, index) => {
+	    const iAccused = myAccusation?.target.gamername === player.gamername;
+	    const otherAccusation = currentAccusations.find(accusation => accusation.target.gamername === player.gamername && accusation.player.gamername !== self.gamername);
+	    return /*#__PURE__*/React.createElement(NameButton, {
+	      key: index,
+	      selected: selectedPlayer?.gamername === player.gamername,
+	      onClick: () => {
+	        if (iAccused) return;
+	        if (selectedPlayer?.gamername === player.gamername) {
+	          setSelectedPlayer(null);
+	          return;
+	        }
+	        setSelectedPlayer(player);
+	      },
+	      disabled: player.gamername === self.gamername || player.gamername === recentlyAccused?.gamername
+	    }, /*#__PURE__*/React.createElement(Box$1, {
+	      style: {
+	        display: "flex",
+	        flexDirection: "row",
+	        alignItems: "center",
+	        justifyContent: "center",
+	        gap: 3,
+	        position: "absolute",
+	        right: 15
+	      }
+	    }, otherAccusation ? /*#__PURE__*/React.createElement(Box$1, {
+	      style: {
+	        width: 30.158,
+	        height: 30.158,
+	        borderRadius: "50%",
+	        backgroundColor: "transparent",
+	        display: "flex",
+	        alignItems: "center",
+	        justifyContent: "center",
+	        position: "relative",
+	        opacity: player.gamername === self.gamername ? 1 : 0.5
+	      }
+	    }, player.gamername === self.gamername ? /*#__PURE__*/React.createElement(LottiePlayer, {
+	      loop: true,
+	      animationData: lottieJson$1,
+	      play: true,
+	      style: {
+	        maxHeight: 35
+	      }
+	    }) : selectedPlayer?.gamername === player.gamername ? /*#__PURE__*/React.createElement(Finger, {
+	      color: "var(--Main-Black)"
+	    }) : /*#__PURE__*/React.createElement(Finger, {
+	      color: "var(--Main-White)"
+	    })) : null, iAccused ? /*#__PURE__*/React.createElement(Box$1, {
+	      style: {
+	        width: 30.158,
+	        height: 30.158,
+	        borderRadius: "50%",
+	        backgroundColor: "var(--Main-Red)",
+	        display: "flex",
+	        alignItems: "center",
+	        justifyContent: "center",
+	        position: "relative"
+	      }
+	    }, /*#__PURE__*/React.createElement(Finger, null)) : null), /*#__PURE__*/React.createElement(Box$1, {
+	      style: {
+	        display: "flex",
+	        flexDirection: "row",
+	        alignItems: "center",
+	        justifyContent: "center",
+	        position: "absolute",
+	        left: 15
+	      }
+	    }, player.gamername === recentlyAccused?.gamername ? /*#__PURE__*/React.createElement(Lock, null) : null), /*#__PURE__*/React.createElement(Text, {
+	      size: 18,
+	      color: selectedPlayer?.gamername === player.gamername ? "var(--Main-Black)" : "var(--Main-White)"
+	    }, player.realname, self.role === "mafia" && player.role === "mafia" || knownPlayerRoles.includes(player.gamername) ? ` (${player.role})` : null));
+	  })), /*#__PURE__*/React.createElement(TheButton, {
+	    onClick: handleSubmitAccuse,
+	    disabled: !selectedPlayer
+	  }, /*#__PURE__*/React.createElement(Text, {
+	    size: 18,
+	    weight: 700
+	  }, "accuse")));
+	}
+
+	function Voting() {
+	  const {
+	    self,
+	    recentlyAccused
+	  } = reactExports.useContext(VariableContext);
+	  const {
+	    handleLifeDeathSelection,
+	    handleLifeDeathVote
+	  } = reactExports.useContext(ActionContext);
+	  const [vote, setVote] = reactExports.useState(null);
+	  const [submitted, setSubmitted] = reactExports.useState(false);
+	  const handleSubmission = () => {
+	    setSubmitted(true);
+	    handleLifeDeathVote(vote);
+	  };
+	  if (self.gamername === recentlyAccused?.gamername) {
+	    return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(ConstrainedBox, {
+	      width: 289
+	    }, /*#__PURE__*/React.createElement(Text, {
+	      size: 18,
+	      opacity: 0.75
+	    }, "a decision is being made about your life. you cannot vote")));
+	  }
+	  if (submitted) {
+	    return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Text, {
+	      size: 18
+	    }, "your vote has been submitted"), /*#__PURE__*/React.createElement(Text, {
+	      size: 18,
+	      opacity: 0.75
+	    }, "see the main screen for the results"));
+	  }
+	  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Text, null, "should ", recentlyAccused?.realname, " live or die?"), /*#__PURE__*/React.createElement(Text, {
+	    size: 18,
+	    opacity: 0.75
+	  }, "post your vote"), /*#__PURE__*/React.createElement(NameButton, {
+	    onClick: () => {
+	      handleLifeDeathSelection("live");
+	      if (vote === "live") {
+	        setVote(null);
+	        return;
+	      }
+	      setVote("live");
+	    },
+	    selected: vote === "live"
+	  }, /*#__PURE__*/React.createElement(Text, {
+	    size: 18,
+	    weight: 700,
+	    color: vote === "live" ? "var(--Main-Black)" : "var(--Main-White)"
+	  }, "live")), /*#__PURE__*/React.createElement(NameButton, {
+	    onClick: () => {
+	      handleLifeDeathSelection("die");
+	      if (vote === "die") {
+	        setVote(null);
+	        return;
+	      }
+	      setVote("die");
+	    },
+	    selected: vote === "die"
+	  }, /*#__PURE__*/React.createElement(Text, {
+	    size: 18,
+	    weight: 700,
+	    color: vote === "die" ? "var(--Main-Black)" : "var(--Main-White)"
+	  }, "die")), /*#__PURE__*/React.createElement(Box$1, {
+	    style: {
+	      flex: 1
+	    }
+	  }), /*#__PURE__*/React.createElement(TheButton, {
+	    disabled: vote === null,
+	    onClick: handleSubmission
+	  }, /*#__PURE__*/React.createElement(Text, {
+	    size: 18,
+	    weight: 700
+	  }, "submit vote")));
 	}
 
 	var v$1 = "5.9.0";
@@ -48082,14 +49125,14 @@ Please use another name.` );
 	  const {
 	    handleSetRealname
 	  } = reactExports.useContext(ActionContext);
-	  const [realName, setRealName] = reactExports.useState(self.gamername || "");
+	  const [realname, setRealName] = reactExports.useState(self.gamername || "");
 	  const [fitsRequiredLength, setFitsRequiredLength] = reactExports.useState(true);
 	  const handleSubmit = () => {
-	    if (realName.length < 1 || realName.length > 13) {
+	    if (realname.length < 1 || realname.length > 13) {
 	      setFitsRequiredLength(false);
 	      return;
 	    }
-	    handleSetRealname(realName);
+	    handleSetRealname(realname);
 	  };
 	  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Box$1, {
 	    style: {
@@ -48104,7 +49147,7 @@ Please use another name.` );
 	    weight: 400
 	  }, "Enter your Mafia name"), /*#__PURE__*/React.createElement(InputBox, {
 	    placeholder: "Mafia name",
-	    value: realName,
+	    value: realname,
 	    onChange: e => setRealName(e.target.value),
 	    disableUnderline: true
 	  }), !fitsRequiredLength ? /*#__PURE__*/React.createElement(Text, {
@@ -48112,17 +49155,13 @@ Please use another name.` );
 	    color: "var(--Main-Red)"
 	  }, "name must be between 1-13 characters") : null, /*#__PURE__*/React.createElement(TheButton, {
 	    onClick: handleSubmit,
-	    disabled: realName.length === 0
+	    disabled: realname.length === 0
 	  }, /*#__PURE__*/React.createElement(Text, {
 	    size: 18,
 	    weight: 600,
 	    color: "var(--Main-White)"
 	  }, "join")));
 	}
-
-	// import NightDetective from './detective';
-	// import NightAngel from './angel';
-	// import NightCivilian from './civilian';
 
 	function Night({
 	  timerStarted = false
@@ -48131,11 +49170,10 @@ Please use another name.` );
 	    self
 	  } = reactExports.useContext(VariableContext);
 	  if (!timerStarted) return null;
-	  if (self.role === 'mafia') return /*#__PURE__*/React.createElement(NightMafia, null);
-	  // if (self.role === 'detective') return <NightDetective />;
-	  // if (self.role === 'angel') return <NightAngel />;
-	  // return <NightCivilian />;
-	  return null;
+	  if (self.role === "mafia") return /*#__PURE__*/React.createElement(NightMafia, null);
+	  if (self.role === "detective") return /*#__PURE__*/React.createElement(NightDetective, null);
+	  if (self.role === "angel") return /*#__PURE__*/React.createElement(NightAngel, null);
+	  return /*#__PURE__*/React.createElement(NightCivilian, null);
 	}
 
 	const MIN_PLAYERS = 5;
@@ -48154,7 +49192,26 @@ Please use another name.` );
 	      setScreenHeight(window.innerHeight);
 	    }
 	  }, []);
+	  reactExports.useEffect(() => {
+	    if (!self.isAlive) return;
+	    if (page === NIGHT_OVER) {
+	      setHeaderTime("day");
+	      setTimeout(() => {
+	        setBgColor("var(--Main-Gray)");
+	        setImage("url(./assets/day-clouds.png)");
+	      }, 1250);
+	    }
+	  }, [page]);
+	  reactExports.useEffect(() => {
+	    if (self.isAlive) return;
+	    setBgColor("var(--Heaven-White)");
+	    setImage("url(./assets/heaven-clouds.png)");
+	    setHeaderColor("var(--Main-Black)");
+	  }, [self.isAlive]);
 	  function getPage(page) {
+	    if (!self.isAlive) {
+	      return null;
+	    }
 	    switch (page) {
 	      case WAITING_PLAYERS:
 	        if (!self.realname || self.realname.length === 0) {
@@ -48180,6 +49237,17 @@ Please use another name.` );
 	        return /*#__PURE__*/React.createElement(Night, {
 	          timerStarted: true
 	        });
+	      case NIGHT_OVER:
+	      case STORY:
+	      case POST_STORY_2:
+	        return /*#__PURE__*/React.createElement(NightFinished, null);
+	      case ACCUSATIONS:
+	        return /*#__PURE__*/React.createElement(Day, null);
+	      case ACCUSED:
+	      case VOTING:
+	        return null;
+	      case VOTING_TIMER:
+	        return /*#__PURE__*/React.createElement(Voting, null);
 	      // case NIGHT:
 	      //   switch (role) {
 	      //     case "mafia":

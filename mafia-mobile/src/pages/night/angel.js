@@ -2,48 +2,23 @@ import React from "react";
 import { ScrollableFlexColumnBox } from "../../components/boxes";
 import { Text } from "../../components/text";
 import { NameButton, TheButton } from "../../components/button";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Box } from "@mui/material";
-import NightTrivia from "./trivia";
+import { VariableContext } from "../../contexts/variables";
+import { ActionContext } from "../../contexts/actions";
 
-export default function NightAngel({ name = "angel", players = [], sendMessageToParent = () => { } }) {
+export default function NightAngel() {
+  const { players } = useContext(VariableContext);
+  const { handleAngelProtection } = useContext(ActionContext);
+
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [confirmed, setConfirmed] = useState(false);
-
-  const [answeringTrivia, setAnsweringTrivia] = useState(false);
-
-  const playersToList = players.filter((player) => !player.inHeaven);
+  const playersToList = players.filter((player) => player.isAlive);
 
   const handleConfirmation = () => {
     setConfirmed(true);
-    sendMessageToParent({ name: "protect", target: selectedPlayer });
-    sendMessageToParent({ name: "finishedNight", player: name });
+    handleAngelProtection(selectedPlayer.gamername);
   };
-
-  if (answeringTrivia) {
-    return <NightTrivia />;
-  }
-
-  if (confirmed) {
-    return (
-      <>
-        <Text>{selectedPlayer}</Text>
-        <Text size={18} opacity={0.75}>
-          will be protected
-        </Text>
-        <Box style={{ flex: 1 }} />
-        <Text size={18} opacity={0.75}>
-          the night isn't over yet
-        </Text>
-        <Box style={{ height: 1 }} />
-        <TheButton onClick={() => setAnsweringTrivia(true)}>
-          <Text size={18} weight={700}>
-            play trivia
-          </Text>
-        </TheButton>
-      </>
-    );
-  }
 
   return (
     <>
@@ -53,23 +28,29 @@ export default function NightAngel({ name = "angel", players = [], sendMessageTo
           return (
             <NameButton
               key={index}
-              selected={player.realName === selectedPlayer}
-              selectedColor={"var(--Main-Yellow)"}
-              onClick={() => setSelectedPlayer(player.realName)}
-              disabled={player.name === name}
+              selected={player.gamername === selectedPlayer?.gamername}
+              selectedcolor={"var(--Main-Yellow)"}
+              onClick={() => {
+                if (selectedPlayer?.gamername === player.gamername) {
+                  setSelectedPlayer(null);
+                  return;
+                }
+                setSelectedPlayer(player);
+              }}
+              disabled={player.role === "angel" || confirmed}
             >
-              <Text size={18}>{player.realName}</Text>
+              <Text size={18}>{player.realname}</Text>
             </NameButton>
           );
         })}
       </ScrollableFlexColumnBox>
       <Box style={{ flex: 1 }} />
       <TheButton
-        disabled={selectedPlayer === null}
+        disabled={selectedPlayer === null || confirmed}
         onClick={handleConfirmation}
       >
         <Text size={18} weight={700}>
-          protect
+          {confirmed ? "protected" : "protect"}
         </Text>
       </TheButton>
     </>

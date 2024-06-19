@@ -1,24 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Box } from "@mui/material";
 import { ConstrainedBox } from "../components/boxes";
 import { Text } from "../components/text";
 import { NameButton, TheButton } from "../components/button";
+import { VariableContext } from "../contexts/variables";
+import { ActionContext } from "../contexts/actions";
 
-export default function Voting({
-  name,
-  playerBeingVotedOn,
-  votingActive,
-  sendMessageToParent,
-}) {
+export default function Voting() {
+  const { self, recentlyAccused } = useContext(VariableContext);
+  const { handleLifeDeathSelection, handleLifeDeathVote } =
+    useContext(ActionContext);
+
   const [vote, setVote] = useState(null);
   const [submitted, setSubmitted] = useState(false);
 
   const handleSubmission = () => {
     setSubmitted(true);
-    sendMessageToParent({ name: "voteSubmitted", player: name });
+    handleLifeDeathVote(vote);
   };
 
-  if (name === playerBeingVotedOn?.name) {
+  if (self.gamername === recentlyAccused?.gamername) {
     return (
       <>
         <ConstrainedBox width={289}>
@@ -43,13 +44,17 @@ export default function Voting({
 
   return (
     <>
-      <Text>should {playerBeingVotedOn?.realName} live or die?</Text>
+      <Text>should {recentlyAccused?.realname} live or die?</Text>
       <Text size={18} opacity={0.75}>
         post your vote
       </Text>
       <NameButton
         onClick={() => {
-          sendMessageToParent({ name: "vote", vote: "live", player: name });
+          handleLifeDeathSelection("live");
+          if (vote === "live") {
+            setVote(null);
+            return;
+          }
           setVote("live");
         }}
         selected={vote === "live"}
@@ -64,7 +69,11 @@ export default function Voting({
       </NameButton>
       <NameButton
         onClick={() => {
-          sendMessageToParent({ name: "vote", vote: "die", player: name });
+          handleLifeDeathSelection("die");
+          if (vote === "die") {
+            setVote(null);
+            return;
+          }
           setVote("die");
         }}
         selected={vote === "die"}
@@ -78,10 +87,7 @@ export default function Voting({
         </Text>
       </NameButton>
       <Box style={{ flex: 1 }} />
-      <TheButton
-        disabled={vote === null || !votingActive}
-        onClick={handleSubmission}
-      >
+      <TheButton disabled={vote === null} onClick={handleSubmission}>
         <Text size={18} weight={700}>
           submit vote
         </Text>

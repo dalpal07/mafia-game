@@ -60,7 +60,7 @@ export default function HeavenDay({ players, nightRecap, accusing }) {
                   ) : null}
                 </Box>
                 <Text size={18} color={"var(--Main-Black)"}>
-                  {player.realName}
+                  {player.realname}
                 </Text>
               </NameButton>
             );

@@ -7,10 +7,7 @@ import lottieJson from "../assets/moon-sun.json";
 import lottieJsonHeaven from "../assets/moon-sun-heaven.json";
 import { VariableContext } from "../contexts/variables";
 
-export default function Header({
-  time,
-  color = "var(--Main-White)",
-}) {
+export default function Header({ time, color = "var(--Main-White)" }) {
   const { self } = useContext(VariableContext);
 
   const [currentTime, setCurrentTime] = useState("night");

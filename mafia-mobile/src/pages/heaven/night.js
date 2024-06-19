@@ -21,13 +21,13 @@ export default function HeavenNight({ players }) {
     if (actionsFollowing === "angel") {
       const angelSaved = players.find((player) => player.saved);
       if (angelSaved) {
-        setFollowingTarget(angelSaved.realName);
+        setFollowingTarget(angelSaved.realname);
       }
     }
     if (actionsFollowing === "detective") {
       const detectiveFound = players.find((player) => player.identified);
       if (detectiveFound) {
-        setFollowingTarget(detectiveFound.realName);
+        setFollowingTarget(detectiveFound.realname);
         setFollowingTargetRole(detectiveFound.role);
       }
     }
@@ -37,7 +37,7 @@ export default function HeavenNight({ players }) {
     setActionsFollowing(selected);
     const followingName = players.find(
       (player) => player.role === selected,
-    )?.realName;
+    )?.realname;
     setFollowingName(followingName);
   };
 
@@ -158,7 +158,7 @@ export default function HeavenNight({ players }) {
                   ) : null}
                 </Box>
                 <Text size={18} color={"var(--Main-Black)"}>
-                  {player.realName}
+                  {player.realname}
                   {player.role === "mafia" ? " (mafia)" : null}
                 </Text>
               </NameButton>
@@ -178,7 +178,7 @@ export default function HeavenNight({ players }) {
       </ConstrainedBox>
       <NameButton
         borderColor={"var(--Main-Black)"}
-        selectedColor={"var(--Main-Yellow)"}
+        selectedcolor={"var(--Main-Yellow)"}
         selected={selected === "angel"}
         onClick={() => setSelected("angel")}
         disabled={players.find((player) => player.role === "angel")?.inHeaven}
@@ -192,7 +192,7 @@ export default function HeavenNight({ players }) {
       </NameButton>
       <NameButton
         borderColor={"var(--Main-Black)"}
-        selectedColor={"var(--Main-Blue)"}
+        selectedcolor={"var(--Main-Blue)"}
         selected={selected === "detective"}
         onClick={() => setSelected("detective")}
         disabled={
@@ -213,7 +213,7 @@ export default function HeavenNight({ players }) {
       </NameButton>
       <NameButton
         borderColor={"var(--Main-Black)"}
-        selectedColor={"var(--Main-Red)"}
+        selectedcolor={"var(--Main-Red)"}
         selected={selected === "mafia"}
         onClick={() => setSelected("mafia")}
       >
