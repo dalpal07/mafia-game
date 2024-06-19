@@ -6,6 +6,14 @@ import { VariableContext } from "../contexts/variables";
 export default function NighttimeTimer() {
   const { nighttimeTimer, setNighttimeTimer } = useContext(VariableContext);
 
+  const nighttimeAudio = new Audio("./assets/Nightloop.wav");
+
+  useEffect(() => {
+    nighttimeAudio.loop = true;
+    nighttimeAudio.play();
+    return () => nighttimeAudio.pause();
+  }, []);
+
   return (
     <>
       <Text size={36} opacity={0.5}>

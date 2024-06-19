@@ -2,7 +2,6 @@ import React, {
   createContext,
   useContext,
   useMemo,
-  useState,
   useRef,
 } from "react";
 import { VariableContext } from "./variables";
@@ -64,30 +63,31 @@ export const ActionProvider = ({ children }) => {
     setDetective,
     setAngel,
     setCivilians,
-    currentMafiaSelections,
     setCurrentMafiaSelections,
-    currentMafiaVotes,
     setCurrentMafiaVotes,
-    detectiveIdentifications,
     setDetectiveIdentifications,
     setCurrentDetectiveIdentification,
-    currentAngelProtection,
     setCurrentAngelProtection,
-    currentCivilianTriviaFinishes,
     setCurrentCivilianTriviaFinishes,
-    currentAccusations,
     setCurrentAccusations,
-    currentLifeDeathSelections,
     setCurrentLifeDeathSelections,
-    currentLifeDeathVotes,
     setCurrentLifeDeathVotes,
     setNighttimeTimer,
     setCurrentKill,
     setAccusationTimer,
-    recentlyAccused,
     setRecentlyAccused,
     setVotingTimer,
+    playersRef,
+    currentMafiaSelectionsRef,
+    currentMafiaVotesRef,
+    detectiveIdentificationsRef,
+    currentCivilianTriviaFinishesRef,
+    currentAccusationsRef,
+    recentlyAccusedRef,
+    currentLifeDeathSelectionsRef,
+    currentLifeDeathVotesRef,    
   } = useContext(VariableContext);
+  
   const introAudioRef = useRef(new Audio("./assets/Introloop.wav"));
 
   const handlePlayerJoin = (gamername) => {
@@ -97,10 +97,10 @@ export const ActionProvider = ({ children }) => {
       realname: "",
       role: "civilian",
       isAlive: true,
-      isHost: players.length === 0,
+      isHost: playersRef.current.length === 0,
     };
     // add the new player to the players array
-    setPlayers([...players, newPlayer]);
+    setPlayers([...playersRef.current, newPlayer]);
   };
   const handlePlayerLeave = () => {
     // remove the player from the players array
@@ -109,38 +109,38 @@ export const ActionProvider = ({ children }) => {
     // TODO
   };
   const handlePlayerSubmitRealname = (gamername, realname) => {
-    const bellAudio = new Audio("./assets/death-bell.wav");
-    bellAudio.volume = 0.25;
-    bellAudio.play();
     // if realname is already taken, add a number to the end of the realname
-    const realnames = players.map((player) => player.realname);
+    const realnames = playersRef.current.map((player) => player.realname);
     if (realnames.includes(realname)) {
-      let i = 1;
+      let i = 2;
       while (realnames.includes(realname + i)) {
         i++;
       }
       realname += i;
     }
     // update the player's realname
-    const newPlayers = players.map((player) => {
+    const newPlayers = playersRef.current.map((player) => {
       if (player.gamername === gamername) {
         player.realname = realname;
       }
       return player;
     });
+    const bellAudio = new Audio("./assets/death-bell.wav");
+    bellAudio.volume = 0.25;
+    bellAudio.play();
     setPlayers(newPlayers);
   };
 
   const handleHostStartGame = () => {
     // assign roles
-    const roles = getRoles(players.length);
+    const roles = getRoles(playersRef.current.length);
     // keep track of the roles
     const mafia = [];
     let detective = null;
     let angel = null;
     const civilians = [];
     // assign the roles to the players
-    const newPlayers = players.map((player, index) => {
+    const newPlayers = playersRef.current.map((player, index) => {
       player.role = roles[index];
       if (player.role === "mafia") {
         mafia.push(player);
@@ -167,29 +167,29 @@ export const ActionProvider = ({ children }) => {
   };
 
   const handleMafiaSelection = (mafiaGamername, targetGamername) => {
-    const mafiaPlayer = players.find(
+    const mafiaPlayer = playersRef.current.find(
       (player) => player.gamername === mafiaGamername,
     );
-    const targetPlayer = players.find(
+    const targetPlayer = playersRef.current.find(
       (player) => player.gamername === targetGamername,
     );
     if (!mafiaPlayer || !targetPlayer) {
       return;
     }
-    const currentMafiaSelection = currentMafiaSelections.find(
+    const currentMafiaSelection = currentMafiaSelectionsRef.current.find(
       (selection) => selection.player === mafiaPlayer,
     );
     // if mafia member has not selected a target, add the target to the currentMafiaSelections array
     if (!currentMafiaSelection) {
       setCurrentMafiaSelections([
-        ...currentMafiaSelections,
+        ...currentMafiaSelectionsRef.current,
         { player: mafiaPlayer, target: targetPlayer },
       ]);
     }
     // if mafia member has selected a target and this target is different from the previous target, update the target in the currentMafiaSelections array
     else if (currentMafiaSelection.target !== targetPlayer) {
       setCurrentMafiaSelections(
-        currentMafiaSelections.map((selection) => {
+        currentMafiaSelectionsRef.current.map((selection) => {
           if (selection.player === mafiaPlayer) {
             selection.target = targetPlayer;
           }
@@ -200,35 +200,35 @@ export const ActionProvider = ({ children }) => {
     // if mafia member has selected a target and this target is the same as the previous target, remove the target from the currentMafiaSelections array
     else {
       setCurrentMafiaSelections(
-        currentMafiaSelections.filter(
+        currentMafiaSelectionsRef.current.filter(
           (selection) => selection.player !== mafiaPlayer,
         ),
       );
     }
   };
   const handleMafiaVote = (mafiaGamername, targetGamername) => {
-    const mafiaPlayer = players.find(
+    const mafiaPlayer = playersRef.current.find(
       (player) => player.gamername === mafiaGamername,
     );
-    const targetPlayer = players.find(
+    const targetPlayer = playersRef.current.find(
       (player) => player.gamername === targetGamername,
     );
     if (!mafiaPlayer || !targetPlayer) {
       return;
     }
-    const currentMafiaVote = currentMafiaVotes.find(
+    const currentMafiaVote = currentMafiaVotesRef.current.find(
       (selection) => selection.player === mafiaPlayer,
     );
     // if mafia member has not voted, add the vote to the currentMafiaVotes array
     if (!currentMafiaVote) {
       setCurrentMafiaVotes([
-        ...currentMafiaVotes,
+        ...currentMafiaVotesRef.current,
         { player: mafiaPlayer, target: targetPlayer },
       ]);
     }
     // remove the vote from the currentMafiaSelections array
     setCurrentMafiaSelections(
-      currentMafiaSelections.filter(
+      currentMafiaSelectionsRef.current.filter(
         (selection) => selection.player !== mafiaPlayer,
       ),
     );
@@ -236,9 +236,9 @@ export const ActionProvider = ({ children }) => {
   };
   const handleDetectiveIdentification = (targetGamername) => {
     // find the detective
-    const detective = players.find((player) => player.role === "detective");
+    const detective = playersRef.current.find((player) => player.role === "detective");
     // find the target
-    const target = players.find(
+    const target = playersRef.current.find(
       (player) => player.gamername === targetGamername,
     );
     // if the detective and target are found, add the identification to the detectiveIdentifications array
@@ -246,7 +246,7 @@ export const ActionProvider = ({ children }) => {
       return;
     }
     setDetectiveIdentifications([
-      ...detectiveIdentifications,
+      ...detectiveIdentificationsRef.current,
       { player: detective, target },
     ]);
     setCurrentDetectiveIdentification({ player: detective, target });
@@ -254,9 +254,9 @@ export const ActionProvider = ({ children }) => {
   };
   const handleAngelProtection = (targetGamername) => {
     // find the angel
-    const angel = players.find((player) => player.role === "angel");
+    const angel = playersRef.current.find((player) => player.role === "angel");
     // find the target
-    const target = players.find(
+    const target = playersRef.current.find(
       (player) => player.gamername === targetGamername,
     );
     // if the angel and target are found, update the currentAngelProtection
@@ -268,13 +268,13 @@ export const ActionProvider = ({ children }) => {
   };
   const handleCivilianTriviaFinish = (gamername) => {
     // find the player
-    const player = players.find((player) => player.gamername === gamername);
+    const player = playersRef.current.find((player) => player.gamername === gamername);
     // if the player is found, add the player to the currentCivilianTriviaFinishes array
     if (!player) {
       return;
     }
     setCurrentCivilianTriviaFinishes([
-      ...currentCivilianTriviaFinishes,
+      ...currentCivilianTriviaFinishesRef.current,
       player,
     ]);
     // TODO: check if night is over
@@ -282,42 +282,42 @@ export const ActionProvider = ({ children }) => {
 
   const handleAccusation = (accuserGamername, targetGamername) => {
     // find the accuser
-    const accuser = players.find(
+    const accuser = playersRef.current.find(
       (player) => player.gamername === accuserGamername,
     );
     // find the target
-    const target = players.find(
+    const target = playersRef.current.find(
       (player) => player.gamername === targetGamername,
     );
     // if the accuser and target are found, add the accusation to the currentAccusations array
     if (!accuser || !target) {
       return;
     }
-    setCurrentAccusations([...currentAccusations, { player: accuser, target }]);
+    setCurrentAccusations([...currentAccusationsRef.current, { player: accuser, target }]);
     // TODO: check if accusations are over
   };
   const handleLifeDeathSelection = (voterGamername, vote) => {
     // find the voter
-    const voter = players.find((player) => player.gamername === voterGamername);
+    const voter = playersRef.current.find((player) => player.gamername === voterGamername);
     // if the voter is found, add the vote to the currentLifeDeathSelections array
     if (!voter) {
       return;
     }
     // get the current vote
-    const currentVote = currentLifeDeathSelections.find(
+    const currentVote = currentLifeDeathSelectionsRef.current.find(
       (vote) => vote.player === voter,
     );
     // if the voter has not voted, add the vote to the currentLifeDeathSelections array
     if (!currentVote) {
       setCurrentLifeDeathSelections([
-        ...currentLifeDeathSelections,
+        ...currentLifeDeathSelectionsRef.current,
         { player: voter, vote },
       ]);
     }
     // if the voter has voted and this vote is different from the previous vote, update the vote in the currentLifeDeathSelections array
     else if (currentVote.vote !== vote) {
       setCurrentLifeDeathSelections(
-        currentLifeDeathSelections.map((playerVote) => {
+        currentLifeDeathSelectionsRef.current.map((playerVote) => {
           if (playerVote.player === voter) {
             playerVote.vote = vote;
           }
@@ -328,7 +328,7 @@ export const ActionProvider = ({ children }) => {
     // if the voter has voted and this vote is the same as the previous vote, remove the vote from the currentLifeDeathSelections array
     else {
       setCurrentLifeDeathSelections(
-        currentLifeDeathSelections.filter(
+        currentLifeDeathSelectionsRef.current.filter(
           (playerVote) => playerVote.player !== voter,
         ),
       );
@@ -336,25 +336,25 @@ export const ActionProvider = ({ children }) => {
   };
   const handleLifeDeathVote = (voterGamername, vote) => {
     // find the voter
-    const voter = players.find((player) => player.gamername === voterGamername);
+    const voter = playersRef.current.find((player) => player.gamername === voterGamername);
     // if the voter is found, add the vote to the currentLifeDeathVotes array
     if (!voter) {
       return;
     }
     // get the current vote
-    const currentVote = currentLifeDeathVotes.find(
+    const currentVote = currentLifeDeathVotesRef.current.find(
       (vote) => vote.player === voter,
     );
     // if the voter has not voted, add the vote to the currentLifeDeathVotes array
     if (!currentVote) {
       setCurrentLifeDeathVotes([
-        ...currentLifeDeathVotes,
+        ...currentLifeDeathVotesRef.current,
         { player: voter, vote },
       ]);
     }
     // remove the vote from the currentLifeDeathSelections array
     setCurrentLifeDeathSelections(
-      currentLifeDeathSelections.filter(
+      currentLifeDeathSelectionsRef.current.filter(
         (playerVote) => playerVote.player !== voter,
       ),
     );
@@ -418,7 +418,7 @@ export const ActionProvider = ({ children }) => {
     // whoever has the most votes dies
     // if there is a tie, select randomly from the tied players
     const voteCounts = {};
-    currentMafiaVotes.forEach((vote) => {
+    currentMafiaVotesRef.current.forEach((vote) => {
       voteCounts[vote.target.gamername] =
         (voteCounts[vote.target.gamername] || 0) + 1;
     });
@@ -427,7 +427,7 @@ export const ActionProvider = ({ children }) => {
       (gamername) => voteCounts[gamername] === maxVotes,
     );
     const randomIndex = Math.floor(Math.random() * playersWithMaxVotes.length);
-    const playerToDie = players.find(
+    const playerToDie = playersRef.current.find(
       (player) => player.gamername === playersWithMaxVotes[randomIndex],
     );
     if (!playerToDie) {
@@ -478,16 +478,16 @@ export const ActionProvider = ({ children }) => {
   };
   const handleTransitionFromVotingResultsPage = () => {
     // check if player lives or dies
-    const votesToLive = currentLifeDeathVotes.filter(
+    const votesToLive = currentLifeDeathVotesRef.current.filter(
       (vote) => vote.vote === "live",
     ).length;
-    const votesToDie = currentLifeDeathVotes.filter(
+    const votesToDie = currentLifeDeathVotesRef.current.filter(
       (vote) => vote.vote === "die",
     ).length;
     if (votesToDie > votesToLive) {
       // the player dies
-      const newPlayers = players.map((player) => {
-        if (player.gamername === recentlyAccused?.gamername) {
+      const newPlayers = playersRef.current.map((player) => {
+        if (player.gamername === recentlyAccusedRef.current?.gamername) {
           player.isAlive = false;
         }
         return player;

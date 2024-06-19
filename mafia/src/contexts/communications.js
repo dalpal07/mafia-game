@@ -6,6 +6,7 @@ import React, {
   useRef,
 } from "react";
 import { VariableContext } from "./variables";
+import { ActionContext } from "./actions";
 
 export const CommunicationContext = createContext({});
 
@@ -28,15 +29,35 @@ export const CommunicationProvider = ({ children }) => {
     recentlyAccused,
     currentLifeDeathSelections,
     currentLifeDeathVotes,
+    playersRef,
+    pageRef,
+    mafiaRef,
+    detectiveRef,
+    angelRef,
+    civiliansRef,
+    currentMafiaSelectionsRef,
+    currentMafiaVotesRef,
+    currentKillRef,
+    detectiveIdentificationsRef,
+    currentDetectiveIdentificationRef,
+    currentAngelProtectionRef,
+    currentCivilianTriviaFinishesRef,
+    currentAccusationsRef,
+    recentlyAccusedRef,
+    currentLifeDeathSelectionsRef,
+    currentLifeDeathVotesRef,    
   } = useContext(VariableContext);
-
+  const {
+    handlePlayerJoin,
+    handlePlayerSubmitRealname,
+    handleHostStartGame,
+    handleHostSkipInstructions,
+    handleMafiaSelection,
+    handleMafiaVote,
+  } = useContext(ActionContext);
   const gamernamesNeedingConfirmationRef = useRef([]);
-
+  
   const sendMessageToParent = (message) => {
-    if (typeof message !== "string") {
-      parent.postMessage(JSON.stringify(message), "*");
-      return;
-    }
     parent.postMessage(message, "*");
   };
 
@@ -51,28 +72,28 @@ export const CommunicationProvider = ({ children }) => {
           player: gamername,
           name: "state update",
           state: {
-            players,
-            page,
-            mafia,
-            detective,
-            angel,
-            civilians,
-            currentMafiaSelections,
-            currentMafiaVotes,
-            currentKill,
-            detectiveIdentifications,
-            currentDetectiveIdentification,
-            currentAngelProtection,
-            currentCivilianTriviaFinishes,
-            currentAccusations,
-            recentlyAccused,
-            currentLifeDeathSelections,
-            currentLifeDeathVotes,
+            players: playersRef.current,
+            page: pageRef.current,
+            mafia: mafiaRef.current,
+            detective: detectiveRef.current,
+            angel: angelRef.current,
+            civilians: civiliansRef.current,
+            currentMafiaSelections: currentMafiaSelectionsRef.current,
+            currentMafiaVotes: currentMafiaVotesRef.current,
+            currentKill: currentKillRef.current,
+            detectiveIdentifications: detectiveIdentificationsRef.current,
+            currentDetectiveIdentification: currentDetectiveIdentificationRef.current,
+            currentAngelProtection: currentAngelProtectionRef.current,
+            currentCivilianTriviaFinishes: currentCivilianTriviaFinishesRef.current,
+            currentAccusations: currentAccusationsRef.current,
+            recentlyAccused: recentlyAccusedRef.current,
+            currentLifeDeathSelections: currentLifeDeathSelectionsRef.current,
+            currentLifeDeathVotes: currentLifeDeathVotesRef.current,
           },
         }),
       );
       continueToNudgePlayer(gamername);
-    }, 100);
+    }, 250);
   };
 
   const sendStateUpdateToPlayer = (gamername) => {
@@ -82,23 +103,23 @@ export const CommunicationProvider = ({ children }) => {
         player: gamername,
         name: "state update",
         state: {
-          players,
-          page,
-          mafia,
-          detective,
-          angel,
-          civilians,
-          currentMafiaSelections,
-          currentMafiaVotes,
-          currentKill,
-          detectiveIdentifications,
-          currentDetectiveIdentification,
-          currentAngelProtection,
-          currentCivilianTriviaFinishes,
-          currentAccusations,
-          recentlyAccused,
-          currentLifeDeathSelections,
-          currentLifeDeathVotes,
+          players: playersRef.current,
+          page: pageRef.current,
+          mafia: mafiaRef.current,
+          detective: detectiveRef.current,
+          angel: angelRef.current,
+          civilians: civiliansRef.current,
+          currentMafiaSelections: currentMafiaSelectionsRef.current,
+          currentMafiaVotes: currentMafiaVotesRef.current,
+          currentKill: currentKillRef.current,
+          detectiveIdentifications: detectiveIdentificationsRef.current,
+          currentDetectiveIdentification: currentDetectiveIdentificationRef.current,
+          currentAngelProtection: currentAngelProtectionRef.current,
+          currentCivilianTriviaFinishes: currentCivilianTriviaFinishesRef.current,
+          currentAccusations: currentAccusationsRef.current,
+          recentlyAccused: recentlyAccusedRef.current,
+          currentLifeDeathSelections: currentLifeDeathSelectionsRef.current,
+          currentLifeDeathVotes: currentLifeDeathVotesRef.current,
         },
       }),
     );
@@ -121,23 +142,23 @@ export const CommunicationProvider = ({ children }) => {
     const msg = event.data;
     if (msg.name === "confirm state") {
       const playerState = {
-        players,
-        page,
-        mafia,
-        detective,
-        angel,
-        civilians,
-        currentMafiaSelections,
-        currentMafiaVotes,
-        currentKill,
-        detectiveIdentifications,
-        currentDetectiveIdentification,
-        currentAngelProtection,
-        currentCivilianTriviaFinishes,
-        currentAccusations,
-        recentlyAccused,
-        currentLifeDeathSelections,
-        currentLifeDeathVotes,
+        players: playersRef.current,
+        page: pageRef.current,
+        mafia: mafiaRef.current,
+        detective: detectiveRef.current,
+        angel: angelRef.current,
+        civilians: civiliansRef.current,
+        currentMafiaSelections: currentMafiaSelectionsRef.current,
+        currentMafiaVotes: currentMafiaVotesRef.current,
+        currentKill: currentKillRef.current,
+        detectiveIdentifications: detectiveIdentificationsRef.current,
+        currentDetectiveIdentification: currentDetectiveIdentificationRef.current,
+        currentAngelProtection: currentAngelProtectionRef.current,
+        currentCivilianTriviaFinishes: currentCivilianTriviaFinishesRef.current,
+        currentAccusations: currentAccusationsRef.current,
+        recentlyAccused: recentlyAccusedRef.current,
+        currentLifeDeathSelections: currentLifeDeathSelectionsRef.current,
+        currentLifeDeathVotes: currentLifeDeathVotesRef.current,
       };
       if (JSON.stringify(msg.state) !== JSON.stringify(playerState)) {
         sendStateUpdateToPlayer(msg.player);
@@ -147,6 +168,24 @@ export const CommunicationProvider = ({ children }) => {
             (player) => player !== msg.player,
           );
       }
+    }
+    else if (msg.name === "RegisterMadderController") {
+      handlePlayerJoin(msg.player);
+    }
+    else if (msg.name === "SetRealname") {
+      handlePlayerSubmitRealname(msg.player, msg.realname);
+    }
+    else if (msg.name === "HostStart") {
+      handleHostStartGame();
+    }
+    else if (msg.name === "HostSkip") {
+      handleHostSkipInstructions();
+    }
+    else if (msg.name === "MafiaSelection") {
+      handleMafiaSelection(msg.player, msg.selection);
+    }
+    else if (msg.name === "MafiaVote") {
+      handleMafiaVote(msg.player, msg.vote);
     }
   }
 
