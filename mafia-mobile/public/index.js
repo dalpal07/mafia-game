@@ -19488,7 +19488,7 @@ Please use another name.` );
 	var Input$1 = Input;
 
 	const Text = styled$1(Typography$1)(({
-	  color = 'var(--Main-White)',
+	  color = "var(--Main-White)",
 	  size = 24,
 	  opacity = 1,
 	  weight = 400
@@ -19497,39 +19497,39 @@ Please use another name.` );
 	  fontSize: size,
 	  opacity,
 	  fontWeight: weight,
-	  fontFamily: 'American Typewriter',
-	  lineHeight: '1',
-	  textAlign: 'center'
+	  fontFamily: "American Typewriter",
+	  lineHeight: "1",
+	  textAlign: "center"
 	}));
 
 	const TheButton = styled$1(Button$1)(({
-	  color = 'var(--Main-Red)'
+	  color = "var(--Main-Red)"
 	}) => ({
 	  backgroundColor: color,
-	  display: 'flex',
-	  flexDirection: 'row',
-	  alignItems: 'center',
-	  justifyContent: 'center',
+	  display: "flex",
+	  flexDirection: "row",
+	  alignItems: "center",
+	  justifyContent: "center",
 	  borderRadius: 10,
-	  padding: '12px 24px',
-	  width: 'calc(100% - 48px)',
-	  textTransform: 'none',
-	  '&:disabled': {
+	  padding: "12px 24px",
+	  width: "calc(100% - 48px)",
+	  textTransform: "none",
+	  "&:disabled": {
 	    opacity: 0.5
 	  },
-	  '&:hover': {
+	  "&:hover": {
 	    backgroundColor: color
 	  }
 	}));
 	const NameButton = styled$1(TheButton)(({
 	  selected = false,
-	  selectedColor = 'var(--Main-White)',
-	  borderColor = 'var(--Main-White)'
+	  selectedColor = "var(--Main-White)",
+	  borderColor = "var(--Main-White)"
 	}) => ({
-	  backgroundColor: selected ? selectedColor : 'transparent',
+	  backgroundColor: selected ? selectedColor : "transparent",
 	  border: `1px solid ${borderColor}`,
-	  '&:hover': {
-	    backgroundColor: selected ? selectedColor : 'transparent'
+	  "&:hover": {
+	    backgroundColor: selected ? selectedColor : "transparent"
 	  }
 	}));
 
@@ -21575,17 +21575,17 @@ Please use another name.` );
 	};
 	var LottiePlayer = makeLottiePlayer(lottie);
 
-	var v$3 = "5.9.0";
-	var fr$3 = 30;
-	var ip$3 = 0;
-	var op$3 = 60;
-	var w$3 = 277;
-	var h$3 = 630;
-	var nm$3 = "MafiaBanner3";
-	var ddd$3 = 0;
-	var assets$3 = [
+	var v$2 = "5.9.0";
+	var fr$2 = 30;
+	var ip$2 = 0;
+	var op$2 = 60;
+	var w$2 = 277;
+	var h$2 = 630;
+	var nm$2 = "MafiaBanner3";
+	var ddd$2 = 0;
+	var assets$2 = [
 	];
-	var layers$3 = [
+	var layers$2 = [
 		{
 			ddd: 0,
 			ind: 1,
@@ -43312,96 +43312,321 @@ Please use another name.` );
 			bm: 0
 		}
 	];
-	var markers$3 = [
+	var markers$2 = [
 	];
-	var lottieJson$2 = {
-		v: v$3,
-		fr: fr$3,
-		ip: ip$3,
-		op: op$3,
-		w: w$3,
-		h: h$3,
-		nm: nm$3,
-		ddd: ddd$3,
-		assets: assets$3,
-		layers: layers$3,
-		markers: markers$3
+	var lottieJson$1 = {
+		v: v$2,
+		fr: fr$2,
+		ip: ip$2,
+		op: op$2,
+		w: w$2,
+		h: h$2,
+		nm: nm$2,
+		ddd: ddd$2,
+		assets: assets$2,
+		layers: layers$2,
+		markers: markers$2
 	};
 
-	const GlobalContext = /*#__PURE__*/reactExports.createContext();
-	const GlobalProvider = ({
+	const WAITING_PLAYERS = 0;
+	const WELCOME = 1;
+	const YOU_READY = 2;
+	const REVEAL_IDENTITY = 3;
+	const INSTRUCTIONS = 4;
+	const NIGHTTIME = 5;
+	const NIGHTTIME_TIMER = 6;
+	const GAME_OVER = 16;
+
+	const VariableContext = /*#__PURE__*/reactExports.createContext({
+	  self: {},
+	  setSelf: () => {},
+	  players: [],
+	  setPlayers: () => {},
+	  page: 0,
+	  setPage: () => {},
+	  mafia: [],
+	  setMafia: () => {},
+	  detective: null,
+	  setDetective: () => {},
+	  angel: null,
+	  setAngel: () => {},
+	  civilians: [],
+	  setCivilians: () => {},
+	  currentMafiaSelections: [],
+	  setCurrentMafiaSelections: () => {},
+	  currentMafiaVotes: [],
+	  setCurrentMafiaVotes: () => {},
+	  currentKill: null,
+	  setCurrentKill: () => {},
+	  detectiveIdentifications: [],
+	  setDetectiveIdentifications: () => {},
+	  currentDetectiveIdentification: null,
+	  setCurrentDetectiveIdentification: () => {},
+	  currentAngelProtection: null,
+	  setCurrentAngelProtection: () => {},
+	  currentCivilianTriviaFinishes: [],
+	  setCurrentCivilianTriviaFinishes: () => {},
+	  currentAccusations: [],
+	  setCurrentAccusations: () => {},
+	  recentlyAccused: null,
+	  setRecentlyAccused: () => {},
+	  currentLifeDeathSelections: [],
+	  setCurrentLifeDeathSelections: () => {},
+	  currentLifeDeathVotes: [],
+	  setCurrentLifeDeathVotes: () => {}
+	});
+	const VariableProvider = ({
 	  children
 	}) => {
-	  const [state, setState] = reactExports.useState({});
-	  return /*#__PURE__*/React.createElement(GlobalContext.Provider, {
-	    value: {
-	      state,
-	      setState
+	  const [self, setSelf] = reactExports.useState({
+	    gamername: "",
+	    realname: "",
+	    role: "",
+	    isAlive: true,
+	    isHost: false
+	  });
+	  const [players, setPlayers] = reactExports.useState([]);
+	  const [page, setPage] = reactExports.useState(WAITING_PLAYERS);
+	  const [mafia, setMafia] = reactExports.useState([]);
+	  const [detective, setDetective] = reactExports.useState(null);
+	  const [angel, setAngel] = reactExports.useState(null);
+	  const [civilians, setCivilians] = reactExports.useState([]);
+	  const [currentMafiaSelections, setCurrentMafiaSelections] = reactExports.useState([]);
+	  const [currentMafiaVotes, setCurrentMafiaVotes] = reactExports.useState([]);
+	  const [currentKill, setCurrentKill] = reactExports.useState(null);
+	  const [detectiveIdentifications, setDetectiveIdentifications] = reactExports.useState([]);
+	  const [currentDetectiveIdentification, setCurrentDetectiveIdentification] = reactExports.useState(null);
+	  const [currentAngelProtection, setCurrentAngelProtection] = reactExports.useState(null);
+	  const [currentCivilianTriviaFinishes, setCurrentCivilianTriviaFinishes] = reactExports.useState([]);
+	  const [currentAccusations, setCurrentAccusations] = reactExports.useState([]);
+	  const [recentlyAccused, setRecentlyAccused] = reactExports.useState(null);
+	  const [currentLifeDeathSelections, setCurrentLifeDeathSelections] = reactExports.useState([]);
+	  const [currentLifeDeathVotes, setCurrentLifeDeathVotes] = reactExports.useState([]);
+	  const variables = reactExports.useMemo(() => {
+	    return {
+	      self,
+	      setSelf,
+	      players,
+	      setPlayers,
+	      page,
+	      setPage,
+	      mafia,
+	      setMafia,
+	      detective,
+	      setDetective,
+	      angel,
+	      setAngel,
+	      civilians,
+	      setCivilians,
+	      currentMafiaSelections,
+	      setCurrentMafiaSelections,
+	      currentMafiaVotes,
+	      setCurrentMafiaVotes,
+	      currentKill,
+	      setCurrentKill,
+	      detectiveIdentifications,
+	      setDetectiveIdentifications,
+	      currentDetectiveIdentification,
+	      setCurrentDetectiveIdentification,
+	      currentAngelProtection,
+	      setCurrentAngelProtection,
+	      currentCivilianTriviaFinishes,
+	      setCurrentCivilianTriviaFinishes,
+	      currentAccusations,
+	      setCurrentAccusations,
+	      recentlyAccused,
+	      setRecentlyAccused,
+	      currentLifeDeathSelections,
+	      setCurrentLifeDeathSelections,
+	      currentLifeDeathVotes,
+	      setCurrentLifeDeathVotes
+	    };
+	  }, [self, setSelf, players, setPlayers, page, setPage, mafia, setMafia, detective, setDetective, angel, setAngel, civilians, setCivilians, currentMafiaSelections, setCurrentMafiaSelections, currentMafiaVotes, setCurrentMafiaVotes, currentKill, setCurrentKill, detectiveIdentifications, setDetectiveIdentifications, currentDetectiveIdentification, setCurrentDetectiveIdentification, currentAngelProtection, setCurrentAngelProtection, currentCivilianTriviaFinishes, setCurrentCivilianTriviaFinishes, currentAccusations, setCurrentAccusations, recentlyAccused, setRecentlyAccused, currentLifeDeathSelections, setCurrentLifeDeathSelections, currentLifeDeathVotes, setCurrentLifeDeathVotes]);
+	  return /*#__PURE__*/React.createElement(VariableContext.Provider, {
+	    value: variables
+	  }, children);
+	};
+
+	const CommunicationContext = /*#__PURE__*/reactExports.createContext({
+	  sendMessageToParent: () => {}
+	});
+	const CommunicationProvider = ({
+	  children
+	}) => {
+	  const {
+	    self,
+	    setSelf,
+	    setPlayers,
+	    setPage,
+	    setMafia,
+	    setDetective,
+	    setAngel,
+	    setCivilians,
+	    setCurrentMafiaSelections,
+	    setCurrentMafiaVotes,
+	    setCurrentKill,
+	    setDetectiveIdentifications,
+	    setCurrentDetectiveIdentification,
+	    setCurrentAngelProtection,
+	    setCurrentCivilianTriviaFinishes,
+	    setCurrentAccusations,
+	    setRecentlyAccused,
+	    setCurrentLifeDeathSelections,
+	    setCurrentLifeDeathVotes
+	  } = reactExports.useContext(VariableContext);
+	  const sendMessageToParent = message => {
+	    parent.postMessage(message, "*");
+	  };
+	  const handleMessageFromParent = event => {
+	    if (!event || !event.data) return;
+	    const msg = event.data;
+	    if (msg.name === "name") {
+	      const newSelf = self;
+	      newSelf.gamername = msg.player;
+	      setSelf(newSelf);
+	    } else if (msg.name === "state update") {
+	      const {
+	        state
+	      } = msg;
+	      if (!state) return;
+	      if (state.players) {
+	        const newSelf = state.players.find(player => player.gamername === self.gamername);
+	        if (newSelf) setSelf(newSelf);
+	      }
+	      setPage(state.page);
+	      setPlayers(state.players);
+	      setMafia(state.mafia);
+	      setDetective(state.detective);
+	      setAngel(state.angel);
+	      setCivilians(state.civilians);
+	      setCurrentMafiaSelections(state.currentMafiaSelections);
+	      setCurrentMafiaVotes(state.currentMafiaVotes);
+	      setCurrentKill(state.currentKill);
+	      setDetectiveIdentifications(state.detectiveIdentifications);
+	      setCurrentDetectiveIdentification(state.currentDetectiveIdentification);
+	      setCurrentAngelProtection(state.currentAngelProtection);
+	      setCurrentCivilianTriviaFinishes(state.currentCivilianTriviaFinishes);
+	      setCurrentAccusations(state.currentAccusations);
+	      setRecentlyAccused(state.recentlyAccused);
+	      setCurrentLifeDeathSelections(state.currentLifeDeathSelections);
+	      setCurrentLifeDeathVotes(state.currentLifeDeathVotes);
+	      sendMessageToParent(JSON.stringify({
+	        name: "confirm state",
+	        state
+	      }));
 	    }
+	  };
+	  reactExports.useEffect(() => {
+	    window.addEventListener("message", handleMessageFromParent);
+	    sendMessageToParent(JSON.stringify({
+	      name: "ready"
+	    }));
+	    return () => {
+	      window.removeEventListener("message", handleMessageFromParent);
+	    };
+	  }, []);
+	  const communications = reactExports.useMemo(() => {
+	    return {
+	      sendMessageToParent
+	    };
+	  }, [sendMessageToParent]);
+	  return /*#__PURE__*/React.createElement(CommunicationContext.Provider, {
+	    value: communications
+	  }, children);
+	};
+
+	const ActionContext = /*#__PURE__*/reactExports.createContext({
+	  handleSetRealname: () => {},
+	  handleHostStart: () => {},
+	  handleHostSkip: () => {},
+	  handleMafiaSelection: () => {},
+	  handleMafiaVote: () => {}
+	});
+	const ActionProvider = ({
+	  children
+	}) => {
+	  const {
+	    sendMessageToParent
+	  } = reactExports.useContext(CommunicationContext);
+	  const handleSetRealname = realname => {
+	    sendMessageToParent(JSON.stringify({
+	      name: "SetRealname",
+	      realname
+	    }));
+	  };
+	  const handleHostStart = () => {
+	    sendMessageToParent(JSON.stringify({
+	      name: "HostStart"
+	    }));
+	  };
+	  const handleHostSkip = () => {
+	    sendMessageToParent(JSON.stringify({
+	      name: "HostSkip"
+	    }));
+	  };
+	  const handleMafiaSelection = gamername => {
+	    sendMessageToParent(JSON.stringify({
+	      name: "MafiaSelection",
+	      selection: gamername
+	    }));
+	  };
+	  const handleMafiaVote = gamername => {
+	    sendMessageToParent(JSON.stringify({
+	      name: "MafiaVote",
+	      vote: gamername
+	    }));
+	  };
+	  const actions = reactExports.useMemo(() => {
+	    return {
+	      handleSetRealname,
+	      handleHostStart,
+	      handleHostSkip,
+	      handleMafiaSelection,
+	      handleMafiaVote
+	    };
+	  }, [handleSetRealname, handleHostStart, handleHostSkip, handleMafiaSelection, handleMafiaVote]);
+	  return /*#__PURE__*/React.createElement(ActionContext.Provider, {
+	    value: actions
 	  }, children);
 	};
 
 	function WaitingPlayers({
-	  isHost,
-	  enoughPlayers,
 	  screenHeight,
-	  minPlayers,
-	  everyoneReady,
-	  sendMessageToParent
+	  minPlayers
 	}) {
 	  const {
-	    state
-	  } = reactExports.useContext(GlobalContext);
-	  const [enough, setEnough] = reactExports.useState(false);
-	  const [ready, setReady] = reactExports.useState(false);
-	  const [host, setHost] = reactExports.useState(false);
+	    players,
+	    self
+	  } = reactExports.useContext(VariableContext);
+	  const {
+	    handleHostStart
+	  } = reactExports.useContext(ActionContext);
+	  const ready = players.every(player => player.realname && player.realname.length > 0);
 	  const [bannerShown, setBannerShown] = reactExports.useState(false);
 	  reactExports.useEffect(() => {
 	    setTimeout(() => {
 	      setBannerShown(true);
 	    }, 1250);
 	  }, []);
-	  reactExports.useEffect(() => {
-	    setEnough(state.totalPlayers >= minPlayers);
-	  }, [state.totalPlayers]);
-	  reactExports.useEffect(() => {
-	    setReady(state.allReady);
-	  }, [state.allReady]);
-	  reactExports.useEffect(() => {
-	    setHost(state.isHost);
-	  }, [state.isHost]);
-	  reactExports.useEffect(() => {
-	    console.log({
-	      enough: state.totalPlayers >= minPlayers,
-	      ready: state.allReady,
-	      host: state.isHost
-	    });
-	  }, [state]);
-	  const handleStart = () => {
-	    sendMessageToParent({
-	      name: 'start',
-	      player: state.gamername
-	    });
-	  };
-	  if (!host) {
+	  if (!self.isHost) {
 	    return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(LottiePlayer, {
 	      loop: false,
-	      animationData: lottieJson$2,
+	      animationData: lottieJson$1,
 	      play: true,
 	      style: {
 	        height: screenHeight - 221
 	      }
 	    }), /*#__PURE__*/React.createElement(Box$1, {
 	      style: {
-	        display: 'flex',
-	        flexDirection: 'column',
-	        alignItems: 'center',
-	        justifyContent: 'flex-start',
-	        width: '100%',
+	        display: "flex",
+	        flexDirection: "column",
+	        alignItems: "center",
+	        justifyContent: "flex-start",
+	        width: "100%",
 	        maxWidth: 400,
 	        gap: 18,
 	        opacity: bannerShown ? 1 : 0,
-	        transition: 'opacity ease-in 0.25s'
+	        transition: "opacity ease-in 0.25s"
 	      }
 	    }, /*#__PURE__*/React.createElement(Box$1, {
 	      style: {
@@ -43424,22 +43649,22 @@ Please use another name.` );
 	  }
 	  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(LottiePlayer, {
 	    loop: false,
-	    animationData: lottieJson$2,
+	    animationData: lottieJson$1,
 	    play: true,
 	    style: {
 	      height: screenHeight - 221
 	    }
 	  }), /*#__PURE__*/React.createElement(Box$1, {
 	    style: {
-	      display: 'flex',
-	      flexDirection: 'column',
-	      alignItems: 'center',
-	      justifyContent: 'flex-start',
-	      width: '100%',
+	      display: "flex",
+	      flexDirection: "column",
+	      alignItems: "center",
+	      justifyContent: "flex-start",
+	      width: "100%",
 	      maxWidth: 400,
 	      gap: 18,
 	      opacity: bannerShown ? 1 : 0,
-	      transition: 'opacity ease-in 0.25s'
+	      transition: "opacity ease-in 0.25s"
 	    }
 	  }, /*#__PURE__*/React.createElement(Box$1, {
 	    style: {
@@ -43450,9 +43675,9 @@ Please use another name.` );
 	  }, "welcome"), /*#__PURE__*/React.createElement(Text, {
 	    size: 18,
 	    opacity: 0.5
-	  }, enough ? 'press start once all players are in ' : `requires ${minPlayers} players to start`), /*#__PURE__*/React.createElement(TheButton, {
-	    disabled: !enough || !ready,
-	    onClick: handleStart
+	  }, players.length >= minPlayers ? "press start once all players are in " : `requires ${minPlayers} players to start`), /*#__PURE__*/React.createElement(TheButton, {
+	    disabled: players.length < minPlayers || !ready,
+	    onClick: handleHostStart
 	  }, /*#__PURE__*/React.createElement(Text, {
 	    size: 18,
 	    weight: 700
@@ -43464,53 +43689,53 @@ Please use another name.` );
 	}
 
 	const SpaceBetweenRowBox = styled$1(Box$1)({
-	  display: 'flex',
-	  flexDirection: 'row',
-	  alignItems: 'center',
-	  justifyContent: 'space-between',
-	  width: '100%'
+	  display: "flex",
+	  flexDirection: "row",
+	  alignItems: "center",
+	  justifyContent: "space-between",
+	  width: "100%"
 	});
 	const StandardPageBox = styled$1(Box$1)({
-	  display: 'flex',
-	  flexDirection: 'column',
-	  alignItems: 'center',
-	  justifyContent: 'flex-start',
-	  width: '100%',
-	  height: '100vh',
+	  display: "flex",
+	  flexDirection: "column",
+	  alignItems: "center",
+	  justifyContent: "flex-start",
+	  width: "100%",
+	  height: "100vh",
 	  maxWidth: 400,
 	  gap: 18
 	});
 	const HeaderBox = styled$1(StandardPageBox)({
 	  paddingLeft: 24,
 	  paddingRight: 24,
-	  height: 'fit-content',
+	  height: "fit-content",
 	  opacity: 0.75
 	});
 	const ConstrainedBox = styled$1(Box$1)(({
-	  width = '100%',
-	  height = '100%'
+	  width = "100%",
+	  height = "100%"
 	}) => ({
-	  display: 'flex',
-	  flexDirection: 'column',
-	  alignItems: 'center',
-	  justifyContent: 'center',
+	  display: "flex",
+	  flexDirection: "column",
+	  alignItems: "center",
+	  justifyContent: "center",
 	  maxWidth: width,
 	  maxHeight: height
 	}));
 	const Line = styled$1(Box$1)(({
-	  color = 'var(--Main-White)'
+	  color = "var(--Main-White)"
 	}) => ({
-	  width: '100%',
+	  width: "100%",
 	  height: 0.5,
 	  backgroundColor: color
 	}));
 	const ScrollableFlexColumnBox = styled$1(Box$1)({
-	  display: 'flex',
-	  flexDirection: 'column',
-	  alignItems: 'center',
-	  justifyContent: 'flex-start',
-	  width: '100%',
-	  overflowY: 'scroll',
+	  display: "flex",
+	  flexDirection: "column",
+	  alignItems: "center",
+	  justifyContent: "flex-start",
+	  width: "100%",
+	  overflowY: "scroll",
 	  gap: 18
 	});
 
@@ -43528,15 +43753,14 @@ Please use another name.` );
 	}
 
 	function IdentityReveal({
-	  screenHeight,
-	  role
+	  screenHeight
 	}) {
+	  const {
+	    self
+	  } = reactExports.useContext(VariableContext);
 	  const [yourRole, setYourRole] = reactExports.useState(false);
 	  const [yourGoalIntro, setYourGoalIntro] = reactExports.useState(false);
 	  const [yourGoal, setYourGoal] = reactExports.useState(false);
-	  const {
-	    state
-	  } = reactExports.useContext(GlobalContext);
 	  reactExports.useEffect(() => {
 	    setTimeout(() => {
 	      setYourRole(true);
@@ -43555,51 +43779,48 @@ Please use another name.` );
 	  }), /*#__PURE__*/React.createElement(Text, {
 	    style: {
 	      opacity: yourRole ? 1 : 0,
-	      transition: 'opacity 2s ease'
+	      transition: "opacity 2s ease"
 	    }
-	  }, "you're a", state.role === 'angel' ? 'n' : null), /*#__PURE__*/React.createElement(Text, {
+	  }, "you're a", self.role === "angel" ? "n" : null), /*#__PURE__*/React.createElement(Text, {
 	    size: 42,
 	    weight: 700,
-	    color: state.role === 'mafia' ? 'var(--Main-Red)' : state.role === 'detective' ? 'var(--Main-Blue)' : state.role === 'angel' ? 'var(--Main-Yellow)' : 'var(--Main-White)',
+	    color: self.role === "mafia" ? "var(--Main-Red)" : self.role === "detective" ? "var(--Main-Blue)" : self.role === "angel" ? "var(--Main-Yellow)" : "var(--Main-White)",
 	    style: {
 	      opacity: yourRole ? 1 : 0,
-	      transition: 'opacity 2s ease'
+	      transition: "opacity 2s ease"
 	    }
-	  }, state.role), yourGoalIntro ? /*#__PURE__*/React.createElement(Text, {
+	  }, self.role), yourGoalIntro ? /*#__PURE__*/React.createElement(Text, {
 	    size: 18,
 	    opacity: 0.5,
 	    style: {
 	      opacity: yourGoalIntro ? 1 : 0,
-	      transition: 'opacity 1s ease'
+	      transition: "opacity 1s ease"
 	    }
 	  }, "your goal:") : null, yourGoal ? /*#__PURE__*/React.createElement(Text, {
 	    size: 24,
 	    style: {
 	      opacity: yourGoal ? 1 : 0,
-	      transition: 'opacity 1s ease'
+	      transition: "opacity 1s ease"
 	    }
-	  }, state.role === 'mafia' ? 'kill' : state.role === 'detective' ? 'find the mafia' : state.role === 'angel' ? 'protect' : 'survive') : null);
+	  }, self.role === "mafia" ? "kill" : self.role === "detective" ? "find the mafia" : self.role === "angel" ? "protect" : "survive") : null);
 	}
 
-	function Instructions({
-	  isHost,
-	  sendMessageToParent
-	}) {
+	function Instructions() {
 	  const {
-	    state
-	  } = reactExports.useContext(GlobalContext);
+	    self
+	  } = reactExports.useContext(VariableContext);
+	  const {
+	    handleHostSkip
+	  } = reactExports.useContext(ActionContext);
 	  const [skipPressed, setSkipPressed] = reactExports.useState(false);
 	  const handleSkip = () => {
-	    sendMessageToParent({
-	      name: 'skip',
-	      player: state.gamername
-	    });
 	    setSkipPressed(true);
+	    handleHostSkip();
 	  };
 	  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Text, {
 	    size: 18,
 	    opacity: 0.5
-	  }, "see screen for instructions"), state.isHost ? /*#__PURE__*/React.createElement(TheButton, {
+	  }, "see screen for instructions"), self.isHost ? /*#__PURE__*/React.createElement(TheButton, {
 	    onClick: handleSkip,
 	    disabled: skipPressed
 	  }, /*#__PURE__*/React.createElement(Text, {
@@ -43608,322 +43829,8 @@ Please use another name.` );
 	  }, "skip")) : null);
 	}
 
-	const questions = [{
-	  question: "who is known as the \"Queen of Pop\"?",
-	  options: ["Madonna", "Beyonce", "Rihanna", "Taylor Swift"],
-	  answer: "Madonna"
-	}, {
-	  question: "which country won the FIFA World Cup in 2018?",
-	  options: ["Croatia", "Belgium", "France", "England"],
-	  answer: "France"
-	}, {
-	  question: "what was considered to be the first video game ever created?",
-	  options: ["Space Invaders", "Pacman", "Tetris", "Pong"],
-	  answer: "Pong"
-	}, {
-	  question: "where does the game Mafia Originate From?",
-	  options: ["Italy", "Soviet Union", "USA", "Russia"],
-	  answer: "Soviet Union"
-	}, {
-	  question: "during the mid-20th century, the Mafia played a significant role in the development of which American city?",
-	  options: ["New York", "Chicago", "Los Angeles", "Las Vegas"],
-	  answer: "Las Vegas"
-	}, {
-	  question: "what term is commonly used to describe the Mafia's code of silence and refusal to cooperate with law enforcement?",
-	  options: ["Omerta", "Cosa Nostra", "Capo", "Consigliere"],
-	  answer: "Omerta"
-	}, {
-	  question: "what former Mafia member became a high-profile informant, helping the FBI dismantle the American Mafia in the 1980s?",
-	  options: ["John Junior Gotti", "Salvatore \"Sammy the Bull\" Gravano", "Vincent \"The Chin\" Gigante", "Joseph \"Joe Bananas\" Bonanno"],
-	  answer: "Salvatore \"Sammy the Bull\" Gravano"
-	}, {
-	  question: "what city is often considered the birthplace of the real-life Mafia, where criminal organizations like the Sicilian Mafia first emerged?",
-	  options: ["Rome", "Naples", "Palermo", "Venice"],
-	  answer: "Palermo"
-	}, {
-	  question: "what is the name of the Italian-American Mafia that emerged in the United States during the late 19th century?",
-	  options: ["Cosa Nostra", "La Cosa Nostra", "The Mob", "The Outfit"],
-	  answer: "Cosa Nostra"
-	}, {
-	  question: "which country doesn't border the Caspian Sea?",
-	  options: ["Azerbaijan", "Uzbekistan", "Kazakhstan", "Iran"],
-	  answer: "Uzbekistan"
-	}];
-	const getTriviaQuestions = quantity => {
-	  const questionsCopy = [...questions];
-	  const selectedQuestions = [];
-	  for (let i = 0; i < quantity; i++) {
-	    const randomIndex = Math.floor(Math.random() * questionsCopy.length);
-	    selectedQuestions.push(questionsCopy[randomIndex]);
-	    questionsCopy.splice(randomIndex, 1);
-	  }
-	  return selectedQuestions;
-	};
-
-	function NightTrivia({
-	  sendMessageToParent,
-	  name
-	}) {
-	  const [questions, setQuestions] = reactExports.useState(getTriviaQuestions(3));
-	  const [currentQuestion, setCurrentQuestion] = reactExports.useState(0);
-	  const [score, setScore] = reactExports.useState(0);
-	  const [answer, setAnswer] = reactExports.useState(null);
-	  const [submitted, setSubmitted] = reactExports.useState(false);
-	  reactExports.useEffect(() => {
-	    if (submitted) {
-	      if (currentQuestion === questions.length - 1) {
-	        if (sendMessageToParent !== undefined) {
-	          sendMessageToParent({
-	            name: 'finishedNight',
-	            player: name
-	          });
-	        }
-	      }
-	      setTimeout(() => {
-	        handleNextQuestion();
-	      }, 1500);
-	    }
-	  }, [submitted]);
-	  const handleSubmission = () => {
-	    setSubmitted(true);
-	    if (answer === questions[currentQuestion].answer) {
-	      setScore(score + 1);
-	    }
-	  };
-	  const handleNextQuestion = () => {
-	    setCurrentQuestion(currentQuestion + 1);
-	    setSubmitted(false);
-	    setAnswer(null);
-	  };
-	  const handlePlayAgain = () => {
-	    setQuestions(getTriviaQuestions(5));
-	    setCurrentQuestion(0);
-	    setScore(0);
-	    setAnswer(null);
-	    setSubmitted(false);
-	  };
-	  if (currentQuestion === questions.length) {
-	    return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Text, {
-	      opacity: 0.75
-	    }, "final results"), /*#__PURE__*/React.createElement(Text, {
-	      weight: 700,
-	      opacity: 0.75
-	    }, score, "/", currentQuestion), /*#__PURE__*/React.createElement(Box$1, {
-	      style: {
-	        flex: 1
-	      }
-	    }), /*#__PURE__*/React.createElement(TheButton, {
-	      onClick: handlePlayAgain
-	    }, /*#__PURE__*/React.createElement(Text, {
-	      size: 18,
-	      weight: 700
-	    }, "play again")));
-	  }
-	  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Text, null, questions[currentQuestion].question), /*#__PURE__*/React.createElement(ScrollableFlexColumnBox, null, questions[currentQuestion].options.map((option, index) => {
-	    return /*#__PURE__*/React.createElement(NameButton, {
-	      key: index,
-	      selected: answer === option,
-	      onClick: () => setAnswer(option),
-	      disabled: submitted
-	    }, /*#__PURE__*/React.createElement(Text, {
-	      size: 18,
-	      color: answer === option ? 'var(--Main-Black)' : 'var(--Main-White)'
-	    }, option));
-	  })), submitted ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Box$1, {
-	    style: {
-	      height: 12
-	    }
-	  }), /*#__PURE__*/React.createElement(Text, {
-	    size: 28,
-	    weight: 700,
-	    color: answer === questions[currentQuestion].answer ? 'var(--Main-White)' : 'var(--Main-Red)'
-	  }, answer === questions[currentQuestion].answer ? 'correct' : 'incorrect'), /*#__PURE__*/React.createElement(Text, {
-	    weight: 700,
-	    opacity: 0.75
-	  }, score, "/", currentQuestion + 1)) : null, /*#__PURE__*/React.createElement(Box$1, {
-	    style: {
-	      flex: 1
-	    }
-	  }), submitted ? null : /*#__PURE__*/React.createElement(TheButton, {
-	    disabled: answer === null,
-	    onClick: handleSubmission
-	  }, /*#__PURE__*/React.createElement(Text, {
-	    size: 18,
-	    weight: 700
-	  }, "submit")));
-	}
-
-	function NightAngel({
-	  name,
-	  players,
-	  sendMessageToParent
-	}) {
-	  const [selectedPlayer, setSelectedPlayer] = reactExports.useState(null);
-	  const [confirmed, setConfirmed] = reactExports.useState(false);
-	  const [answeringTrivia, setAnsweringTrivia] = reactExports.useState(false);
-	  const playersToList = players.filter(player => !player.inHeaven);
-	  const handleConfirmation = () => {
-	    setConfirmed(true);
-	    sendMessageToParent({
-	      name: 'protect',
-	      target: selectedPlayer
-	    });
-	    sendMessageToParent({
-	      name: 'finishedNight',
-	      player: name
-	    });
-	  };
-	  if (answeringTrivia) {
-	    return /*#__PURE__*/React.createElement(NightTrivia, null);
-	  }
-	  if (confirmed) {
-	    return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Text, null, selectedPlayer), /*#__PURE__*/React.createElement(Text, {
-	      size: 18,
-	      opacity: 0.75
-	    }, "will be protected"), /*#__PURE__*/React.createElement(Box$1, {
-	      style: {
-	        flex: 1
-	      }
-	    }), /*#__PURE__*/React.createElement(Text, {
-	      size: 18,
-	      opacity: 0.75
-	    }, "the night isn't over  yet"), /*#__PURE__*/React.createElement(Box$1, {
-	      style: {
-	        height: 1
-	      }
-	    }), /*#__PURE__*/React.createElement(TheButton, {
-	      onClick: () => setAnsweringTrivia(true)
-	    }, /*#__PURE__*/React.createElement(Text, {
-	      size: 18,
-	      weight: 700
-	    }, "play trivia")));
-	  }
-	  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Text, null, "who will you protect?"), /*#__PURE__*/React.createElement(ScrollableFlexColumnBox, null, playersToList.map((player, index) => {
-	    return /*#__PURE__*/React.createElement(NameButton, {
-	      key: index,
-	      selected: player.realName === selectedPlayer,
-	      selectedColor: 'var(--Main-Yellow)',
-	      onClick: () => setSelectedPlayer(player.realName),
-	      disabled: player.name === name
-	    }, /*#__PURE__*/React.createElement(Text, {
-	      size: 18
-	    }, player.realName));
-	  })), /*#__PURE__*/React.createElement(Box$1, {
-	    style: {
-	      flex: 1
-	    }
-	  }), /*#__PURE__*/React.createElement(TheButton, {
-	    disabled: selectedPlayer === null,
-	    onClick: handleConfirmation
-	  }, /*#__PURE__*/React.createElement(Text, {
-	    size: 18,
-	    weight: 700
-	  }, "protect")));
-	}
-
-	function NightDetective({
-	  name,
-	  players,
-	  knownRoles,
-	  setKnownRoles,
-	  sendMessageToParent
-	}) {
-	  const [selectedPlayer, setSelectedPlayer] = reactExports.useState(null);
-	  const [confirmed, setConfirmed] = reactExports.useState(false);
-	  const [answeringTrivia, setAnsweringTrivia] = reactExports.useState(false);
-	  const playersToList = players.filter(player => !player.inHeaven);
-	  const handleConfirmation = () => {
-	    setConfirmed(true);
-	    setKnownRoles(prev => [...prev, selectedPlayer.name]);
-	    sendMessageToParent({
-	      name: 'identified',
-	      target: selectedPlayer.name
-	    });
-	    setTimeout(() => {
-	      sendMessageToParent({
-	        name: 'finishedNight',
-	        player: name
-	      });
-	    }, 1500);
-	  };
-	  if (answeringTrivia) {
-	    return /*#__PURE__*/React.createElement(NightTrivia, null);
-	  }
-	  if (confirmed) {
-	    return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Text, null, selectedPlayer.realName), /*#__PURE__*/React.createElement(Text, {
-	      size: 18,
-	      opacity: 0.75
-	    }, "is a", selectedPlayer.role === 'angel' ? 'n' : null), /*#__PURE__*/React.createElement(Text, {
-	      size: 42,
-	      weight: 700
-	    }, playersToList.find(player => player.name === selectedPlayer.name).role), /*#__PURE__*/React.createElement(Box$1, {
-	      style: {
-	        flex: 1
-	      }
-	    }), /*#__PURE__*/React.createElement(Text, {
-	      size: 18,
-	      opacity: 0.75
-	    }, "the night isn't over  yet"), /*#__PURE__*/React.createElement(Box$1, {
-	      style: {
-	        height: 1
-	      }
-	    }), /*#__PURE__*/React.createElement(TheButton, {
-	      onClick: () => setAnsweringTrivia(true)
-	    }, /*#__PURE__*/React.createElement(Text, {
-	      size: 18,
-	      weight: 700
-	    }, "play trivia")));
-	  }
-	  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Text, null, "who will you identify?"), /*#__PURE__*/React.createElement(ScrollableFlexColumnBox, null, playersToList.map((player, index) => {
-	    return /*#__PURE__*/React.createElement(NameButton, {
-	      key: index,
-	      selected: player === selectedPlayer,
-	      selectedColor: 'var(--Main-Blue)',
-	      onClick: () => setSelectedPlayer(player),
-	      disabled: knownRoles.includes(player.name) || player.name === name
-	    }, /*#__PURE__*/React.createElement(Text, {
-	      size: 18
-	    }, player.realName, knownRoles.includes(player.name) ? ` (${player.role})` : ''));
-	  })), /*#__PURE__*/React.createElement(Box$1, {
-	    style: {
-	      flex: 1
-	    }
-	  }), /*#__PURE__*/React.createElement(TheButton, {
-	    disabled: selectedPlayer === null,
-	    onClick: handleConfirmation
-	  }, /*#__PURE__*/React.createElement(Text, {
-	    size: 18,
-	    weight: 700
-	  }, "identify")));
-	}
-
-	function NightCivilian({
-	  name,
-	  sendMessageToParent
-	}) {
-	  const [answeringTrivia, setAnsweringTrivia] = reactExports.useState(false);
-	  reactExports.useEffect(() => {
-	    setTimeout(() => {
-	      setAnsweringTrivia(true);
-	    }, 4000);
-	  }, []);
-	  if (answeringTrivia) {
-	    return /*#__PURE__*/React.createElement(NightTrivia, {
-	      sendMessageToParent: sendMessageToParent,
-	      name: name
-	    });
-	  }
-	  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Text, null, "trivia"), /*#__PURE__*/React.createElement(Text, {
-	    size: 18,
-	    opacity: 0.5
-	  }, "if you don\u2019t complete at least one round"), /*#__PURE__*/React.createElement(Text, {
-	    weight: 700,
-	    color: 'var(--Main-Red)'
-	  }, "you could risk death"));
-	}
-
 	const Skull = ({
-	  color = 'var(--Main-White)'
+	  color = "var(--Main-White)"
 	}) => {
 	  return /*#__PURE__*/React.createElement("svg", {
 	    width: "14",
@@ -43935,36 +43842,6 @@ Please use another name.` );
 	    id: "Vector",
 	    d: "M13.9051 7.01586C13.9051 7.01586 13.9279 2.85911 10.255 1.3625C6.58209 -0.134103 -0.738744 0.862172 0.143714 8.0136C0.1618 8.16038 0.348504 9.08302 0.45542 9.60627C0.502761 9.83937 0.457016 10.0803 0.3251 10.2846C0.120842 10.6021 1.57192 12.5239 1.7448 13.1057C1.79905 13.2885 1.87406 13.3997 1.95118 13.466C2.16874 13.6533 2.30598 13.9059 2.31289 14.18L2.36023 16.1491C2.36395 16.2974 2.40279 16.4437 2.47779 16.5753C3.63897 18.6205 5.39378 19.0799 6.07358 19.1823C6.22677 19.2057 6.38315 19.1935 6.53369 19.157C7.13263 19.0126 7.89753 19.1745 7.89753 19.1745C9.61883 19.529 11.0763 17.2215 11.4673 16.5358C11.5348 16.4173 11.5752 16.2871 11.5859 16.154L11.7486 14.1219C11.7662 13.9044 11.8572 13.6948 12.0194 13.5353C12.4183 13.1437 13.137 11.276 13.4295 10.7566C13.5763 10.4958 13.5934 10.3373 13.5609 10.2407C13.5056 10.0739 13.5146 9.89399 13.5678 9.72672C13.8301 8.89869 13.9056 7.01586 13.9056 7.01586H13.9051ZM3.65812 10.2714C2.40385 10.6611 2.01927 9.41804 2.01927 9.41804C2.01927 9.41804 1.4932 8.10089 1.89799 7.43329C2.30278 6.7657 3.71876 6.35753 4.8725 6.69157C6.0257 7.02562 5.82357 8.71338 5.82357 8.71338C5.92464 9.04742 4.91292 9.8818 3.65865 10.2714H3.65812ZM7.74541 12.2659C7.74541 12.2659 7.08955 12.4308 6.92571 11.5198C6.94593 11.8836 6.87199 12.4888 6.08634 12.1816C4.99377 11.7549 6.65284 9.084 6.65284 9.084C6.65284 9.084 6.65816 8.78702 6.92891 8.8431C7.19965 8.89918 7.21987 8.89869 7.30072 9.14008C7.38157 9.38147 8.85872 11.4784 7.74594 12.2664L7.74541 12.2659ZM11.8933 9.71502C11.8933 9.71502 11.1651 10.8839 9.48585 9.87302C9.48585 9.87302 8.15073 9.28247 8.08956 8.4598C8.02892 7.63762 8.67627 6.58331 9.40447 6.57259C10.1327 6.56186 11.4279 6.80276 11.8933 7.26652C12.3588 7.73027 11.8933 9.71502 11.8933 9.71502Z",
 	    fill: color
-	  }));
-	};
-	const Finger = ({
-	  color = 'var(--Main-White)'
-	}) => {
-	  return /*#__PURE__*/React.createElement("svg", {
-	    width: "15",
-	    height: "22",
-	    viewBox: "0 0 15 22",
-	    fill: "none",
-	    xmlns: "http://www.w3.org/2000/svg"
-	  }, /*#__PURE__*/React.createElement("path", {
-	    fillRule: "evenodd",
-	    clipRule: "evenodd",
-	    d: "M3.74833 0.260466C2.87675 0.260466 2.17019 0.967025 2.17019 1.83861V8.85263C2.15991 8.86806 0.416748 11.4849 0.416748 12.1842C0.416748 12.8856 1.81954 14.9898 1.81954 14.9898L2.20715 15.4743C2.42275 16.8737 3.5576 17.9699 4.9756 18.1268V20.9516C4.9756 20.9516 6.72909 21.3023 8.48258 21.127C10.2361 20.9516 11.6389 20.0749 11.6389 20.0749V18.1244C13.023 17.952 14.0942 16.7714 14.0942 15.3405V9.37862C14.0942 8.60388 13.4662 7.97583 12.6914 7.97583C11.9241 7.97583 11.3006 8.59196 11.2888 9.35651V9.02792C11.2888 8.25318 10.6607 7.62513 9.88601 7.62513C9.11127 7.62513 8.48322 8.25318 8.48322 9.02792V16.7433H8.4831V8.85257C8.4831 7.98099 7.77655 7.27443 6.90497 7.27443C6.03338 7.27443 5.32683 7.98099 5.32683 8.85257V16.7433H5.32647V1.83861C5.32647 0.967023 4.61991 0.260466 3.74833 0.260466Z",
-	    fill: color
-	  }));
-	};
-	const Lock = () => {
-	  return /*#__PURE__*/React.createElement("svg", {
-	    xmlns: "http://www.w3.org/2000/svg",
-	    width: "16",
-	    height: "22",
-	    viewBox: "0 0 16 22",
-	    fill: "none"
-	  }, /*#__PURE__*/React.createElement("path", {
-	    fillRule: "evenodd",
-	    clipRule: "evenodd",
-	    d: "M13.8286 6.28571C13.8286 4.61864 13.1663 3.01984 11.9875 1.84104C10.8087 0.662243 9.20993 0 7.54286 0C5.87578 0 4.27699 0.662243 3.09819 1.84104C1.91939 3.01984 1.25714 4.61864 1.25714 6.28571V10.0571H0V22H15.0857V10.0571H13.8286V6.28571ZM11.3143 6.28571H11.3141C11.3141 4.20281 9.62558 2.51429 7.54268 2.51429C5.4598 2.51429 3.7713 4.20276 3.77125 6.28562L3.77143 6.28571V10.0571H11.3143V6.28571Z",
-	    fill: "#BB3737"
 	  }));
 	};
 	const FullLogo = () => {
@@ -43982,115 +43859,80 @@ Please use another name.` );
 	  }));
 	};
 
-	function NightMafia({
-	  name,
-	  players,
-	  sendMessageToParent
-	}) {
-	  const [selectedPlayer, setSelectedPlayer] = reactExports.useState(null);
-	  const [confirmed, setConfirmed] = reactExports.useState(false);
-	  const [answeringTrivia, setAnsweringTrivia] = reactExports.useState(false);
-	  const playersToList = players.filter(player => !player.inHeaven);
+	function NightMafia() {
+	  const {
+	    players,
+	    self,
+	    currentMafiaSelections,
+	    currentMafiaVotes
+	  } = reactExports.useContext(VariableContext);
+	  const {
+	    handleMafiaSelection,
+	    handleMafiaVote
+	  } = reactExports.useContext(ActionContext);
+	  const [mySelection, setMySelection] = reactExports.useState(null);
+	  const [otherSelectionsAndVotes, setOtherSelectionsAndVotes] = reactExports.useState([]);
+	  const [myVote, setMyVote] = reactExports.useState(null);
+	  const playersToList = players.filter(player => player.isAlive);
 	  const handleConfirmation = () => {
-	    setConfirmed(true);
-	    sendMessageToParent({
-	      name: 'finishedNight',
-	      player: name
-	    });
+	    if (mySelection === null) return;
+	    handleMafiaVote(mySelection.gamername);
 	  };
-	  if (answeringTrivia) {
-	    return /*#__PURE__*/React.createElement(NightTrivia, null);
-	  }
-	  if (confirmed) {
-	    return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(ConstrainedBox, {
-	      width: 342
-	    }, /*#__PURE__*/React.createElement(Text, {
-	      size: 18,
-	      opacity: 0.75
-	    }, "your vote will be taken into consideration")), /*#__PURE__*/React.createElement(Text, {
-	      size: 18,
-	      weight: 600,
-	      color: 'var(--Main-Red)'
-	    }, "soon, someone will die"), /*#__PURE__*/React.createElement(Box$1, {
-	      style: {
-	        flex: 1
-	      }
-	    }), /*#__PURE__*/React.createElement(Text, {
-	      size: 18,
-	      opacity: 0.75
-	    }, "the night isn't over  yet"), /*#__PURE__*/React.createElement(Box$1, {
-	      style: {
-	        height: 1
-	      }
-	    }), /*#__PURE__*/React.createElement(TheButton, {
-	      onClick: () => setAnsweringTrivia(true)
-	    }, /*#__PURE__*/React.createElement(Text, {
-	      size: 18,
-	      weight: 700
-	    }, "play trivia")));
-	  }
+	  reactExports.useEffect(() => {
+	    const mySelection = currentMafiaSelections.find(selection => selection.player.gamername === self.gamername);
+	    if (mySelection) {
+	      setMySelection(mySelection.target);
+	    } else {
+	      setMySelection(null);
+	    }
+	    const myVote = currentMafiaVotes.find(vote => vote.player.gamername === self.gamername);
+	    if (myVote) {
+	      setMyVote(myVote.target);
+	    } else {
+	      setMyVote(null);
+	    }
+	    const otherSelections = currentMafiaSelections.filter(selection => selection.player.gamername !== self.gamername);
+	    const otherVotes = currentMafiaVotes.filter(vote => vote.player.gamername !== self.gamername);
+	    const otherSelectionsTargets = otherSelections.map(selection => selection.target);
+	    const otherVotesTargets = otherVotes.map(vote => vote.target);
+	    setOtherSelectionsAndVotes([...otherSelectionsTargets, ...otherVotesTargets]);
+	  }, [currentMafiaSelections, currentMafiaVotes]);
 	  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Text, null, "who will die tonight?"), /*#__PURE__*/React.createElement(Text, {
 	    size: 18,
 	    opacity: 0.5
 	  }, "each mafia has 1 vote"), /*#__PURE__*/React.createElement(ScrollableFlexColumnBox, null, playersToList.map((player, index) => {
-	    const iVoted = player.killVotes.includes(name);
-	    const otherKillVotes = player.killVotes.filter(voter => voter !== name).length;
+	    const iVoted = mySelection?.gamername === player.gamername || myVote?.gamername === player.gamername;
+	    const otherKillVotes = otherSelectionsAndVotes.filter(target => target.gamername === player.gamername).length;
 	    return /*#__PURE__*/React.createElement(NameButton, {
 	      key: index,
-	      disabled: player.role === 'mafia',
-	      onClick: () => {
-	        if (selectedPlayer === player.name) {
-	          setSelectedPlayer(null);
-	          sendMessageToParent({
-	            name: 'changeKillVote',
-	            oldTarget: player.name,
-	            target: null,
-	            player: name
-	          });
-	          return;
-	        }
-	        if (selectedPlayer) {
-	          sendMessageToParent({
-	            name: 'changeKillVote',
-	            oldTarget: selectedPlayer,
-	            target: player.name,
-	            player: name
-	          });
-	        } else {
-	          sendMessageToParent({
-	            name: 'killVote',
-	            target: player.name,
-	            player: name
-	          });
-	        }
-	        setSelectedPlayer(player.name);
-	      }
+	      disabled: player.role === "mafia" || myVote !== null,
+	      onClick: () => handleMafiaSelection(player.gamername)
 	    }, /*#__PURE__*/React.createElement(Box$1, {
 	      style: {
-	        display: 'flex',
-	        flexDirection: 'row',
-	        alignItems: 'center',
-	        justifyContent: 'center',
+	        display: "flex",
+	        flexDirection: "row",
+	        alignItems: "center",
+	        justifyContent: "center",
 	        gap: 3,
-	        position: 'absolute',
+	        position: "absolute",
 	        right: 15
 	      }
 	    }, otherKillVotes > 0 ? /*#__PURE__*/React.createElement(Box$1, {
 	      style: {
 	        width: 30.158,
 	        height: 30.158,
-	        borderRadius: '50%',
-	        backgroundColor: 'transparent',
-	        display: 'flex',
-	        alignItems: 'center',
-	        justifyContent: 'center',
-	        position: 'relative',
+	        borderRadius: "50%",
+	        backgroundColor: "transparent",
+	        display: "flex",
+	        alignItems: "center",
+	        justifyContent: "center",
+	        position: "relative",
 	        opacity: 0.5
 	      }
 	    }, /*#__PURE__*/React.createElement(Skull, null), otherKillVotes > 1 ? /*#__PURE__*/React.createElement(Text, {
 	      size: 18,
 	      style: {
-	        position: 'absolute',
+	        position: "absolute",
 	        right: -17,
 	        bottom: -2
 	      }
@@ -44102,1019 +43944,30 @@ Please use another name.` );
 	      style: {
 	        width: 30.158,
 	        height: 30.158,
-	        borderRadius: '50%',
-	        backgroundColor: 'var(--Main-Red)',
-	        display: 'flex',
-	        alignItems: 'center',
-	        justifyContent: 'center',
-	        position: 'relative'
+	        borderRadius: "50%",
+	        backgroundColor: "var(--Main-Red)",
+	        display: "flex",
+	        alignItems: "center",
+	        justifyContent: "center",
+	        position: "relative"
 	      }
 	    }, /*#__PURE__*/React.createElement(Skull, null)) : null), /*#__PURE__*/React.createElement(Text, {
 	      size: 18
-	    }, player.realName, player.role === 'mafia' ? ' (mafia)' : null));
+	    }, player.realname, player.role === "mafia" ? " (mafia)" : null));
 	  })), /*#__PURE__*/React.createElement(Box$1, {
 	    style: {
 	      flex: 1
 	    }
 	  }), /*#__PURE__*/React.createElement(TheButton, {
-	    disabled: !selectedPlayer,
+	    disabled: mySelection === null || myVote !== null,
 	    onClick: handleConfirmation,
 	    style: {
-	      position: 'relative'
+	      position: "relative"
 	    }
 	  }, /*#__PURE__*/React.createElement(Text, {
 	    size: 18,
 	    weight: 700
-	  }, "confirm votes")));
-	}
-
-	function NightFinished() {
-	  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(ConstrainedBox, {
-	    width: 289
-	  }, /*#__PURE__*/React.createElement(Text, {
-	    size: 18,
-	    opacity: 0.75
-	  }, "see screen to learn what happened during the night")));
-	}
-
-	var v$2 = "5.9.0";
-	var fr$2 = 30;
-	var ip$2 = 0;
-	var op$2 = 60;
-	var w$2 = 20;
-	var h$2 = 35;
-	var nm$2 = "FinalHand";
-	var ddd$2 = 0;
-	var assets$2 = [
-	];
-	var layers$2 = [
-		{
-			ddd: 0,
-			ind: 1,
-			ty: 4,
-			nm: "Layer 1/Group 17 Outlines",
-			sr: 1,
-			ks: {
-				o: {
-					a: 0,
-					k: 100,
-					ix: 11
-				},
-				r: {
-					a: 0,
-					k: 0,
-					ix: 10
-				},
-				p: {
-					a: 0,
-					k: [
-						10,
-						17.5,
-						0
-					],
-					ix: 2,
-					l: 2
-				},
-				a: {
-					a: 0,
-					k: [
-						20,
-						30.5,
-						0
-					],
-					ix: 1,
-					l: 2
-				},
-				s: {
-					a: 1,
-					k: [
-						{
-							i: {
-								x: [
-									0.833,
-									0.833,
-									0.833
-								],
-								y: [
-									0.833,
-									0.833,
-									0.833
-								]
-							},
-							o: {
-								x: [
-									0.167,
-									0.167,
-									0.167
-								],
-								y: [
-									0.167,
-									0.167,
-									0.167
-								]
-							},
-							t: 0,
-							s: [
-								34,
-								34,
-								100
-							]
-						},
-						{
-							i: {
-								x: [
-									0.833,
-									0.833,
-									0.833
-								],
-								y: [
-									0.833,
-									0.833,
-									0.833
-								]
-							},
-							o: {
-								x: [
-									0.167,
-									0.167,
-									0.167
-								],
-								y: [
-									0.167,
-									0.167,
-									0.167
-								]
-							},
-							t: 30,
-							s: [
-								47,
-								47,
-								100
-							]
-						},
-						{
-							t: 60,
-							s: [
-								34,
-								34,
-								100
-							]
-						}
-					],
-					ix: 6,
-					l: 2
-				}
-			},
-			ao: 0,
-			shapes: [
-				{
-					ty: "gr",
-					it: [
-						{
-							ind: 0,
-							ty: "sh",
-							ix: 1,
-							ks: {
-								a: 0,
-								k: {
-									i: [
-										[
-											2.485,
-											0
-										],
-										[
-											0,
-											-2.485
-										],
-										[
-											0,
-											0
-										],
-										[
-											0,
-											-2
-										],
-										[
-											0,
-											0
-										],
-										[
-											0,
-											0
-										],
-										[
-											-4.044,
-											-0.447
-										],
-										[
-											0,
-											0
-										],
-										[
-											-5,
-											0.5
-										],
-										[
-											0,
-											0
-										],
-										[
-											0,
-											0
-										],
-										[
-											0,
-											4.08
-										],
-										[
-											0,
-											0
-										],
-										[
-											2.209,
-											0
-										],
-										[
-											0,
-											-2.209
-										],
-										[
-											0,
-											0
-										],
-										[
-											2.209,
-											0
-										],
-										[
-											0,
-											-2.209
-										],
-										[
-											0,
-											0
-										],
-										[
-											2.485,
-											0
-										],
-										[
-											0,
-											-2.485
-										],
-										[
-											0,
-											0
-										]
-									],
-									o: [
-										[
-											-2.485,
-											0
-										],
-										[
-											0,
-											0
-										],
-										[
-											0,
-											0
-										],
-										[
-											0,
-											2
-										],
-										[
-											0,
-											0
-										],
-										[
-											0.615,
-											3.99
-										],
-										[
-											0,
-											0
-										],
-										[
-											0,
-											0
-										],
-										[
-											5,
-											-0.5
-										],
-										[
-											0,
-											0
-										],
-										[
-											3.946,
-											-0.492
-										],
-										[
-											0,
-											0
-										],
-										[
-											0,
-											-2.209
-										],
-										[
-											-2.209,
-											0
-										],
-										[
-											0,
-											0
-										],
-										[
-											0,
-											-2.209
-										],
-										[
-											-2.209,
-											0
-										],
-										[
-											0,
-											0
-										],
-										[
-											0,
-											-2.485
-										],
-										[
-											-2.485,
-											0
-										],
-										[
-											0,
-											0
-										],
-										[
-											0,
-											-2.485
-										]
-									],
-									v: [
-										[
-											-10,
-											-30
-										],
-										[
-											-14.5,
-											-25.5
-										],
-										[
-											-14.5,
-											-5.5
-										],
-										[
-											-19.5,
-											4
-										],
-										[
-											-15.5,
-											12
-										],
-										[
-											-14.395,
-											13.382
-										],
-										[
-											-6.5,
-											20.945
-										],
-										[
-											-6.5,
-											29
-										],
-										[
-											3.5,
-											29.5
-										],
-										[
-											12.5,
-											26.5
-										],
-										[
-											12.5,
-											20.938
-										],
-										[
-											19.5,
-											13
-										],
-										[
-											19.5,
-											-4
-										],
-										[
-											15.5,
-											-8
-										],
-										[
-											11.5,
-											-4
-										],
-										[
-											11.5,
-											-5
-										],
-										[
-											7.5,
-											-9
-										],
-										[
-											3.5,
-											-5
-										],
-										[
-											3.5,
-											-5.5
-										],
-										[
-											-1,
-											-10
-										],
-										[
-											-5.5,
-											-5.5
-										],
-										[
-											-5.5,
-											-25.5
-										]
-									],
-									c: true
-								},
-								ix: 2
-							},
-							nm: "Path 1",
-							mn: "ADBE Vector Shape - Group",
-							hd: false
-						},
-						{
-							ty: "fl",
-							c: {
-								a: 0,
-								k: [
-									0.733333333333,
-									0.215686289469,
-									0.215686289469,
-									1
-								],
-								ix: 4
-							},
-							o: {
-								a: 0,
-								k: 100,
-								ix: 5
-							},
-							r: 1,
-							bm: 0,
-							nm: "Fill 1",
-							mn: "ADBE Vector Graphic - Fill",
-							hd: false
-						},
-						{
-							ty: "tr",
-							p: {
-								a: 0,
-								k: [
-									19.75,
-									30.25
-								],
-								ix: 2
-							},
-							a: {
-								a: 0,
-								k: [
-									0,
-									0
-								],
-								ix: 1
-							},
-							s: {
-								a: 0,
-								k: [
-									100,
-									100
-								],
-								ix: 3
-							},
-							r: {
-								a: 0,
-								k: 0,
-								ix: 6
-							},
-							o: {
-								a: 0,
-								k: 100,
-								ix: 7
-							},
-							sk: {
-								a: 0,
-								k: 0,
-								ix: 4
-							},
-							sa: {
-								a: 0,
-								k: 0,
-								ix: 5
-							},
-							nm: "Transform"
-						}
-					],
-					nm: "Group 1",
-					np: 2,
-					cix: 2,
-					bm: 0,
-					ix: 1,
-					mn: "ADBE Vector Group",
-					hd: false
-				}
-			],
-			ip: 0,
-			op: 60,
-			st: 0,
-			bm: 0
-		}
-	];
-	var markers$2 = [
-	];
-	var lottieJson$1 = {
-		v: v$2,
-		fr: fr$2,
-		ip: ip$2,
-		op: op$2,
-		w: w$2,
-		h: h$2,
-		nm: nm$2,
-		ddd: ddd$2,
-		assets: assets$2,
-		layers: layers$2,
-		markers: markers$2
-	};
-
-	function Day({
-	  name,
-	  role,
-	  beingAccused,
-	  players,
-	  knownRoles,
-	  sendMessageToParent
-	}) {
-	  const [selectedPlayer, setSelectedPlayer] = reactExports.useState(null);
-	  const playersToList = players.filter(player => !player.inHeaven);
-	  const handleAccuse = () => {
-	    sendMessageToParent({
-	      name: 'accuse',
-	      target: selectedPlayer.name,
-	      player: name
-	    });
-	    setSelectedPlayer(null);
-	  };
-	  return /*#__PURE__*/React.createElement(React.Fragment, null, beingAccused ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Text, {
-	    weight: 700,
-	    color: 'var(--Main-Red)',
-	    size: 24
-	  }, "you are being accused"), /*#__PURE__*/React.createElement(Text, {
-	    size: 18,
-	    opacity: 0.75
-	  }, "defend yourself")) : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Text, null, "who will you accuse?"), /*#__PURE__*/React.createElement(Text, {
-	    size: 18,
-	    opacity: 0.75
-	  }, "2+ accusations are required")), /*#__PURE__*/React.createElement(ScrollableFlexColumnBox, null, playersToList.map((player, index) => {
-	    const myAccusation = player.accusations.find(accusation => accusation === name);
-	    const otherAccusation = player.accusations.find(accusation => accusation !== name);
-	    return /*#__PURE__*/React.createElement(NameButton, {
-	      key: index,
-	      selected: selectedPlayer?.realName === player.realName,
-	      onClick: () => {
-	        if (myAccusation) return;
-	        setSelectedPlayer(player);
-	      },
-	      disabled: player.name === name || player.locked
-	    }, /*#__PURE__*/React.createElement(Box$1, {
-	      style: {
-	        display: 'flex',
-	        flexDirection: 'row',
-	        alignItems: 'center',
-	        justifyContent: 'center',
-	        gap: 3,
-	        position: 'absolute',
-	        right: 15
-	      }
-	    }, otherAccusation ? /*#__PURE__*/React.createElement(Box$1, {
-	      style: {
-	        width: 30.158,
-	        height: 30.158,
-	        borderRadius: '50%',
-	        backgroundColor: 'transparent',
-	        display: 'flex',
-	        alignItems: 'center',
-	        justifyContent: 'center',
-	        position: 'relative',
-	        opacity: player.name === name ? 1 : 0.5
-	      }
-	    }, player.name === name ? /*#__PURE__*/React.createElement(LottiePlayer, {
-	      loop: true,
-	      animationData: lottieJson$1,
-	      play: true,
-	      style: {
-	        maxHeight: 35
-	      }
-	    }) : selectedPlayer?.realName === player.realName ? /*#__PURE__*/React.createElement(Finger, {
-	      color: 'var(--Main-Black)'
-	    }) : /*#__PURE__*/React.createElement(Finger, {
-	      color: 'var(--Main-White)'
-	    })) : null, myAccusation ? /*#__PURE__*/React.createElement(Box$1, {
-	      style: {
-	        width: 30.158,
-	        height: 30.158,
-	        borderRadius: '50%',
-	        backgroundColor: 'var(--Main-Red)',
-	        display: 'flex',
-	        alignItems: 'center',
-	        justifyContent: 'center',
-	        position: 'relative'
-	      }
-	    }, /*#__PURE__*/React.createElement(Finger, null)) : null), /*#__PURE__*/React.createElement(Box$1, {
-	      style: {
-	        display: 'flex',
-	        flexDirection: 'row',
-	        alignItems: 'center',
-	        justifyContent: 'center',
-	        position: 'absolute',
-	        left: 15
-	      }
-	    }, player.locked ? /*#__PURE__*/React.createElement(Lock, null) : null), /*#__PURE__*/React.createElement(Text, {
-	      size: 18,
-	      color: selectedPlayer?.realName === player.realName ? 'var(--Main-Black)' : 'var(--Main-White)'
-	    }, player.realName, role === 'mafia' && player.role === 'mafia' || role === 'detective' && knownRoles.includes(player.name) ? ` (${player.role})` : null));
-	  })), /*#__PURE__*/React.createElement(TheButton, {
-	    onClick: handleAccuse,
-	    disabled: !selectedPlayer
-	  }, /*#__PURE__*/React.createElement(Text, {
-	    size: 18,
-	    weight: 700
-	  }, "accuse")));
-	}
-
-	function Voting({
-	  name,
-	  playerBeingVotedOn,
-	  votingActive,
-	  sendMessageToParent
-	}) {
-	  const [vote, setVote] = reactExports.useState(null);
-	  const [submitted, setSubmitted] = reactExports.useState(false);
-	  const handleSubmission = () => {
-	    setSubmitted(true);
-	    sendMessageToParent({
-	      name: 'voteSubmitted',
-	      player: name
-	    });
-	  };
-	  if (name === playerBeingVotedOn?.name) {
-	    return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(ConstrainedBox, {
-	      width: 289
-	    }, /*#__PURE__*/React.createElement(Text, {
-	      size: 18,
-	      opacity: 0.75
-	    }, "a decision is being made about your life. you cannot vote")));
-	  }
-	  if (submitted) {
-	    return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Text, {
-	      size: 18
-	    }, "your vote has been submitted"), /*#__PURE__*/React.createElement(Text, {
-	      size: 18,
-	      opacity: 0.75
-	    }, "see the main screen for the results"));
-	  }
-	  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Text, null, "should ", playerBeingVotedOn?.realName, " live or die?"), /*#__PURE__*/React.createElement(Text, {
-	    size: 18,
-	    opacity: 0.75
-	  }, "post your vote"), /*#__PURE__*/React.createElement(NameButton, {
-	    onClick: () => {
-	      sendMessageToParent({
-	        name: 'vote',
-	        vote: 'live',
-	        player: name
-	      });
-	      setVote('live');
-	    },
-	    selected: vote === 'live'
-	  }, /*#__PURE__*/React.createElement(Text, {
-	    size: 18,
-	    weight: 700,
-	    color: vote === 'live' ? 'var(--Main-Black)' : 'var(--Main-White)'
-	  }, "live")), /*#__PURE__*/React.createElement(NameButton, {
-	    onClick: () => {
-	      sendMessageToParent({
-	        name: 'vote',
-	        vote: 'die',
-	        player: name
-	      });
-	      setVote('die');
-	    },
-	    selected: vote === 'die'
-	  }, /*#__PURE__*/React.createElement(Text, {
-	    size: 18,
-	    weight: 700,
-	    color: vote === 'die' ? 'var(--Main-Black)' : 'var(--Main-White)'
-	  }, "die")), /*#__PURE__*/React.createElement(Box$1, {
-	    style: {
-	      flex: 1
-	    }
-	  }), /*#__PURE__*/React.createElement(TheButton, {
-	    disabled: vote === null || !votingActive,
-	    onClick: handleSubmission
-	  }, /*#__PURE__*/React.createElement(Text, {
-	    size: 18,
-	    weight: 700
-	  }, "submit vote")));
-	}
-
-	function Win({
-	  winner,
-	  isHost,
-	  sendMessageToParent
-	}) {
-	  const handlePlayAgain = () => {
-	    sendMessageToParent({
-	      name: 'playAgain'
-	    });
-	  };
-	  const handleExit = () => {
-	    sendMessageToParent({
-	      name: 'exit-press'
-	    });
-	  };
-	  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Text, {
-	    size: 18,
-	    opacity: 0.5
-	  }, "game over"), /*#__PURE__*/React.createElement(Text, {
-	    opacity: 0.75
-	  }, winner ? 'your team wins!' : 'you failed'), isHost ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Box$1, {
-	    style: {
-	      height: 1
-	    }
-	  }), /*#__PURE__*/React.createElement(TheButton, {
-	    onClick: handlePlayAgain
-	  }, /*#__PURE__*/React.createElement(Text, {
-	    size: 18,
-	    weight: 700
-	  }, "play again")), /*#__PURE__*/React.createElement(NameButton, {
-	    onClick: handleExit
-	  }, /*#__PURE__*/React.createElement(Text, {
-	    size: 18,
-	    weight: 700
-	  }, "exit"))) : null);
-	}
-
-	function HeavenWelcome() {
-	  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Text, {
-	    color: 'var(--Main-Black)'
-	  }, "welcome to heaven"), /*#__PURE__*/React.createElement(ConstrainedBox, {
-	    width: 289
-	  }, /*#__PURE__*/React.createElement(Text, {
-	    color: 'var(--Main-Black)',
-	    size: 18,
-	    opacity: 0.75
-	  }, "you will be able to select to see the actions of other players")), /*#__PURE__*/React.createElement(Text, {
-	    color: 'var(--Main-Red)',
-	    weight: 700
-	  }, "don't say a word"));
-	}
-
-	function HeavenNight({
-	  players
-	}) {
-	  const [selected, setSelected] = reactExports.useState(null); // angel, detective, mafia
-	  const [actionsFollowing, setActionsFollowing] = reactExports.useState(null);
-	  const [followingName, setFollowingName] = reactExports.useState(null);
-	  const [followingTarget, setFollowingTarget] = reactExports.useState(null);
-	  const [followingTargetRole, setFollowingTargetRole] = reactExports.useState(null);
-	  const playersToList = players.filter(player => !player.inHeaven);
-	  reactExports.useEffect(() => {
-	    if (actionsFollowing === 'angel') {
-	      const angelSaved = players.find(player => player.saved);
-	      if (angelSaved) {
-	        setFollowingTarget(angelSaved.realName);
-	      }
-	    }
-	    if (actionsFollowing === 'detective') {
-	      const detectiveFound = players.find(player => player.identified);
-	      if (detectiveFound) {
-	        setFollowingTarget(detectiveFound.realName);
-	        setFollowingTargetRole(detectiveFound.role);
-	      }
-	    }
-	  }, [players, actionsFollowing]);
-	  const handleFollow = () => {
-	    setActionsFollowing(selected);
-	    const followingName = players.find(player => player.role === selected)?.realName;
-	    setFollowingName(followingName);
-	  };
-	  if (actionsFollowing === 'angel' || actionsFollowing === 'detective') {
-	    return /*#__PURE__*/React.createElement(React.Fragment, null, followingTarget === null ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Text, {
-	      color: 'var(--Main-Black)',
-	      opacity: 0.75
-	    }, followingName), /*#__PURE__*/React.createElement(Text, {
-	      color: 'var(--Main-Black)',
-	      size: 18,
-	      opacity: 0.5
-	    }, "is making a selection...")) : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Text, {
-	      color: 'var(--Main-Black)',
-	      opacity: 0.75
-	    }, followingTarget, actionsFollowing === 'detective' ? ` (${followingTargetRole})` : null), /*#__PURE__*/React.createElement(Text, {
-	      color: 'var(--Main-Black)',
-	      size: 18,
-	      opacity: 0.5
-	    }, actionsFollowing === 'detective' ? 'was identified by' : 'was saved by'), /*#__PURE__*/React.createElement(Text, {
-	      color: 'var(--Main-Black)',
-	      opacity: 0.75
-	    }, followingName)));
-	  } else if (actionsFollowing === 'mafia') {
-	    // if (mafiaDoneVoting) {
-	    //     return (
-	    //         <Box
-	    //             style={{
-	    //                 width: '100vw',
-	    //                 height: '100vh',
-	    //                 backgroundRepeat: 'repeat',
-	    //                 backgroundImage: 'url(../../../assets/heaven-stars.png)',
-	    //                 display: 'flex',
-	    //                 flexDirection: 'column',
-	    //                 alignItems: 'center',
-	    //                 justifyContent: 'center',
-	    //                 backgroundColor: '#E0E0E0',
-	    //                 backgroundPosition: 'center',
-	    //             }}
-	    //         >
-	    //             <StandardPageBox>
-	    //                 <Header name={name} role={role} time={'night'} color={'var(--Main-Black)'}/>
-	    //                 <Text color={'var(--Main-Black)'} size={18} opacity={0.75}>
-	    //                     the mafia has voted
-	    //                 </Text>
-	    //                 <Text color={'var(--Main-Red)'} size={18}>
-	    //                     soon, someone will die
-	    //                 </Text>
-	    //             </StandardPageBox>
-	    //         </Box>
-	    //     )
-	    // }
-	    return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(ScrollableFlexColumnBox, null, playersToList.map((player, index) => {
-	      return /*#__PURE__*/React.createElement(NameButton, {
-	        key: index,
-	        disabled: player.role === 'mafia',
-	        borderColor: 'var(--Main-Black)'
-	      }, /*#__PURE__*/React.createElement(Box$1, {
-	        style: {
-	          display: 'flex',
-	          flexDirection: 'row',
-	          alignItems: 'center',
-	          justifyContent: 'center',
-	          gap: 3,
-	          position: 'absolute',
-	          right: 15
-	        }
-	      }, player.killVotes?.length > 0 ? /*#__PURE__*/React.createElement(Box$1, {
-	        style: {
-	          width: 30.158,
-	          height: 30.158,
-	          borderRadius: '50%',
-	          backgroundColor: 'transparent',
-	          display: 'flex',
-	          alignItems: 'center',
-	          justifyContent: 'center',
-	          position: 'relative',
-	          opacity: 0.5
-	        }
-	      }, /*#__PURE__*/React.createElement(Skull, {
-	        color: 'var(--Main-Black)'
-	      }), player.killVotes?.length > 1 ? /*#__PURE__*/React.createElement(Text, {
-	        size: 18,
-	        style: {
-	          position: 'absolute',
-	          right: -17,
-	          bottom: -2
-	        },
-	        color: 'var(--Main-Black)'
-	      }, "x", player.killVotes?.length) : null) : null, player.killVotes?.length > 1 ? /*#__PURE__*/React.createElement(Box$1, {
-	        style: {
-	          width: 17
-	        }
-	      }) : null), /*#__PURE__*/React.createElement(Text, {
-	        size: 18,
-	        color: 'var(--Main-Black)'
-	      }, player.realName, player.role === 'mafia' ? ' (mafia)' : null));
-	    })));
-	  }
-	  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(ConstrainedBox, {
-	    width: 289
-	  }, /*#__PURE__*/React.createElement(Text, {
-	    color: 'var(--Main-Black)',
-	    opacity: 0.75
-	  }, "who\u2019s actions would you like to follow tonight?")), /*#__PURE__*/React.createElement(NameButton, {
-	    borderColor: 'var(--Main-Black)',
-	    selectedColor: 'var(--Main-Yellow)',
-	    selected: selected === 'angel',
-	    onClick: () => setSelected('angel'),
-	    disabled: players.find(player => player.role === 'angel')?.inHeaven
-	  }, /*#__PURE__*/React.createElement(Text, {
-	    color: 'var(--Main-Black)',
-	    size: 18
-	  }, "the angel", players.find(player => player.role === 'angel')?.inHeaven ? ' (dead)' : null)), /*#__PURE__*/React.createElement(NameButton, {
-	    borderColor: 'var(--Main-Black)',
-	    selectedColor: 'var(--Main-Blue)',
-	    selected: selected === 'detective',
-	    onClick: () => setSelected('detective'),
-	    disabled: players.find(player => player.role === 'detective')?.inHeaven
-	  }, /*#__PURE__*/React.createElement(Text, {
-	    color: selected === 'detective' ? 'var(--Main-White)' : 'var(--Main-Black)',
-	    size: 18
-	  }, "the detective", players.find(player => player.role === 'detective')?.inHeaven ? ' (dead)' : null)), /*#__PURE__*/React.createElement(NameButton, {
-	    borderColor: 'var(--Main-Black)',
-	    selectedColor: 'var(--Main-Red)',
-	    selected: selected === 'mafia',
-	    onClick: () => setSelected('mafia')
-	  }, /*#__PURE__*/React.createElement(Text, {
-	    color: selected === 'mafia' ? 'var(--Main-White)' : 'var(--Main-Black)',
-	    size: 18
-	  }, "the mafia")), /*#__PURE__*/React.createElement(Box$1, {
-	    style: {
-	      flex: 1
-	    }
-	  }), /*#__PURE__*/React.createElement(TheButton, {
-	    disabled: selected === null,
-	    onClick: handleFollow
-	  }, /*#__PURE__*/React.createElement(Text, {
-	    size: 18,
-	    weight: 700
-	  }, "follow")));
-	}
-
-	function HeavenDay({
-	  players,
-	  nightRecap,
-	  accusing
-	}) {
-	  const playersToList = players.filter(player => !player.inHeaven);
-	  if (nightRecap) {
-	    return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(ConstrainedBox, {
-	      width: 289
-	    }, /*#__PURE__*/React.createElement(Text, {
-	      color: 'var(--Main-Black)',
-	      size: 18,
-	      opacity: 0.75
-	    }, "see screen to learn what happened during the night")));
-	  } else if (accusing) {
-	    return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Text, {
-	      color: 'var(--Main-Black)'
-	    }, "current accusations"), /*#__PURE__*/React.createElement(ScrollableFlexColumnBox, null, playersToList.map((player, index) => {
-	      const accusation = player.accusations.length > 0;
-	      return /*#__PURE__*/React.createElement(NameButton, {
-	        key: index,
-	        borderColor: 'var(--Main-Black)'
-	      }, /*#__PURE__*/React.createElement(Box$1, {
-	        style: {
-	          display: 'flex',
-	          flexDirection: 'row',
-	          alignItems: 'center',
-	          justifyContent: 'center',
-	          gap: 3,
-	          position: 'absolute',
-	          right: 15
-	        }
-	      }, accusation ? /*#__PURE__*/React.createElement(Box$1, {
-	        style: {
-	          width: 30.158,
-	          height: 30.158,
-	          borderRadius: '50%',
-	          backgroundColor: 'transparent',
-	          display: 'flex',
-	          alignItems: 'center',
-	          justifyContent: 'center',
-	          position: 'relative',
-	          opacity: 0.5
-	        }
-	      }, /*#__PURE__*/React.createElement(Finger, {
-	        color: 'var(--Main-Black)'
-	      })) : null), /*#__PURE__*/React.createElement(Text, {
-	        size: 18,
-	        color: 'var(--Main-Black)'
-	      }, player.realName));
-	    })));
-	  }
-	  return /*#__PURE__*/React.createElement(Text, {
-	    color: 'var(--Main-Black)',
-	    size: 18,
-	    opacity: 0.75
-	  }, "see screen");
+	  }, myVote === null ? "confirm vote" : "vote confirmed")));
 	}
 
 	var v$1 = "5.9.0";
@@ -49148,25 +48001,23 @@ Please use another name.` );
 	};
 
 	function Header({
-	  name,
-	  role,
 	  time,
-	  color = 'var(--Main-White)'
+	  color = "var(--Main-White)"
 	}) {
-	  const [currentTime, setCurrentTime] = reactExports.useState('night');
+	  const {
+	    self
+	  } = reactExports.useContext(VariableContext);
+	  const [currentTime, setCurrentTime] = reactExports.useState("night");
 	  const animationRef = reactExports.useRef(null);
 	  const [enteredHeaven, setEnteredHeaven] = reactExports.useState(false);
-	  const {
-	    state
-	  } = reactExports.useContext(GlobalContext);
 	  reactExports.useEffect(() => {
-	    if (!enteredHeaven && color === 'var(--Main-Black)') {
+	    if (!enteredHeaven && color === "var(--Main-Black)") {
 	      setEnteredHeaven(true);
 	      animationRef.current.goToAndStop(59, true);
 	    }
 	    if (time && time !== currentTime) {
 	      setCurrentTime(time);
-	      if (time === 'day') {
+	      if (time === "day") {
 	        animationRef.current.playSegments([0, 59], true);
 	      } else {
 	        animationRef.current.playSegments([59, 0], true);
@@ -49181,13 +48032,13 @@ Please use another name.` );
 	    color: color,
 	    size: 18,
 	    style: {
-	      width: '45%',
-	      display: 'flex',
-	      justifyContent: 'flex-start'
+	      width: "45%",
+	      display: "flex",
+	      justifyContent: "flex-start"
 	    }
-	  }, state.realname), time ? /*#__PURE__*/React.createElement(LottiePlayer, {
+	  }, self.realname), time ? /*#__PURE__*/React.createElement(LottiePlayer, {
 	    loop: false,
-	    animationData: color === 'var(--Main-White)' ? lottieJson : lottieJsonHeaven,
+	    animationData: color === "var(--Main-White)" ? lottieJson : lottieJsonHeaven,
 	    play: false,
 	    ref: animationRef,
 	    style: {
@@ -49197,11 +48048,11 @@ Please use another name.` );
 	    color: color,
 	    size: 18,
 	    style: {
-	      width: '45%',
-	      display: 'flex',
-	      justifyContent: 'flex-end'
+	      width: "45%",
+	      display: "flex",
+	      justifyContent: "flex-end"
 	    }
-	  }, "role: ", state.role)), /*#__PURE__*/React.createElement(Line, {
+	  }, "role: ", self.role)), /*#__PURE__*/React.createElement(Line, {
 	    color: color
 	  }), /*#__PURE__*/React.createElement(Box$1, {
 	    style: {
@@ -49211,40 +48062,34 @@ Please use another name.` );
 	}
 
 	const InputBox = styled$1(Input$1)({
-	  padding: '12px 24px',
-	  width: 'calc(100% - 48px)',
+	  padding: "12px 24px",
+	  width: "calc(100% - 48px)",
 	  borderRadius: 10,
-	  backgroundColor: 'var(--Main-White)',
-	  display: 'flex',
-	  flexDirection: 'row',
-	  alignItems: 'center',
-	  justifyContent: 'flex-start',
-	  fontFamily: 'American Typewriter',
+	  backgroundColor: "var(--Main-White)",
+	  display: "flex",
+	  flexDirection: "row",
+	  alignItems: "center",
+	  justifyContent: "flex-start",
+	  fontFamily: "American Typewriter",
 	  fontSize: 18,
 	  fontWeight: 400,
-	  color: 'var(--Main-Black)'
+	  color: "var(--Main-Black)"
 	});
-	function EnterName({
-	  name,
-	  setPage,
-	  sendMessageToParent
-	}) {
+	function EnterName() {
 	  const {
-	    state
-	  } = reactExports.useContext(GlobalContext);
-	  const [realName, setRealName] = reactExports.useState(state.gamername || '');
+	    self
+	  } = reactExports.useContext(VariableContext);
+	  const {
+	    handleSetRealname
+	  } = reactExports.useContext(ActionContext);
+	  const [realName, setRealName] = reactExports.useState(self.gamername || "");
 	  const [fitsRequiredLength, setFitsRequiredLength] = reactExports.useState(true);
 	  const handleSubmit = () => {
-	    if (realName.length < 1 || realName.length > 12) {
+	    if (realName.length < 1 || realName.length > 13) {
 	      setFitsRequiredLength(false);
 	      return;
 	    }
-	    setPage(1);
-	    sendMessageToParent({
-	      name: 'setRealName',
-	      realName: realName,
-	      player: name
-	    });
+	    handleSetRealname(realName);
 	  };
 	  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Box$1, {
 	    style: {
@@ -49258,447 +48103,193 @@ Please use another name.` );
 	    size: 24,
 	    weight: 400
 	  }, "Enter your Mafia name"), /*#__PURE__*/React.createElement(InputBox, {
-	    placeholder: 'Mafia name',
+	    placeholder: "Mafia name",
 	    value: realName,
 	    onChange: e => setRealName(e.target.value),
 	    disableUnderline: true
 	  }), !fitsRequiredLength ? /*#__PURE__*/React.createElement(Text, {
 	    size: 12,
-	    color: 'var(--Main-Red)'
-	  }, "name must be between 1-12 characters") : null, /*#__PURE__*/React.createElement(TheButton, {
+	    color: "var(--Main-Red)"
+	  }, "name must be between 1-13 characters") : null, /*#__PURE__*/React.createElement(TheButton, {
 	    onClick: handleSubmit,
 	    disabled: realName.length === 0
 	  }, /*#__PURE__*/React.createElement(Text, {
 	    size: 18,
 	    weight: 600,
-	    color: 'var(--Main-White)'
+	    color: "var(--Main-White)"
 	  }, "join")));
 	}
 
+	// import NightDetective from './detective';
+	// import NightAngel from './angel';
+	// import NightCivilian from './civilian';
+
+	function Night({
+	  timerStarted = false
+	}) {
+	  const {
+	    self
+	  } = reactExports.useContext(VariableContext);
+	  if (!timerStarted) return null;
+	  if (self.role === 'mafia') return /*#__PURE__*/React.createElement(NightMafia, null);
+	  // if (self.role === 'detective') return <NightDetective />;
+	  // if (self.role === 'angel') return <NightAngel />;
+	  // return <NightCivilian />;
+	  return null;
+	}
+
 	const MIN_PLAYERS = 5;
-	const ENTER_NAME = 0;
-	const WAITING_PLAYERS = 1;
-	const PREPARATION = 2;
-	const IDENTITY_REVEAL = 3;
-	const INSTRUCTIONS = 4;
-	const NIGHT = 5;
-	const NIGHT_FINISHED = 6;
-	const DAY = 7;
-	const VOTING = 8;
-	const WIN = 9;
-	const HEAVEN_WELCOME = 10;
-	const HEAVEN_DAY = 11;
-	const HEAVEN_NIGHT = 12;
-	const TRANSITION_TO_DAY_STALL = 1225;
-	const TRANSITION_TO_NIGHT_STALL = 1450;
 	function App() {
 	  const {
-	    state,
-	    setState
-	  } = reactExports.useContext(GlobalContext);
-	  const [page, setPage] = reactExports.useState(ENTER_NAME);
-	  const [screenHeight, setScreenHeight] = reactExports.useState(window.innerHeight);
-	  const [everyoneReady, setEveryoneReady] = reactExports.useState(false);
-	  const [realName, setRealName] = reactExports.useState(null);
-	  const realNameRef = reactExports.useRef(realName);
-	  const [name, setName] = reactExports.useState(null);
-	  const nameRef = reactExports.useRef(name);
-	  const [isHost, setIsHost] = reactExports.useState(false);
-	  const [enoughPlayers, setEnoughPlayers] = reactExports.useState(false);
-	  const [role, setRole] = reactExports.useState(null); // mafia, detective, angel, civilian
-	  const roleRef = reactExports.useRef(role);
-	  const [players, setPlayers] = reactExports.useState([]);
-	  const [knownRoles, setKnownRoles] = reactExports.useState([]);
-	  const [beingAccused, setBeingAccused] = reactExports.useState(false);
-	  const [playerBeingVotedOn, setPlayerBeingVotedOn] = reactExports.useState(null);
-	  const [winner, setWinner] = reactExports.useState(false);
-	  const [actionsFollowing, setActionsFollowing] = reactExports.useState(null); // mafia, detective, angel
-	  const [mafiaDoneVoting, setMafiaDoneVoting] = reactExports.useState(true);
-	  const [nightRecap, setNightRecap] = reactExports.useState(false);
-	  const [accusing, setAccusing] = reactExports.useState(true);
-	  const [inHeaven, setInHeaven] = reactExports.useState(false);
-	  const inHeavenRef = reactExports.useRef(inHeaven);
-	  const [votingActive, setVotingActive] = reactExports.useState(false);
-	  const [headerPage, setHeaderPage] = reactExports.useState(null);
-	  const femaleScreamAudio = new Audio('./assets/female-scream.wav');
-	  const maleScreamAudio = new Audio('./assets/male-scream.wav');
-	  function sendMessageToParent(message) {
-	    if (window.ReactNativeWebView) {
-	      window.ReactNativeWebView.postMessage(JSON.stringify(message));
-	    }
-	    if (window.parent) {
-	      window.parent.postMessage(JSON.stringify(message), "*");
-	    }
-	  }
-	  function handleMessageFromParent(event) {
-	    const msg = event.data;
-	    if (msg.name === 'name') {
-	      setName(msg.player);
-	      nameRef.current = msg.player;
-	    } else if (msg.name === 'host') {
-	      setIsHost(true);
-	    } else if (msg.name === 'enoughPlayers') {
-	      setEnoughPlayers(true);
-	    } else if (msg.name === 'realName') {
-	      realNameRef.current = msg.realName;
-	      setRealName(msg.realName);
-	    } else if (msg.name === 'notEveryoneReady') {
-	      setEveryoneReady(false);
-	    } else if (msg.name === 'everyoneReady') {
-	      setEveryoneReady(true);
-	    } else if (msg.name === 'female-scream') {
-	      femaleScreamAudio.play();
-	    } else if (msg.name === 'male-scream') {
-	      maleScreamAudio.play();
-	    } else if (msg.name === 'state update') {
-	      setState(msg.state);
-	      sendMessageToParent({
-	        name: 'confirm state',
-	        state: msg.state,
-	        player: msg.state.gamername
-	      });
-	    } else if (msg.name === 'stateUpdate') {
-	      if (msg.players) {
-	        setPlayers(msg.players);
-	        msg.players.forEach(player => {
-	          if (player.accused) {
-	            setPlayerBeingVotedOn(player);
-	          }
-	          if (player.name === nameRef.current) {
-	            if (!roleRef.current || msg.page === 'restart') {
-	              setRole(player.role);
-	              roleRef.current = player.role;
-	            }
-	            if (!realNameRef.current && player.realName) {
-	              setRealName(player.realName);
-	              realNameRef.current = player.realName;
-	              if (!msg.page) {
-	                setPage(WAITING_PLAYERS);
-	              }
-	            }
-	            if (player.inHeaven && !inHeavenRef.current) {
-	              setInHeaven(player.inHeaven);
-	              inHeavenRef.current = true;
-	              setPage(HEAVEN_WELCOME);
-	              setHeaderPage(HEAVEN_WELCOME);
-	            } else if (!player.inHeaven && inHeavenRef.current) {
-	              setInHeaven(player.inHeaven);
-	              inHeavenRef.current = false;
-	            }
-	            if (player.accusations?.length > 0) {
-	              setBeingAccused(true);
-	              sendMessageToParent({
-	                name: 'vibration'
-	              });
-	            } else {
-	              setBeingAccused(false);
-	            }
-	            setWinner(player.winner);
-	          }
-	        });
-	      }
-	      if (msg.page) {
-	        switch (msg.page) {
-	          case 'preparation':
-	            setPage(PREPARATION);
-	            setHeaderPage(PREPARATION);
-	            break;
-	          case 'identityReveal':
-	            setPage(IDENTITY_REVEAL);
-	            setHeaderPage(IDENTITY_REVEAL);
-	            break;
-	          case 'instructions':
-	            setPage(INSTRUCTIONS);
-	            setHeaderPage(INSTRUCTIONS);
-	            break;
-	          case 'night':
-	            if (inHeavenRef.current) {
-	              setActionsFollowing(null);
-	              setHeaderPage(HEAVEN_NIGHT);
-	              setTimeout(() => {
-	                setPage(HEAVEN_NIGHT);
-	              }, TRANSITION_TO_NIGHT_STALL);
-	            } else {
-	              setHeaderPage(NIGHT);
-	              setTimeout(() => {
-	                setPage(NIGHT);
-	              }, TRANSITION_TO_NIGHT_STALL);
-	            }
-	            break;
-	          case 'nightFinished':
-	            if (inHeavenRef.current) {
-	              setActionsFollowing(null);
-	              setHeaderPage(HEAVEN_DAY);
-	              setNightRecap(true);
-	              setTimeout(() => {
-	                setPage(HEAVEN_DAY);
-	              }, TRANSITION_TO_DAY_STALL);
-	            } else {
-	              setHeaderPage(NIGHT_FINISHED);
-	              setTimeout(() => {
-	                setPage(NIGHT_FINISHED);
-	              }, TRANSITION_TO_DAY_STALL);
-	            }
-	            break;
-	          case 'day':
-	            if (inHeavenRef.current) {
-	              setHeaderPage(HEAVEN_DAY);
-	              setPage(HEAVEN_DAY);
-	              setAccusing(true);
-	              setNightRecap(false);
-	            } else {
-	              setHeaderPage(DAY);
-	              setPage(DAY);
-	            }
-	            break;
-	          case 'voting':
-	            setVotingActive(false);
-	            if (inHeavenRef.current) {
-	              setHeaderPage(HEAVEN_DAY);
-	              setPage(HEAVEN_DAY);
-	              setAccusing(false);
-	              setNightRecap(false);
-	            } else {
-	              setHeaderPage(VOTING);
-	              setPage(VOTING);
-	            }
-	            break;
-	          case 'votingActive':
-	            setVotingActive(true);
-	            if (inHeavenRef.current) {
-	              setHeaderPage(HEAVEN_DAY);
-	              setPage(HEAVEN_DAY);
-	              setAccusing(false);
-	              setNightRecap(false);
-	            } else {
-	              setHeaderPage(VOTING);
-	              setPage(VOTING);
-	            }
-	            break;
-	          case 'win':
-	            setHeaderPage(WIN);
-	            setPage(WIN);
-	            break;
-	          case 'restart':
-	            setHeaderPage(PREPARATION);
-	            setPage(PREPARATION);
-	            setKnownRoles([]);
-	            setBeingAccused(false);
-	            setPlayerBeingVotedOn(null);
-	            setWinner(false);
-	            setActionsFollowing(null);
-	            setMafiaDoneVoting(true);
-	            setNightRecap(false);
-	            setAccusing(true);
-	            setInHeaven(false);
-	            inHeavenRef.current = false;
-	            break;
-	        }
-	      }
-	    }
-	  }
+	    page,
+	    self
+	  } = reactExports.useContext(VariableContext);
+	  const [screenHeight, setScreenHeight] = reactExports.useState(0);
+	  const [headerTime, setHeaderTime] = reactExports.useState("night");
+	  const [headerColor, setHeaderColor] = reactExports.useState("var(--Main-White)");
+	  const [bgColor, setBgColor] = reactExports.useState("var(--Main-Black)");
+	  const [image, setImage] = reactExports.useState("url(./assets/night-stars.png)");
 	  reactExports.useEffect(() => {
-	    const updateHeight = () => {
+	    if (typeof window !== "undefined") {
 	      setScreenHeight(window.innerHeight);
-	    };
-	    window.addEventListener('resize', updateHeight);
-	    window.addEventListener('message', handleMessageFromParent);
-	    sendMessageToParent({
-	      name: 'ready'
-	    });
-	    return () => {
-	      window.removeEventListener('resize', updateHeight);
-	      window.removeEventListener('message', handleMessageFromParent);
-	    };
+	    }
 	  }, []);
 	  function getPage(page) {
 	    switch (page) {
-	      case ENTER_NAME:
-	        return /*#__PURE__*/React.createElement(EnterName, {
-	          setPage: setPage,
-	          name: name,
-	          sendMessageToParent: sendMessageToParent
-	        });
 	      case WAITING_PLAYERS:
-	        return /*#__PURE__*/React.createElement(WaitingPlayers, {
-	          isHost: isHost,
-	          enoughPlayers: enoughPlayers,
-	          screenHeight: screenHeight,
-	          minPlayers: MIN_PLAYERS,
-	          everyoneReady: everyoneReady,
-	          sendMessageToParent: sendMessageToParent
-	        });
-	      case PREPARATION:
+	        if (!self.realname || self.realname.length === 0) {
+	          return /*#__PURE__*/React.createElement(EnterName, null);
+	        } else {
+	          return /*#__PURE__*/React.createElement(WaitingPlayers, {
+	            screenHeight: screenHeight,
+	            minPlayers: MIN_PLAYERS
+	          });
+	        }
+	      case WELCOME:
+	      case YOU_READY:
 	        return /*#__PURE__*/React.createElement(Preparation, null);
-	      case IDENTITY_REVEAL:
+	      case REVEAL_IDENTITY:
 	        return /*#__PURE__*/React.createElement(IdentityReveal, {
-	          screenHeight: screenHeight,
-	          role: role
+	          screenHeight: screenHeight
 	        });
 	      case INSTRUCTIONS:
-	        return /*#__PURE__*/React.createElement(Instructions, {
-	          name: name,
-	          role: role,
-	          isHost: isHost,
-	          sendMessageToParent: sendMessageToParent
+	        return /*#__PURE__*/React.createElement(Instructions, null);
+	      case NIGHTTIME:
+	        return /*#__PURE__*/React.createElement(Night, null);
+	      case NIGHTTIME_TIMER:
+	        return /*#__PURE__*/React.createElement(Night, {
+	          timerStarted: true
 	        });
-	      case NIGHT:
-	        switch (role) {
-	          case 'mafia':
-	            return /*#__PURE__*/React.createElement(NightMafia, {
-	              name: name,
-	              players: players,
-	              sendMessageToParent: sendMessageToParent
-	            });
-	          case 'detective':
-	            return /*#__PURE__*/React.createElement(NightDetective, {
-	              name: name,
-	              players: players,
-	              knownRoles: knownRoles,
-	              setKnownRoles: setKnownRoles,
-	              sendMessageToParent: sendMessageToParent
-	            });
-	          case 'angel':
-	            return /*#__PURE__*/React.createElement(NightAngel, {
-	              name: name,
-	              players: players,
-	              sendMessageToParent: sendMessageToParent
-	            });
-	          case 'civilian':
-	            return /*#__PURE__*/React.createElement(NightCivilian, {
-	              name: name,
-	              sendMessageToParent: sendMessageToParent
-	            });
-	          default:
-	            return null;
-	        }
-	      case NIGHT_FINISHED:
-	        return /*#__PURE__*/React.createElement(NightFinished, {
-	          name: name,
-	          role: role
-	        });
-	      case DAY:
-	        return /*#__PURE__*/React.createElement(Day, {
-	          name: name,
-	          role: role,
-	          beingAccused: beingAccused,
-	          players: players,
-	          knownRoles: knownRoles,
-	          sendMessageToParent: sendMessageToParent
-	        });
-	      case VOTING:
-	        return /*#__PURE__*/React.createElement(Voting, {
-	          name: name,
-	          role: role,
-	          playerBeingVotedOn: playerBeingVotedOn,
-	          votingActive: votingActive,
-	          sendMessageToParent: sendMessageToParent
-	        });
-	      case WIN:
-	        return /*#__PURE__*/React.createElement(Win, {
-	          name: name,
-	          role: role,
-	          winner: winner,
-	          isHost: isHost,
-	          sendMessageToParent: sendMessageToParent
-	        });
-	      case HEAVEN_WELCOME:
-	        return /*#__PURE__*/React.createElement(HeavenWelcome, {
-	          name: name,
-	          role: role,
-	          sendMessageToParent: sendMessageToParent
-	        });
-	      case HEAVEN_DAY:
-	        return /*#__PURE__*/React.createElement(HeavenDay, {
-	          name: name,
-	          role: role,
-	          players: players,
-	          nightRecap: nightRecap,
-	          accusing: accusing,
-	          sendMessageToParent: sendMessageToParent
-	        });
-	      case HEAVEN_NIGHT:
-	        return /*#__PURE__*/React.createElement(HeavenNight, {
-	          name: name,
-	          role: role,
-	          actionsFollowing: actionsFollowing,
-	          setActionsFollowing: setActionsFollowing,
-	          players: players,
-	          mafiaDoneVoting: mafiaDoneVoting,
-	          sendMessageToParent: sendMessageToParent
-	        });
+	      // case NIGHT:
+	      //   switch (role) {
+	      //     case "mafia":
+	      //       return (
+	      //         <NightMafia/>
+	      //       );
+	      //     case "detective":
+	      //       return (
+	      //         <NightDetective/>
+	      //       );
+	      //     case "angel":
+	      //       return (
+	      //         <NightAngel/>
+	      //       );
+	      //     case "civilian":
+	      //       return (
+	      //         <NightCivilian/>
+	      //       );
+	      //     default:
+	      //       return null;
+	      //   }
+	      // case NIGHT_FINISHED:
+	      //   return <NightFinished/>;
+	      // case DAY:
+	      //   return (
+	      //     <Day/>
+	      //   );
+	      // case VOTING:
+	      //   return (
+	      //     <Voting/>
+	      //   );
+	      // case WIN:
+	      //   return (
+	      //     <Win/>
+	      //   );
+	      // case HEAVEN_WELCOME:
+	      //   return (
+	      //     <HeavenWelcome/>
+	      //   );
+	      // case HEAVEN_DAY:
+	      //   return (
+	      //     <HeavenDay/>
+	      //   );
+	      // case HEAVEN_NIGHT:
+	      //   return (
+	      //     <HeavenNight/>
+	      //   );
 	      default:
 	        return null;
 	    }
 	  }
-	  if (!state || !state.gamername) {
+	  if (!self || !self.gamername) {
 	    return /*#__PURE__*/React.createElement(Box$1, {
 	      style: {
-	        display: 'flex',
-	        flexDirection: 'column',
-	        alignItems: 'center',
-	        justifyContent: 'flex-start',
-	        height: '100vh',
-	        width: '100vw'
+	        display: "flex",
+	        flexDirection: "column",
+	        alignItems: "center",
+	        justifyContent: "flex-start",
+	        height: "100vh",
+	        width: "100vw"
 	      }
 	    });
-	  } else if (state.page <= IDENTITY_REVEAL) {
+	  } else if (page <= REVEAL_IDENTITY) {
 	    return /*#__PURE__*/React.createElement(Box$1, {
 	      style: {
-	        display: 'flex',
-	        flexDirection: 'column',
-	        alignItems: 'center',
-	        justifyContent: 'flex-start',
-	        height: '100vh',
-	        width: '100vw'
+	        display: "flex",
+	        flexDirection: "column",
+	        alignItems: "center",
+	        justifyContent: "flex-start",
+	        height: "100vh",
+	        width: "100vw"
 	      }
-	    }, /*#__PURE__*/React.createElement(StandardPageBox, null, getPage(state.page)));
-	  } else if (state.page === INSTRUCTIONS || state.page === WIN) {
+	    }, /*#__PURE__*/React.createElement(StandardPageBox, null, getPage(page)));
+	  } else if (page === INSTRUCTIONS || page === GAME_OVER) {
 	    return /*#__PURE__*/React.createElement(Box$1, {
 	      style: {
-	        display: 'flex',
-	        flexDirection: 'column',
-	        alignItems: 'center',
-	        justifyContent: 'center',
-	        height: '100vh',
-	        width: '100vw'
+	        display: "flex",
+	        flexDirection: "column",
+	        alignItems: "center",
+	        justifyContent: "center",
+	        height: "100vh",
+	        width: "100vw"
 	      }
-	    }, /*#__PURE__*/React.createElement(StandardPageBox, null, /*#__PURE__*/React.createElement(Header, {
-	      name: realName,
-	      role: role
-	    }), getPage(state.page)));
+	    }, /*#__PURE__*/React.createElement(StandardPageBox, null, /*#__PURE__*/React.createElement(Header, null), getPage(page)));
 	  } else {
-	    const time = headerPage === NIGHT || headerPage === HEAVEN_NIGHT ? 'night' : 'day';
-	    const headerColor = headerPage >= HEAVEN_WELCOME ? 'var(--Main-Black)' : 'var(--Main-White)';
-	    const bgColor = page === NIGHT ? 'var(--Main-Black)' : page <= VOTING ? 'var(--Main-Gray)' : '#E0E0E0';
-	    const image = page === NIGHT ? 'url(./assets/night-stars.png)' : page <= VOTING ? 'url(./assets/day-clouds.png)' : page <= HEAVEN_DAY ? 'url(./assets/heaven-clouds.png)' : 'url(./assets/heaven-stars.png)';
 	    return /*#__PURE__*/React.createElement(Box$1, {
 	      style: {
-	        display: 'flex',
-	        flexDirection: 'column',
-	        alignItems: 'center',
-	        justifyContent: 'center',
-	        height: '100vh',
-	        width: '100vw'
+	        display: "flex",
+	        flexDirection: "column",
+	        alignItems: "center",
+	        justifyContent: "center",
+	        height: "100vh",
+	        width: "100vw"
 	      }
 	    }, /*#__PURE__*/React.createElement(Box$1, {
 	      style: {
-	        width: '100vw',
-	        height: '100vh',
-	        backgroundRepeat: 'repeat',
+	        width: "100vw",
+	        height: "100vh",
+	        backgroundRepeat: "repeat",
 	        backgroundImage: image,
-	        display: 'flex',
-	        flexDirection: 'column',
-	        alignItems: 'center',
-	        justifyContent: 'center',
+	        display: "flex",
+	        flexDirection: "column",
+	        alignItems: "center",
+	        justifyContent: "center",
 	        backgroundColor: bgColor
 	      }
 	    }, /*#__PURE__*/React.createElement(StandardPageBox, null, /*#__PURE__*/React.createElement(Header, {
-	      name: realName,
-	      role: role,
-	      time: time,
+	      time: headerTime,
 	      color: headerColor
-	    }), getPage(state.page), /*#__PURE__*/React.createElement(Box$1, {
+	    }), getPage(page), /*#__PURE__*/React.createElement(Box$1, {
 	      style: {
 	        height: 18
 	      }
@@ -49706,6 +48297,6 @@ Please use another name.` );
 	  }
 	}
 
-	createRoot(document.querySelector('#root')).render( /*#__PURE__*/React.createElement(GlobalProvider, null, /*#__PURE__*/React.createElement(App, null)));
+	createRoot(document.querySelector("#root")).render( /*#__PURE__*/React.createElement(VariableProvider, null, /*#__PURE__*/React.createElement(CommunicationProvider, null, /*#__PURE__*/React.createElement(ActionProvider, null, /*#__PURE__*/React.createElement(App, null)))));
 
 })();
