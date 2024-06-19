@@ -1,14 +1,22 @@
 import React, { useEffect, useContext } from "react";
 import { Text } from "../components/text";
 import Timer from "../components/timer";
+import { VariableContext } from "../contexts/variables";
 
 export default function Accusations() {
+  const { accusationTimer, setAccusationTimer } = useContext(VariableContext);
   const makeAccusationAudio = new Audio("./assets/make-accusation.mp3");
+  const dayAudio = new Audio("./assets/Dayloop.wav");
 
   useEffect(() => {
+    dayAudio.loop = true;
+    dayAudio.play();
     makeAccusationAudio.play();
 
-    return () => makeAccusationAudio.pause();
+    return () => {
+      dayAudio.pause();
+      makeAccusationAudio.pause();
+    };
   }, []);
 
   return (
@@ -16,7 +24,7 @@ export default function Accusations() {
       <Text size={36} opacity={0.5}>
         you have 5 minutes to make an accusation
       </Text>
-      <Timer />
+      <Timer timer={accusationTimer} setTimer={setAccusationTimer} />
     </>
   );
 }

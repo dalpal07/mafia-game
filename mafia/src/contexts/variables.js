@@ -1,4 +1,10 @@
-import React, { createContext, useMemo, useState, useRef, useEffect } from "react";
+import React, {
+  createContext,
+  useMemo,
+  useState,
+  useRef,
+  useEffect,
+} from "react";
 import { WAITING_PLAYERS } from "../pages";
 
 export const VariableContext = createContext({
@@ -41,7 +47,7 @@ export const VariableContext = createContext({
   currentLifeDeathSelections: [],
   setCurrentLifeDeathSelections: () => {},
   currentLifeDeathVotes: [],
-  setCurrentLifeDeathVotes: () => { },
+  setCurrentLifeDeathVotes: () => {},
   playersRef: null,
   pageRef: null,
   mafiaRef: null,
@@ -101,51 +107,17 @@ export const VariableProvider = ({ children }) => {
   const currentMafiaVotesRef = useRef(currentMafiaVotes);
   const currentKillRef = useRef(currentKill);
   const detectiveIdentificationsRef = useRef(detectiveIdentifications);
-  const currentDetectiveIdentificationRef = useRef(currentDetectiveIdentification);
+  const currentDetectiveIdentificationRef = useRef(
+    currentDetectiveIdentification,
+  );
   const currentAngelProtectionRef = useRef(currentAngelProtection);
-  const currentCivilianTriviaFinishesRef = useRef(currentCivilianTriviaFinishes);
+  const currentCivilianTriviaFinishesRef = useRef(
+    currentCivilianTriviaFinishes,
+  );
   const currentAccusationsRef = useRef(currentAccusations);
   const recentlyAccusedRef = useRef(recentlyAccused);
   const currentLifeDeathSelectionsRef = useRef(currentLifeDeathSelections);
   const currentLifeDeathVotesRef = useRef(currentLifeDeathVotes);
-
-  useEffect(() => {
-    playersRef.current = players;
-    pageRef.current = page;
-    mafiaRef.current = mafia;
-    detectiveRef.current = detective;
-    angelRef.current = angel;
-    civiliansRef.current = civilians;
-    currentMafiaSelectionsRef.current = currentMafiaSelections;
-    currentMafiaVotesRef.current = currentMafiaVotes;
-    currentKillRef.current = currentKill;
-    detectiveIdentificationsRef.current = detectiveIdentifications;
-    currentDetectiveIdentificationRef.current = currentDetectiveIdentification;
-    currentAngelProtectionRef.current = currentAngelProtection;
-    currentCivilianTriviaFinishesRef.current = currentCivilianTriviaFinishes;
-    currentAccusationsRef.current = currentAccusations;
-    recentlyAccusedRef.current = recentlyAccused;
-    currentLifeDeathSelectionsRef.current = currentLifeDeathSelections;
-    currentLifeDeathVotesRef.current = currentLifeDeathVotes;
-  }, [
-    players,
-    page,
-    mafia,
-    detective,
-    angel,
-    civilians,
-    currentMafiaSelections,
-    currentMafiaVotes,
-    currentKill,
-    detectiveIdentifications,
-    currentDetectiveIdentification,
-    currentAngelProtection,
-    currentCivilianTriviaFinishes,
-    currentAccusations,
-    recentlyAccused,
-    currentLifeDeathSelections,
-    currentLifeDeathVotes,
-  ]);
 
   const variables = useMemo(() => {
     return {
@@ -205,7 +177,7 @@ export const VariableProvider = ({ children }) => {
       currentAccusationsRef,
       recentlyAccusedRef,
       currentLifeDeathSelectionsRef,
-      currentLifeDeathVotesRef,      
+      currentLifeDeathVotesRef,
     };
   }, [
     players,
@@ -264,7 +236,7 @@ export const VariableProvider = ({ children }) => {
     currentAccusationsRef,
     recentlyAccusedRef,
     currentLifeDeathSelectionsRef,
-    currentLifeDeathVotesRef,    
+    currentLifeDeathVotesRef,
   ]);
 
   return (

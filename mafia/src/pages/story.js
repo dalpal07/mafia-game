@@ -1,7 +1,12 @@
 import React, { useEffect, useState, useContext } from "react";
 import { Text } from "../components/text";
+import { VariableContext } from "../contexts/variables";
+import { ActionContext } from "../contexts/actions";
 
 export default function Story() {
+  const { currentKill, currentAngelProtection } = useContext(VariableContext);
+  const { handleProgressToPostStoryPage } = useContext(ActionContext);
+
   const [reveal, setReveal] = useState(false);
   const playerMurderedAudio = new Audio("./assets/player-murdered.mp3");
   const playerAlmostMurderedAudio = new Audio(
@@ -9,12 +14,10 @@ export default function Story() {
   );
   const deathAudio = new Audio("./assets/Deathloop.wav");
 
-  const targetedPlayer = playerStates.find((player) => player.isTargeted);
-  const saved = targetedPlayer && targetedPlayer.isProtected;
+  const saved =
+    currentKill?.gamername === currentAngelProtection?.target.gamername;
 
   useEffect(() => {
-    if (!saved) {
-    }
     setTimeout(() => {
       setReveal(true);
       deathAudio.play();
@@ -22,12 +25,12 @@ export default function Story() {
         if (!saved) {
           playerMurderedAudio.play();
           playerMurderedAudio.onended = () => {
-            () => {};
+            handleProgressToPostStoryPage();
           };
         } else {
           playerAlmostMurderedAudio.play();
           playerAlmostMurderedAudio.onended = () => {
-            () => {};
+            handleProgressToPostStoryPage();
           };
         }
       }, 10000);
@@ -46,7 +49,7 @@ export default function Story() {
     return (
       <>
         <Text size={56} color={"var(--Main-Red)"} weight={700}>
-          {targetedPlayer.realname}
+          {currentKill?.realname}
         </Text>
         <Text size={36} opacity={0.5}>
           was killed by the mafia
@@ -69,7 +72,7 @@ export default function Story() {
   return (
     <>
       <Text size={56} weight={700}>
-        {targetedPlayer.realname}
+        {currentKill?.realname}
       </Text>
       <Text size={36} opacity={0.5}>
         survived

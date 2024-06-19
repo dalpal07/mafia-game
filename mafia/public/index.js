@@ -16455,6 +16455,7 @@ Please use another name.` );
 	const NIGHT_OVER$1 = 7;
 	const STORY$1 = 8;
 	const POST_STORY_2$1 = 10;
+	const ACCUSATIONS$1 = 11;
 	const ACCUSED$1 = 12;
 	const VOTING$1 = 13;
 	const VOTING_TIMER$1 = 14;
@@ -16560,25 +16561,6 @@ Please use another name.` );
 	  const recentlyAccusedRef = reactExports.useRef(recentlyAccused);
 	  const currentLifeDeathSelectionsRef = reactExports.useRef(currentLifeDeathSelections);
 	  const currentLifeDeathVotesRef = reactExports.useRef(currentLifeDeathVotes);
-	  reactExports.useEffect(() => {
-	    playersRef.current = players;
-	    pageRef.current = page;
-	    mafiaRef.current = mafia;
-	    detectiveRef.current = detective;
-	    angelRef.current = angel;
-	    civiliansRef.current = civilians;
-	    currentMafiaSelectionsRef.current = currentMafiaSelections;
-	    currentMafiaVotesRef.current = currentMafiaVotes;
-	    currentKillRef.current = currentKill;
-	    detectiveIdentificationsRef.current = detectiveIdentifications;
-	    currentDetectiveIdentificationRef.current = currentDetectiveIdentification;
-	    currentAngelProtectionRef.current = currentAngelProtection;
-	    currentCivilianTriviaFinishesRef.current = currentCivilianTriviaFinishes;
-	    currentAccusationsRef.current = currentAccusations;
-	    recentlyAccusedRef.current = recentlyAccused;
-	    currentLifeDeathSelectionsRef.current = currentLifeDeathSelections;
-	    currentLifeDeathVotesRef.current = currentLifeDeathVotes;
-	  }, [players, page, mafia, detective, angel, civilians, currentMafiaSelections, currentMafiaVotes, currentKill, detectiveIdentifications, currentDetectiveIdentification, currentAngelProtection, currentCivilianTriviaFinishes, currentAccusations, recentlyAccused, currentLifeDeathSelections, currentLifeDeathVotes]);
 	  const variables = reactExports.useMemo(() => {
 	    return {
 	      players,
@@ -42354,22 +42336,44 @@ Please use another name.` );
 	    setCurrentAccusations,
 	    setCurrentLifeDeathSelections,
 	    setCurrentLifeDeathVotes,
+	    nighttimeTimer,
 	    setNighttimeTimer,
 	    setCurrentKill,
 	    setAccusationTimer,
 	    setRecentlyAccused,
 	    setVotingTimer,
 	    playersRef,
+	    pageRef,
 	    currentMafiaSelectionsRef,
 	    currentMafiaVotesRef,
 	    detectiveIdentificationsRef,
+	    currentDetectiveIdentificationRef,
+	    currentAngelProtectionRef,
 	    currentCivilianTriviaFinishesRef,
 	    currentAccusationsRef,
 	    recentlyAccusedRef,
 	    currentLifeDeathSelectionsRef,
-	    currentLifeDeathVotesRef
+	    currentLifeDeathVotesRef,
+	    mafiaRef,
+	    detectiveRef,
+	    angelRef,
+	    civiliansRef,
+	    currentKillRef,
+	    accusationTimer
 	  } = reactExports.useContext(VariableContext);
 	  const introAudioRef = reactExports.useRef(new Audio("./assets/Introloop.wav"));
+	  const narrationAudioRef = reactExports.useRef(new Audio("./assets/narration.mp3"));
+	  const nighttimeOverTimeoutRef = reactExports.useRef(null);
+	  reactExports.useEffect(() => {
+	    if (nighttimeTimer === 0 && pageRef.current === NIGHTTIME_TIMER$1) {
+	      handleProgressToNightOverPage();
+	    }
+	  }, [nighttimeTimer]);
+	  reactExports.useEffect(() => {
+	    if (accusationTimer === 0 && pageRef.current === ACCUSATIONS$1) {
+	      handleProgressToNighttimePage();
+	    }
+	  }, [accusationTimer]);
 	  const handlePlayerJoin = gamername => {
 	    // create a new player info object, with the gamername
 	    const newPlayer = {
@@ -42380,7 +42384,8 @@ Please use another name.` );
 	      isHost: playersRef.current.length === 0
 	    };
 	    // add the new player to the players array
-	    setPlayers([...playersRef.current, newPlayer]);
+	    playersRef.current = [...playersRef.current, newPlayer];
+	    setPlayers(playersRef.current);
 	  };
 	  const handlePlayerLeave = () => {
 	    // remove the player from the players array
@@ -42408,7 +42413,8 @@ Please use another name.` );
 	    const bellAudio = new Audio("./assets/death-bell.wav");
 	    bellAudio.volume = 0.25;
 	    bellAudio.play();
-	    setPlayers(newPlayers);
+	    playersRef.current = newPlayers;
+	    setPlayers(playersRef.current);
 	  };
 	  const handleHostStartGame = () => {
 	    // assign roles
@@ -42432,11 +42438,16 @@ Please use another name.` );
 	      }
 	      return player;
 	    });
-	    setPlayers(newPlayers);
-	    setMafia(mafia);
-	    setDetective(detective);
-	    setAngel(angel);
-	    setCivilians(civilians);
+	    playersRef.current = newPlayers;
+	    setPlayers(playersRef.current);
+	    mafiaRef.current = mafia;
+	    setMafia(mafiaRef.current);
+	    detectiveRef.current = detective;
+	    setDetective(detectiveRef.current);
+	    angelRef.current = angel;
+	    setAngel(angelRef.current);
+	    civiliansRef.current = civilians;
+	    setCivilians(civiliansRef.current);
 	    // advance to welcome page
 	    handleProgressToWelcomePage();
 	  };
@@ -42444,53 +42455,71 @@ Please use another name.` );
 	    // advance to nighttime page
 	    handleProgressToNighttimePage();
 	  };
+	  const setNighttimeOverTimeout = () => {
+	    nighttimeOverTimeoutRef.current = setTimeout(() => {
+	      if (pageRef.current === NIGHTTIME_TIMER$1) {
+	        if (isNightOver(currentMafiaVotesRef.current, currentDetectiveIdentificationRef.current, currentAngelProtectionRef.current, currentCivilianTriviaFinishesRef.current, playersRef.current.length)) {
+	          handleProgressToNightOverPage();
+	        }
+	      }
+	    }, 2000);
+	  };
 	  const handleMafiaSelection = (mafiaGamername, targetGamername) => {
+	    if (pageRef.current !== NIGHTTIME_TIMER$1) return;
 	    const mafiaPlayer = playersRef.current.find(player => player.gamername === mafiaGamername);
 	    const targetPlayer = playersRef.current.find(player => player.gamername === targetGamername);
 	    if (!mafiaPlayer || !targetPlayer) {
 	      return;
 	    }
-	    const currentMafiaSelection = currentMafiaSelectionsRef.current.find(selection => selection.player === mafiaPlayer);
+	    const currentMafiaSelection = currentMafiaSelectionsRef.current.find(selection => selection.player.gamername === mafiaPlayer.gamername);
 	    // if mafia member has not selected a target, add the target to the currentMafiaSelections array
 	    if (!currentMafiaSelection) {
-	      setCurrentMafiaSelections([...currentMafiaSelectionsRef.current, {
+	      currentMafiaSelectionsRef.current = [...currentMafiaSelectionsRef.current, {
 	        player: mafiaPlayer,
 	        target: targetPlayer
-	      }]);
+	      }];
+	      setCurrentMafiaSelections(currentMafiaSelectionsRef.current);
 	    }
 	    // if mafia member has selected a target and this target is different from the previous target, update the target in the currentMafiaSelections array
 	    else if (currentMafiaSelection.target !== targetPlayer) {
-	      setCurrentMafiaSelections(currentMafiaSelectionsRef.current.map(selection => {
-	        if (selection.player === mafiaPlayer) {
+	      currentMafiaSelectionsRef.current = currentMafiaSelectionsRef.current.map(selection => {
+	        if (selection.player.gamername === mafiaPlayer.gamername) {
 	          selection.target = targetPlayer;
 	        }
 	        return selection;
-	      }));
+	      });
+	      setCurrentMafiaSelections(currentMafiaSelectionsRef.current);
 	    }
 	    // if mafia member has selected a target and this target is the same as the previous target, remove the target from the currentMafiaSelections array
 	    else {
-	      setCurrentMafiaSelections(currentMafiaSelectionsRef.current.filter(selection => selection.player !== mafiaPlayer));
+	      currentMafiaSelectionsRef.current = currentMafiaSelectionsRef.current.filter(selection => selection.player.gamername !== mafiaPlayer.gamername);
+	      setCurrentMafiaSelections(currentMafiaSelectionsRef.current);
 	    }
 	  };
 	  const handleMafiaVote = (mafiaGamername, targetGamername) => {
+	    if (pageRef.current !== NIGHTTIME_TIMER$1) return;
 	    const mafiaPlayer = playersRef.current.find(player => player.gamername === mafiaGamername);
 	    const targetPlayer = playersRef.current.find(player => player.gamername === targetGamername);
 	    if (!mafiaPlayer || !targetPlayer) {
 	      return;
 	    }
-	    const currentMafiaVote = currentMafiaVotesRef.current.find(selection => selection.player === mafiaPlayer);
+	    const currentMafiaVote = currentMafiaVotesRef.current.find(selection => selection.player.gamername === mafiaPlayer.gamername);
 	    // if mafia member has not voted, add the vote to the currentMafiaVotes array
 	    if (!currentMafiaVote) {
-	      setCurrentMafiaVotes([...currentMafiaVotesRef.current, {
+	      currentMafiaVotesRef.current = [...currentMafiaVotesRef.current, {
 	        player: mafiaPlayer,
 	        target: targetPlayer
-	      }]);
+	      }];
+	      setCurrentMafiaVotes(currentMafiaVotesRef.current);
 	    }
 	    // remove the vote from the currentMafiaSelections array
-	    setCurrentMafiaSelections(currentMafiaSelectionsRef.current.filter(selection => selection.player !== mafiaPlayer));
-	    // TODO: check if night is over
+	    currentMafiaSelectionsRef.current = currentMafiaSelectionsRef.current.filter(selection => selection.player.gamername !== mafiaPlayer.gamername);
+	    setCurrentMafiaSelections(currentMafiaSelectionsRef.current);
+	    // check if night is over
+	    setNighttimeOverTimeout();
 	  };
 	  const handleDetectiveIdentification = targetGamername => {
+	    if (pageRef.current !== NIGHTTIME_TIMER$1) return;
 	    // find the detective
 	    const detective = playersRef.current.find(player => player.role === "detective");
 	    // find the target
@@ -42499,17 +42528,21 @@ Please use another name.` );
 	    if (!detective || !target) {
 	      return;
 	    }
-	    setDetectiveIdentifications([...detectiveIdentificationsRef.current, {
+	    detectiveIdentificationsRef.current = [...detectiveIdentificationsRef.current, {
 	      player: detective,
 	      target
-	    }]);
-	    setCurrentDetectiveIdentification({
+	    }];
+	    setDetectiveIdentifications(detectiveIdentificationsRef.current);
+	    currentDetectiveIdentificationRef.current = {
 	      player: detective,
 	      target
-	    });
-	    // TODO: check if night is over
+	    };
+	    setCurrentDetectiveIdentification(currentDetectiveIdentificationRef.current);
+	    // check if night is over
+	    setNighttimeOverTimeout();
 	  };
 	  const handleAngelProtection = targetGamername => {
+	    if (pageRef.current !== NIGHTTIME_TIMER$1) return;
 	    // find the angel
 	    const angel = playersRef.current.find(player => player.role === "angel");
 	    // find the target
@@ -42518,23 +42551,29 @@ Please use another name.` );
 	    if (!angel || !target) {
 	      return;
 	    }
-	    setCurrentAngelProtection({
+	    currentAngelProtectionRef.current = {
 	      player: angel,
 	      target
-	    });
-	    // TODO: check if night is over
+	    };
+	    setCurrentAngelProtection(currentAngelProtectionRef.current);
+	    // check if night is over
+	    setNighttimeOverTimeout();
 	  };
 	  const handleCivilianTriviaFinish = gamername => {
+	    if (pageRef.current !== NIGHTTIME_TIMER$1) return;
 	    // find the player
 	    const player = playersRef.current.find(player => player.gamername === gamername);
 	    // if the player is found, add the player to the currentCivilianTriviaFinishes array
 	    if (!player) {
 	      return;
 	    }
-	    setCurrentCivilianTriviaFinishes([...currentCivilianTriviaFinishesRef.current, player]);
-	    // TODO: check if night is over
+	    currentCivilianTriviaFinishesRef.current = [...currentCivilianTriviaFinishesRef.current, player];
+	    setCurrentCivilianTriviaFinishes(currentCivilianTriviaFinishesRef.current);
+	    // check if night is over
+	    setNighttimeOverTimeout();
 	  };
 	  const handleAccusation = (accuserGamername, targetGamername) => {
+	    if (pageRef.current !== ACCUSATIONS$1) return;
 	    // find the accuser
 	    const accuser = playersRef.current.find(player => player.gamername === accuserGamername);
 	    // find the target
@@ -42543,11 +42582,30 @@ Please use another name.` );
 	    if (!accuser || !target) {
 	      return;
 	    }
-	    setCurrentAccusations([...currentAccusationsRef.current, {
+	    // if the player has already accused someone, remove the previous accusation
+	    currentAccusationsRef.current = currentAccusationsRef.current.filter(accusation => accusation.player.gamername !== accuserGamername);
+	    // add the new accusation
+	    currentAccusationsRef.current = [...currentAccusationsRef.current, {
 	      player: accuser,
 	      target
-	    }]);
+	    }];
+	    setCurrentAccusations(currentAccusationsRef.current);
 	    // TODO: check if accusations are over
+	    // find the max number of accusations for a single player
+	    const accusationCounts = {};
+	    currentAccusationsRef.current.forEach(accusation => {
+	      accusationCounts[accusation.target.gamername] = (accusationCounts[accusation.target.gamername] || 0) + 1;
+	    });
+	    const maxAccusations = Math.max(...Object.values(accusationCounts));
+	    // if any player has been accused 2 times, set this player as the recentlyAccused and progress to ACCUSED page
+	    if (maxAccusations >= 2) {
+	      const accusedPlayers = Object.keys(accusationCounts).filter(gamername => accusationCounts[gamername] === maxAccusations);
+	      const randomIndex = Math.floor(Math.random() * accusedPlayers.length);
+	      const recentlyAccused = playersRef.current.find(player => player.gamername === accusedPlayers[randomIndex]);
+	      recentlyAccusedRef.current = recentlyAccused;
+	      setRecentlyAccused(recentlyAccusedRef.current);
+	      handleProgressToAccusedPage();
+	    }
 	  };
 	  const handleLifeDeathSelection = (voterGamername, vote) => {
 	    // find the voter
@@ -42560,23 +42618,26 @@ Please use another name.` );
 	    const currentVote = currentLifeDeathSelectionsRef.current.find(vote => vote.player === voter);
 	    // if the voter has not voted, add the vote to the currentLifeDeathSelections array
 	    if (!currentVote) {
-	      setCurrentLifeDeathSelections([...currentLifeDeathSelectionsRef.current, {
+	      currentLifeDeathSelectionsRef.current = [...currentLifeDeathSelectionsRef.current, {
 	        player: voter,
 	        vote
-	      }]);
+	      }];
+	      setCurrentLifeDeathSelections(currentLifeDeathSelectionsRef.current);
 	    }
 	    // if the voter has voted and this vote is different from the previous vote, update the vote in the currentLifeDeathSelections array
 	    else if (currentVote.vote !== vote) {
-	      setCurrentLifeDeathSelections(currentLifeDeathSelectionsRef.current.map(playerVote => {
+	      currentLifeDeathSelectionsRef.current = currentLifeDeathSelectionsRef.current.map(playerVote => {
 	        if (playerVote.player === voter) {
 	          playerVote.vote = vote;
 	        }
 	        return playerVote;
-	      }));
+	      });
+	      setCurrentLifeDeathSelections(currentLifeDeathSelectionsRef.current);
 	    }
 	    // if the voter has voted and this vote is the same as the previous vote, remove the vote from the currentLifeDeathSelections array
 	    else {
-	      setCurrentLifeDeathSelections(currentLifeDeathSelectionsRef.current.filter(playerVote => playerVote.player !== voter));
+	      currentLifeDeathSelectionsRef.current = currentLifeDeathSelectionsRef.current.filter(playerVote => playerVote.player !== voter);
+	      setCurrentLifeDeathSelections(currentLifeDeathSelectionsRef.current);
 	    }
 	  };
 	  const handleLifeDeathVote = (voterGamername, vote) => {
@@ -42590,27 +42651,32 @@ Please use another name.` );
 	    const currentVote = currentLifeDeathVotesRef.current.find(vote => vote.player === voter);
 	    // if the voter has not voted, add the vote to the currentLifeDeathVotes array
 	    if (!currentVote) {
-	      setCurrentLifeDeathVotes([...currentLifeDeathVotesRef.current, {
+	      currentLifeDeathVotesRef.current = [...currentLifeDeathVotesRef.current, {
 	        player: voter,
 	        vote
-	      }]);
+	      }];
+	      setCurrentLifeDeathVotes(currentLifeDeathVotesRef.current);
 	    }
 	    // remove the vote from the currentLifeDeathSelections array
-	    setCurrentLifeDeathSelections(currentLifeDeathSelectionsRef.current.filter(playerVote => playerVote.player !== voter));
+	    currentLifeDeathSelectionsRef.current = currentLifeDeathSelectionsRef.current.filter(playerVote => playerVote.player !== voter);
+	    setCurrentLifeDeathSelections(currentLifeDeathSelectionsRef.current);
 	  };
 	  const handleProgressToWelcomePage = () => {
 	    // play the intro audio
 	    introAudioRef.current.play();
 	    // set the page to WELCOME
-	    setPage(WELCOME$1);
+	    pageRef.current = WELCOME$1;
+	    setPage(pageRef.current);
 	  };
 	  const handleProgressToAreYouReadyPage = () => {
 	    // set the page to YOU_READY
-	    setPage(YOU_READY$1);
+	    pageRef.current = YOU_READY$1;
+	    setPage(pageRef.current);
 	  };
 	  const handleProgressToLookAtYourPhonePage = () => {
 	    // set the page to REVEAL_IDENTITY
-	    setPage(REVEAL_IDENTITY$1);
+	    pageRef.current = REVEAL_IDENTITY$1;
+	    setPage(pageRef.current);
 	  };
 	  const handleProgressToInstructionsPage = () => {
 	    // stop the intro audio
@@ -42620,35 +42686,45 @@ Please use another name.` );
 	    // play the intro audio again
 	    introAudioRef.current.play();
 	    // set the page to INSTRUCTIONS
-	    setPage(INSTRUCTIONS$1);
+	    pageRef.current = INSTRUCTIONS$1;
+	    setPage(pageRef.current);
 	  };
 	  const handleProgressToNighttimePage = () => {
 	    // pause the intro audio
 	    introAudioRef.current.pause();
 	    // reset the currentMafiaSelections array
+	    currentMafiaSelectionsRef.current = [];
 	    setCurrentMafiaSelections([]);
 	    // reset the currentMafiaVotes array
+	    currentMafiaVotesRef.current = [];
 	    setCurrentMafiaVotes([]);
 	    // reset the currentKill
+	    currentKillRef.current = null;
 	    setCurrentKill(null);
 	    // reset the currentDetectiveIdentification
+	    currentDetectiveIdentificationRef.current = null;
 	    setCurrentDetectiveIdentification(null);
 	    // reset the currentAngelProtection
+	    currentAngelProtectionRef.current = null;
 	    setCurrentAngelProtection(null);
 	    // reset the currentCivilianTriviaFinishes array
+	    currentCivilianTriviaFinishesRef.current = [];
 	    setCurrentCivilianTriviaFinishes([]);
 	    // set the page to NIGHTTIME
-	    setPage(NIGHTTIME$1);
+	    pageRef.current = NIGHTTIME$1;
+	    setPage(pageRef.current);
 	  };
 	  const handleProgressToNighttimeTimerPage = () => {
 	    // reset the nighttimeTimer
 	    setNighttimeTimer(120);
 	    // set the page to NIGHTTIME_TIMER
-	    setPage(NIGHTTIME_TIMER$1);
+	    pageRef.current = NIGHTTIME_TIMER$1;
+	    setPage(pageRef.current);
 	  };
 	  const handleProgressToNightOverPage = () => {
 	    // set the page to NIGHT_OVER
-	    setPage(NIGHT_OVER$1);
+	    pageRef.current = NIGHT_OVER$1;
+	    setPage(pageRef.current);
 	  };
 	  const handleProgressToStoryPage = () => {
 	    // decide on the player to die
@@ -42667,47 +42743,66 @@ Please use another name.` );
 	      return;
 	    }
 	    // update the player's isAlive status
-	    if (playerToDie) {
+	    if (playerToDie && playerToDie.gamername !== currentAngelProtectionRef.current?.target.gamername) {
 	      playerToDie.isAlive = false;
 	    }
 	    // set the currentKill
-	    setCurrentKill(playerToDie);
+	    currentKillRef.current = playerToDie;
+	    setCurrentKill(currentKillRef.current);
 	    // set the page to STORY
-	    setPage(STORY$1);
+	    pageRef.current = STORY$1;
+	    setPage(pageRef.current);
 	  };
 	  const handleProgressToPostStoryPage = () => {
 	    // reset the accusationTimer
 	    setAccusationTimer(300);
 	    // reset the recentlyAccused
-	    setRecentlyAccused(null);
+	    recentlyAccusedRef.current = null;
+	    setRecentlyAccused(recentlyAccusedRef.current);
 	    // set the page to POST_STORY_2
-	    setPage(POST_STORY_2$1);
+	    pageRef.current = POST_STORY_2$1;
+	    setPage(pageRef.current);
 	  };
 	  const handleProgressToAccusationTimerPage = () => {
 	    // reset currentAccusations
+	    currentAccusationsRef.current = [];
 	    setCurrentAccusations([]);
 	    // reset currentLifeDeathSelections
+	    currentLifeDeathSelectionsRef.current = [];
 	    setCurrentLifeDeathSelections([]);
 	    // reset currentLifeDeathVotes
+	    currentLifeDeathVotesRef.current = [];
 	    setCurrentLifeDeathVotes([]);
+	    // set the page to ACCUSATIONS
+	    pageRef.current = ACCUSATIONS$1;
+	    setPage(pageRef.current);
 	  };
 	  const handleProgressToAccusedPage = () => {
+	    // play narration audio
+	    narrationAudioRef.current.currentTime = 0;
+	    narrationAudioRef.current.play();
 	    // set the page to ACCUSED
-	    setPage(ACCUSED$1);
+	    pageRef.current = ACCUSED$1;
+	    setPage(pageRef.current);
 	  };
 	  const handleProgressToVotingPage = () => {
 	    // set the page to VOTING
-	    setPage(VOTING$1);
+	    pageRef.current = VOTING$1;
+	    setPage(pageRef.current);
 	  };
 	  const handleProgressToVotingTimerPage = () => {
+	    // stop the narration audio
+	    narrationAudioRef.current.pause();
 	    // reset the votingTimer
 	    setVotingTimer(300);
 	    // set the page to VOTING_TIMER
-	    setPage(VOTING_TIMER$1);
+	    pageRef.current = VOTING_TIMER$1;
+	    setPage(pageRef.current);
 	  };
 	  const handleProgressToVotingResultsPage = () => {
 	    // set the page to VOTING_RESULTS
-	    setPage(VOTING_RESULTS$1);
+	    pageRef.current = VOTING_RESULTS$1;
+	    setPage(pageRef.current);
 	  };
 	  const handleTransitionFromVotingResultsPage = () => {
 	    // check if player lives or dies
@@ -42721,7 +42816,8 @@ Please use another name.` );
 	        }
 	        return player;
 	      });
-	      setPlayers(newPlayers);
+	      playersRef.current = newPlayers;
+	      setPlayers(playersRef.current);
 	      // TODO: check if game is over
 	    } else {
 	      handleProgressToAccusationTimerPage();
@@ -42729,7 +42825,8 @@ Please use another name.` );
 	  };
 	  const handleProgressToGameOverPage = () => {
 	    // set the page to GAME_OVER
-	    setPage(GAME_OVER$1);
+	    pageRef.current = GAME_OVER$1;
+	    setPage(pageRef.current);
 	  };
 	  const actions = reactExports.useMemo(() => ({
 	    handlePlayerJoin,
@@ -42790,6 +42887,18 @@ Please use another name.` );
 	    [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
 	  }
 	  return array;
+	};
+	const isNightOver = (mafiaVotes, currentDetectiveIdentification, currentAngelProtection, currentCivilianTriviaFinishes, playersLength) => {
+	  let totalNightCompletions = 0;
+	  totalNightCompletions += mafiaVotes.length;
+	  if (currentDetectiveIdentification) {
+	    totalNightCompletions++;
+	  }
+	  if (currentAngelProtection) {
+	    totalNightCompletions++;
+	  }
+	  totalNightCompletions += currentCivilianTriviaFinishes.length;
+	  return totalNightCompletions === playersLength;
 	};
 
 	function Welcome({
@@ -63578,6 +63687,9 @@ Please use another name.` );
 	}
 
 	function NightOver() {
+	  const {
+	    handleProgressToStoryPage
+	  } = reactExports.useContext(ActionContext);
 	  const nightOverAudio = new Audio("./assets/night-over.mp3");
 	  const narrationAudio = new Audio("./assets/narration.mp3");
 	  narrationAudio.volume = 0.5;
@@ -63585,7 +63697,7 @@ Please use another name.` );
 	    narrationAudio.play();
 	    setTimeout(() => nightOverAudio.play(), 1000);
 	    nightOverAudio.addEventListener("ended", () => {
-	      setTimeout(() => () => {}, 1000);
+	      setTimeout(() => handleProgressToStoryPage(), 1000);
 	    });
 	    return () => {
 	      nightOverAudio.pause();
@@ -63632,12 +63744,18 @@ Please use another name.` );
 	}
 
 	function Story() {
+	  const {
+	    currentKill,
+	    currentAngelProtection
+	  } = reactExports.useContext(VariableContext);
+	  const {
+	    handleProgressToPostStoryPage
+	  } = reactExports.useContext(ActionContext);
 	  const [reveal, setReveal] = reactExports.useState(false);
 	  const playerMurderedAudio = new Audio("./assets/player-murdered.mp3");
 	  const playerAlmostMurderedAudio = new Audio("./assets/player-almost-murdered.mp3");
 	  const deathAudio = new Audio("./assets/Deathloop.wav");
-	  const targetedPlayer = playerStates.find(player => player.isTargeted);
-	  const saved = targetedPlayer && targetedPlayer.isProtected;
+	  const saved = currentKill?.gamername === currentAngelProtection?.target.gamername;
 	  reactExports.useEffect(() => {
 	    setTimeout(() => {
 	      setReveal(true);
@@ -63646,10 +63764,12 @@ Please use another name.` );
 	        if (!saved) {
 	          playerMurderedAudio.play();
 	          playerMurderedAudio.onended = () => {
+	            handleProgressToPostStoryPage();
 	          };
 	        } else {
 	          playerAlmostMurderedAudio.play();
 	          playerAlmostMurderedAudio.onended = () => {
+	            handleProgressToPostStoryPage();
 	          };
 	        }
 	      }, 10000);
@@ -63667,7 +63787,7 @@ Please use another name.` );
 	      size: 56,
 	      color: "var(--Main-Red)",
 	      weight: 700
-	    }, targetedPlayer.realname), /*#__PURE__*/React.createElement(Text, {
+	    }, currentKill?.realname), /*#__PURE__*/React.createElement(Text, {
 	      size: 36,
 	      opacity: 0.5
 	    }, "was killed by the mafia"), /*#__PURE__*/React.createElement("svg", {
@@ -63684,18 +63804,21 @@ Please use another name.` );
 	  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Text, {
 	    size: 56,
 	    weight: 700
-	  }, targetedPlayer.realname), /*#__PURE__*/React.createElement(Text, {
+	  }, currentKill?.realname), /*#__PURE__*/React.createElement(Text, {
 	    size: 36,
 	    opacity: 0.5
 	  }, "survived"));
 	}
 
 	function PostStory2() {
+	  const {
+	    handleProgressToAccusationTimerPage
+	  } = reactExports.useContext(ActionContext);
 	  const invitationToLieAudio = new Audio("./assets/invitation-to-lie.mp3");
 	  reactExports.useEffect(() => {
 	    setTimeout(() => invitationToLieAudio.play(), 1000);
 	    invitationToLieAudio.onended = () => {
-	      setTimeout(() => () => {}, 1000);
+	      setTimeout(() => handleProgressToAccusationTimerPage(), 1000);
 	    };
 	    return () => invitationToLieAudio.pause();
 	  }, []);
@@ -63706,63 +63829,126 @@ Please use another name.` );
 	}
 
 	function Accusations() {
+	  const {
+	    accusationTimer,
+	    setAccusationTimer
+	  } = reactExports.useContext(VariableContext);
 	  const makeAccusationAudio = new Audio("./assets/make-accusation.mp3");
+	  const dayAudio = new Audio("./assets/Dayloop.wav");
 	  reactExports.useEffect(() => {
+	    dayAudio.loop = true;
+	    dayAudio.play();
 	    makeAccusationAudio.play();
-	    return () => makeAccusationAudio.pause();
+	    return () => {
+	      dayAudio.pause();
+	      makeAccusationAudio.pause();
+	    };
 	  }, []);
 	  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Text, {
 	    size: 36,
 	    opacity: 0.5
-	  }, "you have 5 minutes to make an accusation"), /*#__PURE__*/React.createElement(Timer, null));
+	  }, "you have 5 minutes to make an accusation"), /*#__PURE__*/React.createElement(Timer, {
+	    timer: accusationTimer,
+	    setTimer: setAccusationTimer
+	  }));
 	}
 
 	function Accused() {
+	  const {
+	    recentlyAccused,
+	    currentAccusations
+	  } = reactExports.useContext(VariableContext);
+	  const {
+	    handleProgressToVotingPage
+	  } = reactExports.useContext(ActionContext);
+	  const accusers = currentAccusations.filter(accusation => accusation.target.gamername === recentlyAccused.gamername);
 	  const haveAccusationAudio = new Audio("./assets/have-accusation.mp3");
 	  reactExports.useEffect(() => {
 	    setTimeout(() => haveAccusationAudio.play(), 1000);
 	    haveAccusationAudio.onended = () => {
-	      setTimeout(() => () => {}, 1000);
+	      setTimeout(() => handleProgressToVotingPage(), 1000);
 	    };
 	    return () => haveAccusationAudio.pause();
 	  }, []);
 	  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Text, {
 	    size: 56
-	  }, "accused person"), /*#__PURE__*/React.createElement(Text, {
+	  }, recentlyAccused?.realname), /*#__PURE__*/React.createElement(Text, {
 	    size: 36,
 	    opacity: 0.5
 	  }, "has been accused by"), /*#__PURE__*/React.createElement(Text, {
 	    size: 56,
 	    opacity: 0.75
-	  }, "accuser1", " and ", "accuser2"));
+	  }, accusers[0]?.player.realname, " and ", accusers[1]?.player.realname));
 	}
 
 	function Voting() {
+	  const {
+	    recentlyAccused
+	  } = reactExports.useContext(VariableContext);
+	  const {
+	    handleProgressToVotingTimerPage
+	  } = reactExports.useContext(ActionContext);
 	  const liveOrDieAudio = new Audio("./assets/live-or-die.mp3");
 	  reactExports.useEffect(() => {
 	    liveOrDieAudio.play();
-	    liveOrDieAudio.onended = () => () => {};
+	    liveOrDieAudio.onended = () => handleProgressToVotingTimerPage();
 	    return () => liveOrDieAudio.pause();
 	  }, []);
 	  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Text, {
 	    size: 56,
 	    opacity: 0.75
-	  }, "will ", "accused person", " live or die?"));
+	  }, "will ", recentlyAccused?.realname, " live or die?"));
 	}
 
 	function VotingTimer() {
-	  const liveVotes = []; // players.filter(player => player.vote === 'live');
+	  const {
+	    currentLifeDeathSelections,
+	    currentLifeDeathVotes
+	  } = reactExports.useContext(VariableContext);
+	  const [liveVotes, setLiveVotes] = reactExports.useState([]);
 	  const first4LiveVotes = liveVotes.slice(0, 4);
 	  const second4LiveVotes = liveVotes.slice(4, 8);
 	  const third4LiveVotes = liveVotes.slice(8, 12);
 	  const fourth4LiveVotes = liveVotes.slice(12, 16);
 	  const fifth4LiveVotes = liveVotes.slice(16, 20);
-	  const dieVotes = []; // players.filter(player => player.vote === 'die');
+	  const [dieVotes, setDieVotes] = reactExports.useState([]);
 	  const first4DieVotes = dieVotes.slice(0, 4);
 	  const second4DieVotes = dieVotes.slice(4, 8);
 	  const third4DieVotes = dieVotes.slice(8, 12);
 	  const fourth4DieVotes = dieVotes.slice(12, 16);
 	  const fifth4DieVotes = dieVotes.slice(16, 20);
+	  reactExports.useEffect(() => {
+	    const newLiveVotes = [];
+	    const newDieVotes = [];
+	    currentLifeDeathVotes.forEach(vote => {
+	      if (vote.vote === "live") {
+	        newLiveVotes.push({
+	          realname: vote.player.realname,
+	          voteSubmitted: true
+	        });
+	      } else {
+	        newDieVotes.push({
+	          realname: vote.player.realname,
+	          voteSubmitted: true
+	        });
+	      }
+	    });
+	    currentLifeDeathSelections.forEach(selection => {
+	      if (selection === "live") {
+	        newLiveVotes.push({
+	          realname: vote.player.realname,
+	          voteSubmitted: false
+	        });
+	      } else {
+	        newDieVotes.push({
+	          realname: vote.player.realname,
+	          voteSubmitted: false
+	        });
+	      }
+	    });
+	    setLiveVotes(newLiveVotes);
+	    setDieVotes(newDieVotes);
+	  }, [currentLifeDeathSelections, currentLifeDeathVotes]);
 	  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Timer, null), /*#__PURE__*/React.createElement(Text, {
 	    size: 56,
 	    opacity: 0.75
@@ -63770,60 +63956,60 @@ Please use another name.` );
 	    size: 42,
 	    weight: 700
 	  }, "live"), /*#__PURE__*/React.createElement(VoteListRowBox, null, /*#__PURE__*/React.createElement(VoteListColumnBox, null, first4LiveVotes.map(player => /*#__PURE__*/React.createElement(Text, {
-	    key: player.realName,
+	    key: player.realname,
 	    size: 36,
 	    opacity: player.voteSubmitted ? 1 : 0.5,
 	    weight: player.voteSubmitted ? 600 : 300
-	  }, player.realName))), /*#__PURE__*/React.createElement(VoteListColumnBox, null, second4LiveVotes.map(player => /*#__PURE__*/React.createElement(Text, {
-	    key: player.realName,
+	  }, player.realname))), /*#__PURE__*/React.createElement(VoteListColumnBox, null, second4LiveVotes.map(player => /*#__PURE__*/React.createElement(Text, {
+	    key: player.realname,
 	    size: 36,
 	    opacity: player.voteSubmitted ? 1 : 0.5,
 	    weight: player.voteSubmitted ? 600 : 300
-	  }, player.realName))), /*#__PURE__*/React.createElement(VoteListColumnBox, null, third4LiveVotes.map(player => /*#__PURE__*/React.createElement(Text, {
-	    key: player.realName,
+	  }, player.realname))), /*#__PURE__*/React.createElement(VoteListColumnBox, null, third4LiveVotes.map(player => /*#__PURE__*/React.createElement(Text, {
+	    key: player.realname,
 	    size: 36,
 	    opacity: player.voteSubmitted ? 1 : 0.5,
 	    weight: player.voteSubmitted ? 600 : 300
-	  }, player.realName))), /*#__PURE__*/React.createElement(VoteListColumnBox, null, fourth4LiveVotes.map(player => /*#__PURE__*/React.createElement(Text, {
-	    key: player.realName,
+	  }, player.realname))), /*#__PURE__*/React.createElement(VoteListColumnBox, null, fourth4LiveVotes.map(player => /*#__PURE__*/React.createElement(Text, {
+	    key: player.realname,
 	    size: 36,
 	    opacity: player.voteSubmitted ? 1 : 0.5,
 	    weight: player.voteSubmitted ? 600 : 300
-	  }, player.realName))), /*#__PURE__*/React.createElement(VoteListColumnBox, null, fifth4LiveVotes.map(player => /*#__PURE__*/React.createElement(Text, {
-	    key: player.realName,
+	  }, player.realname))), /*#__PURE__*/React.createElement(VoteListColumnBox, null, fifth4LiveVotes.map(player => /*#__PURE__*/React.createElement(Text, {
+	    key: player.realname,
 	    size: 36,
 	    opacity: player.voteSubmitted ? 1 : 0.5,
 	    weight: player.voteSubmitted ? 600 : 300
-	  }, player.realName))))), /*#__PURE__*/React.createElement(VerticalLine, null), /*#__PURE__*/React.createElement(VotesBox, null, /*#__PURE__*/React.createElement(Text, {
+	  }, player.realname))))), /*#__PURE__*/React.createElement(VerticalLine, null), /*#__PURE__*/React.createElement(VotesBox, null, /*#__PURE__*/React.createElement(Text, {
 	    size: 42,
 	    weight: 700,
 	    color: "var(--Main-Red)"
 	  }, "die"), /*#__PURE__*/React.createElement(VoteListRowBox, null, /*#__PURE__*/React.createElement(VoteListColumnBox, null, first4DieVotes.map(player => /*#__PURE__*/React.createElement(Text, {
-	    key: player.realName,
+	    key: player.realname,
 	    size: 36,
 	    opacity: player.voteSubmitted ? 1 : 0.5,
 	    weight: player.voteSubmitted ? 600 : 300
-	  }, player.realName))), /*#__PURE__*/React.createElement(VoteListColumnBox, null, second4DieVotes.map(player => /*#__PURE__*/React.createElement(Text, {
-	    key: player.realName,
+	  }, player.realname))), /*#__PURE__*/React.createElement(VoteListColumnBox, null, second4DieVotes.map(player => /*#__PURE__*/React.createElement(Text, {
+	    key: player.realname,
 	    size: 36,
 	    opacity: player.voteSubmitted ? 1 : 0.5,
 	    weight: player.voteSubmitted ? 600 : 300
-	  }, player.realName))), /*#__PURE__*/React.createElement(VoteListColumnBox, null, third4DieVotes.map(player => /*#__PURE__*/React.createElement(Text, {
-	    key: player.realName,
+	  }, player.realname))), /*#__PURE__*/React.createElement(VoteListColumnBox, null, third4DieVotes.map(player => /*#__PURE__*/React.createElement(Text, {
+	    key: player.realname,
 	    size: 36,
 	    opacity: player.voteSubmitted ? 1 : 0.5,
 	    weight: player.voteSubmitted ? 600 : 300
-	  }, player.realName))), /*#__PURE__*/React.createElement(VoteListColumnBox, null, fourth4DieVotes.map(player => /*#__PURE__*/React.createElement(Text, {
-	    key: player.realName,
+	  }, player.realname))), /*#__PURE__*/React.createElement(VoteListColumnBox, null, fourth4DieVotes.map(player => /*#__PURE__*/React.createElement(Text, {
+	    key: player.realname,
 	    size: 36,
 	    opacity: player.voteSubmitted ? 1 : 0.5,
 	    weight: player.voteSubmitted ? 600 : 300
-	  }, player.realName))), /*#__PURE__*/React.createElement(VoteListColumnBox, null, fifth4DieVotes.map(player => /*#__PURE__*/React.createElement(Text, {
-	    key: player.realName,
+	  }, player.realname))), /*#__PURE__*/React.createElement(VoteListColumnBox, null, fifth4DieVotes.map(player => /*#__PURE__*/React.createElement(Text, {
+	    key: player.realname,
 	    size: 36,
 	    opacity: player.voteSubmitted ? 1 : 0.5,
 	    weight: player.voteSubmitted ? 600 : 300
-	  }, player.realName)))))));
+	  }, player.realname)))))));
 	}
 
 	function VotingResults() {
@@ -63998,7 +64184,13 @@ Please use another name.` );
 	    handleHostStartGame,
 	    handleHostSkipInstructions,
 	    handleMafiaSelection,
-	    handleMafiaVote
+	    handleMafiaVote,
+	    handleDetectiveIdentification,
+	    handleAngelProtection,
+	    handleCivilianTriviaFinish,
+	    handleAccusation,
+	    handleLifeDeathSelection,
+	    handleLifeDeathVote
 	  } = reactExports.useContext(ActionContext);
 	  const gamernamesNeedingConfirmationRef = reactExports.useRef([]);
 	  const sendMessageToParent = message => {
@@ -64113,6 +64305,18 @@ Please use another name.` );
 	      handleMafiaSelection(msg.player, msg.selection);
 	    } else if (msg.name === "MafiaVote") {
 	      handleMafiaVote(msg.player, msg.vote);
+	    } else if (msg.name === "DetectiveIdentification") {
+	      handleDetectiveIdentification(msg.player, msg.identification);
+	    } else if (msg.name === "AngelProtection") {
+	      handleAngelProtection(msg.protection);
+	    } else if (msg.name === "CivilianFinishTrivia") {
+	      handleCivilianTriviaFinish(msg.player);
+	    } else if (msg.name === "Accuse") {
+	      handleAccusation(msg.player, msg.accusation);
+	    } else if (msg.name === "LifeDeathSelection") {
+	      handleLifeDeathSelection(msg.player, msg.vote);
+	    } else if (msg.name === "LifeDeathVote") {
+	      handleLifeDeathVote(msg.player, msg.vote);
 	    }
 	  }
 	  reactExports.useEffect(() => {

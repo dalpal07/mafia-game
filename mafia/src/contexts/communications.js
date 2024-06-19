@@ -45,7 +45,7 @@ export const CommunicationProvider = ({ children }) => {
     currentAccusationsRef,
     recentlyAccusedRef,
     currentLifeDeathSelectionsRef,
-    currentLifeDeathVotesRef,    
+    currentLifeDeathVotesRef,
   } = useContext(VariableContext);
   const {
     handlePlayerJoin,
@@ -54,9 +54,15 @@ export const CommunicationProvider = ({ children }) => {
     handleHostSkipInstructions,
     handleMafiaSelection,
     handleMafiaVote,
+    handleDetectiveIdentification,
+    handleAngelProtection,
+    handleCivilianTriviaFinish,
+    handleAccusation,
+    handleLifeDeathSelection,
+    handleLifeDeathVote,
   } = useContext(ActionContext);
   const gamernamesNeedingConfirmationRef = useRef([]);
-  
+
   const sendMessageToParent = (message) => {
     parent.postMessage(message, "*");
   };
@@ -82,9 +88,11 @@ export const CommunicationProvider = ({ children }) => {
             currentMafiaVotes: currentMafiaVotesRef.current,
             currentKill: currentKillRef.current,
             detectiveIdentifications: detectiveIdentificationsRef.current,
-            currentDetectiveIdentification: currentDetectiveIdentificationRef.current,
+            currentDetectiveIdentification:
+              currentDetectiveIdentificationRef.current,
             currentAngelProtection: currentAngelProtectionRef.current,
-            currentCivilianTriviaFinishes: currentCivilianTriviaFinishesRef.current,
+            currentCivilianTriviaFinishes:
+              currentCivilianTriviaFinishesRef.current,
             currentAccusations: currentAccusationsRef.current,
             recentlyAccused: recentlyAccusedRef.current,
             currentLifeDeathSelections: currentLifeDeathSelectionsRef.current,
@@ -113,9 +121,11 @@ export const CommunicationProvider = ({ children }) => {
           currentMafiaVotes: currentMafiaVotesRef.current,
           currentKill: currentKillRef.current,
           detectiveIdentifications: detectiveIdentificationsRef.current,
-          currentDetectiveIdentification: currentDetectiveIdentificationRef.current,
+          currentDetectiveIdentification:
+            currentDetectiveIdentificationRef.current,
           currentAngelProtection: currentAngelProtectionRef.current,
-          currentCivilianTriviaFinishes: currentCivilianTriviaFinishesRef.current,
+          currentCivilianTriviaFinishes:
+            currentCivilianTriviaFinishesRef.current,
           currentAccusations: currentAccusationsRef.current,
           recentlyAccused: recentlyAccusedRef.current,
           currentLifeDeathSelections: currentLifeDeathSelectionsRef.current,
@@ -152,7 +162,8 @@ export const CommunicationProvider = ({ children }) => {
         currentMafiaVotes: currentMafiaVotesRef.current,
         currentKill: currentKillRef.current,
         detectiveIdentifications: detectiveIdentificationsRef.current,
-        currentDetectiveIdentification: currentDetectiveIdentificationRef.current,
+        currentDetectiveIdentification:
+          currentDetectiveIdentificationRef.current,
         currentAngelProtection: currentAngelProtectionRef.current,
         currentCivilianTriviaFinishes: currentCivilianTriviaFinishesRef.current,
         currentAccusations: currentAccusationsRef.current,
@@ -168,24 +179,30 @@ export const CommunicationProvider = ({ children }) => {
             (player) => player !== msg.player,
           );
       }
-    }
-    else if (msg.name === "RegisterMadderController") {
+    } else if (msg.name === "RegisterMadderController") {
       handlePlayerJoin(msg.player);
-    }
-    else if (msg.name === "SetRealname") {
+    } else if (msg.name === "SetRealname") {
       handlePlayerSubmitRealname(msg.player, msg.realname);
-    }
-    else if (msg.name === "HostStart") {
+    } else if (msg.name === "HostStart") {
       handleHostStartGame();
-    }
-    else if (msg.name === "HostSkip") {
+    } else if (msg.name === "HostSkip") {
       handleHostSkipInstructions();
-    }
-    else if (msg.name === "MafiaSelection") {
+    } else if (msg.name === "MafiaSelection") {
       handleMafiaSelection(msg.player, msg.selection);
-    }
-    else if (msg.name === "MafiaVote") {
+    } else if (msg.name === "MafiaVote") {
       handleMafiaVote(msg.player, msg.vote);
+    } else if (msg.name === "DetectiveIdentification") {
+      handleDetectiveIdentification(msg.player, msg.identification);
+    } else if (msg.name === "AngelProtection") {
+      handleAngelProtection(msg.protection);
+    } else if (msg.name === "CivilianFinishTrivia") {
+      handleCivilianTriviaFinish(msg.player);
+    } else if (msg.name === "Accuse") {
+      handleAccusation(msg.player, msg.accusation);
+    } else if (msg.name === "LifeDeathSelection") {
+      handleLifeDeathSelection(msg.player, msg.vote);
+    } else if (msg.name === "LifeDeathVote") {
+      handleLifeDeathVote(msg.player, msg.vote);
     }
   }
 

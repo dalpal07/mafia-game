@@ -1,11 +1,13 @@
 import React, {
   createContext,
   useContext,
+  useEffect,
   useMemo,
   useRef,
 } from "react";
 import { VariableContext } from "./variables";
 import {
+  ACCUSATIONS,
   ACCUSED,
   GAME_OVER,
   INSTRUCTIONS,
@@ -72,23 +74,47 @@ export const ActionProvider = ({ children }) => {
     setCurrentAccusations,
     setCurrentLifeDeathSelections,
     setCurrentLifeDeathVotes,
+    nighttimeTimer,
     setNighttimeTimer,
     setCurrentKill,
     setAccusationTimer,
     setRecentlyAccused,
     setVotingTimer,
     playersRef,
+    pageRef,
     currentMafiaSelectionsRef,
     currentMafiaVotesRef,
     detectiveIdentificationsRef,
+    currentDetectiveIdentificationRef,
+    currentAngelProtectionRef,
     currentCivilianTriviaFinishesRef,
     currentAccusationsRef,
     recentlyAccusedRef,
     currentLifeDeathSelectionsRef,
-    currentLifeDeathVotesRef,    
+    currentLifeDeathVotesRef,
+    mafiaRef,
+    detectiveRef,
+    angelRef,
+    civiliansRef,
+    currentKillRef,
+    accusationTimer,
   } = useContext(VariableContext);
-  
+
   const introAudioRef = useRef(new Audio("./assets/Introloop.wav"));
+  const narrationAudioRef = useRef(new Audio("./assets/narration.mp3"));
+  const nighttimeOverTimeoutRef = useRef(null);
+
+  useEffect(() => {
+    if (nighttimeTimer === 0 && pageRef.current === NIGHTTIME_TIMER) {
+      handleProgressToNightOverPage();
+    }
+  }, [nighttimeTimer]);
+
+  useEffect(() => {
+    if (accusationTimer === 0 && pageRef.current === ACCUSATIONS) {
+      handleProgressToNighttimePage();
+    }
+  }, [accusationTimer]);
 
   const handlePlayerJoin = (gamername) => {
     // create a new player info object, with the gamername
@@ -100,7 +126,8 @@ export const ActionProvider = ({ children }) => {
       isHost: playersRef.current.length === 0,
     };
     // add the new player to the players array
-    setPlayers([...playersRef.current, newPlayer]);
+    playersRef.current = [...playersRef.current, newPlayer];
+    setPlayers(playersRef.current);
   };
   const handlePlayerLeave = () => {
     // remove the player from the players array
@@ -128,7 +155,8 @@ export const ActionProvider = ({ children }) => {
     const bellAudio = new Audio("./assets/death-bell.wav");
     bellAudio.volume = 0.25;
     bellAudio.play();
-    setPlayers(newPlayers);
+    playersRef.current = newPlayers;
+    setPlayers(playersRef.current);
   };
 
   const handleHostStartGame = () => {
@@ -153,11 +181,16 @@ export const ActionProvider = ({ children }) => {
       }
       return player;
     });
-    setPlayers(newPlayers);
-    setMafia(mafia);
-    setDetective(detective);
-    setAngel(angel);
-    setCivilians(civilians);
+    playersRef.current = newPlayers;
+    setPlayers(playersRef.current);
+    mafiaRef.current = mafia;
+    setMafia(mafiaRef.current);
+    detectiveRef.current = detective;
+    setDetective(detectiveRef.current);
+    angelRef.current = angel;
+    setAngel(angelRef.current);
+    civiliansRef.current = civilians;
+    setCivilians(civiliansRef.current);
     // advance to welcome page
     handleProgressToWelcomePage();
   };
@@ -166,7 +199,26 @@ export const ActionProvider = ({ children }) => {
     handleProgressToNighttimePage();
   };
 
+  const setNighttimeOverTimeout = () => {
+    nighttimeOverTimeoutRef.current = setTimeout(() => {
+      if (pageRef.current === NIGHTTIME_TIMER) {
+        if (
+          isNightOver(
+            currentMafiaVotesRef.current,
+            currentDetectiveIdentificationRef.current,
+            currentAngelProtectionRef.current,
+            currentCivilianTriviaFinishesRef.current,
+            playersRef.current.length,
+          )
+        ) {
+          handleProgressToNightOverPage();
+        }
+      }
+    }, 2000);
+  };
+
   const handleMafiaSelection = (mafiaGamername, targetGamername) => {
+    if (pageRef.current !== NIGHTTIME_TIMER) return;
     const mafiaPlayer = playersRef.current.find(
       (player) => player.gamername === mafiaGamername,
     );
@@ -177,36 +229,39 @@ export const ActionProvider = ({ children }) => {
       return;
     }
     const currentMafiaSelection = currentMafiaSelectionsRef.current.find(
-      (selection) => selection.player === mafiaPlayer,
+      (selection) => selection.player.gamername === mafiaPlayer.gamername,
     );
     // if mafia member has not selected a target, add the target to the currentMafiaSelections array
     if (!currentMafiaSelection) {
-      setCurrentMafiaSelections([
+      currentMafiaSelectionsRef.current = [
         ...currentMafiaSelectionsRef.current,
         { player: mafiaPlayer, target: targetPlayer },
-      ]);
+      ];
+      setCurrentMafiaSelections(currentMafiaSelectionsRef.current);
     }
     // if mafia member has selected a target and this target is different from the previous target, update the target in the currentMafiaSelections array
     else if (currentMafiaSelection.target !== targetPlayer) {
-      setCurrentMafiaSelections(
-        currentMafiaSelectionsRef.current.map((selection) => {
-          if (selection.player === mafiaPlayer) {
+      currentMafiaSelectionsRef.current = currentMafiaSelectionsRef.current.map(
+        (selection) => {
+          if (selection.player.gamername === mafiaPlayer.gamername) {
             selection.target = targetPlayer;
           }
           return selection;
-        }),
+        },
       );
+      setCurrentMafiaSelections(currentMafiaSelectionsRef.current);
     }
     // if mafia member has selected a target and this target is the same as the previous target, remove the target from the currentMafiaSelections array
     else {
-      setCurrentMafiaSelections(
+      currentMafiaSelectionsRef.current =
         currentMafiaSelectionsRef.current.filter(
-          (selection) => selection.player !== mafiaPlayer,
-        ),
-      );
+          (selection) => selection.player.gamername !== mafiaPlayer.gamername,
+        );
+      setCurrentMafiaSelections(currentMafiaSelectionsRef.current);
     }
   };
   const handleMafiaVote = (mafiaGamername, targetGamername) => {
+    if (pageRef.current !== NIGHTTIME_TIMER) return;
     const mafiaPlayer = playersRef.current.find(
       (player) => player.gamername === mafiaGamername,
     );
@@ -217,26 +272,31 @@ export const ActionProvider = ({ children }) => {
       return;
     }
     const currentMafiaVote = currentMafiaVotesRef.current.find(
-      (selection) => selection.player === mafiaPlayer,
+      (selection) => selection.player.gamername === mafiaPlayer.gamername,
     );
     // if mafia member has not voted, add the vote to the currentMafiaVotes array
     if (!currentMafiaVote) {
-      setCurrentMafiaVotes([
+      currentMafiaVotesRef.current = [
         ...currentMafiaVotesRef.current,
         { player: mafiaPlayer, target: targetPlayer },
-      ]);
+      ];
+      setCurrentMafiaVotes(currentMafiaVotesRef.current);
     }
     // remove the vote from the currentMafiaSelections array
-    setCurrentMafiaSelections(
+    currentMafiaSelectionsRef.current =
       currentMafiaSelectionsRef.current.filter(
-        (selection) => selection.player !== mafiaPlayer,
-      ),
-    );
-    // TODO: check if night is over
+        (selection) => selection.player.gamername !== mafiaPlayer.gamername,
+      );
+    setCurrentMafiaSelections(currentMafiaSelectionsRef.current);
+    // check if night is over
+    setNighttimeOverTimeout();
   };
   const handleDetectiveIdentification = (targetGamername) => {
+    if (pageRef.current !== NIGHTTIME_TIMER) return;
     // find the detective
-    const detective = playersRef.current.find((player) => player.role === "detective");
+    const detective = playersRef.current.find(
+      (player) => player.role === "detective",
+    );
     // find the target
     const target = playersRef.current.find(
       (player) => player.gamername === targetGamername,
@@ -245,14 +305,20 @@ export const ActionProvider = ({ children }) => {
     if (!detective || !target) {
       return;
     }
-    setDetectiveIdentifications([
+    detectiveIdentificationsRef.current = [
       ...detectiveIdentificationsRef.current,
       { player: detective, target },
-    ]);
-    setCurrentDetectiveIdentification({ player: detective, target });
-    // TODO: check if night is over
+    ];
+    setDetectiveIdentifications(detectiveIdentificationsRef.current);
+    currentDetectiveIdentificationRef.current = { player: detective, target };
+    setCurrentDetectiveIdentification(
+      currentDetectiveIdentificationRef.current,
+    );
+    // check if night is over
+    setNighttimeOverTimeout();
   };
   const handleAngelProtection = (targetGamername) => {
+    if (pageRef.current !== NIGHTTIME_TIMER) return;
     // find the angel
     const angel = playersRef.current.find((player) => player.role === "angel");
     // find the target
@@ -263,24 +329,32 @@ export const ActionProvider = ({ children }) => {
     if (!angel || !target) {
       return;
     }
-    setCurrentAngelProtection({ player: angel, target });
-    // TODO: check if night is over
+    currentAngelProtectionRef.current = { player: angel, target };
+    setCurrentAngelProtection(currentAngelProtectionRef.current);
+    // check if night is over
+    setNighttimeOverTimeout();
   };
   const handleCivilianTriviaFinish = (gamername) => {
+    if (pageRef.current !== NIGHTTIME_TIMER) return;
     // find the player
-    const player = playersRef.current.find((player) => player.gamername === gamername);
+    const player = playersRef.current.find(
+      (player) => player.gamername === gamername,
+    );
     // if the player is found, add the player to the currentCivilianTriviaFinishes array
     if (!player) {
       return;
     }
-    setCurrentCivilianTriviaFinishes([
+    currentCivilianTriviaFinishesRef.current = [
       ...currentCivilianTriviaFinishesRef.current,
       player,
-    ]);
-    // TODO: check if night is over
+    ];
+    setCurrentCivilianTriviaFinishes(currentCivilianTriviaFinishesRef.current);
+    // check if night is over
+    setNighttimeOverTimeout();
   };
 
   const handleAccusation = (accuserGamername, targetGamername) => {
+    if (pageRef.current !== ACCUSATIONS) return;
     // find the accuser
     const accuser = playersRef.current.find(
       (player) => player.gamername === accuserGamername,
@@ -293,12 +367,43 @@ export const ActionProvider = ({ children }) => {
     if (!accuser || !target) {
       return;
     }
-    setCurrentAccusations([...currentAccusationsRef.current, { player: accuser, target }]);
+    // if the player has already accused someone, remove the previous accusation
+    currentAccusationsRef.current = currentAccusationsRef.current.filter(
+      (accusation) => accusation.player.gamername !== accuserGamername,
+    );
+    // add the new accusation
+    currentAccusationsRef.current = [
+      ...currentAccusationsRef.current,
+      { player: accuser, target },
+    ];
+    setCurrentAccusations(currentAccusationsRef.current);
     // TODO: check if accusations are over
+    // find the max number of accusations for a single player
+    const accusationCounts = {};
+    currentAccusationsRef.current.forEach((accusation) => {
+      accusationCounts[accusation.target.gamername] =
+        (accusationCounts[accusation.target.gamername] || 0) + 1;
+    });
+    const maxAccusations = Math.max(...Object.values(accusationCounts));
+    // if any player has been accused 2 times, set this player as the recentlyAccused and progress to ACCUSED page
+    if (maxAccusations >= 2) {
+      const accusedPlayers = Object.keys(accusationCounts).filter(
+        (gamername) => accusationCounts[gamername] === maxAccusations,
+      );
+      const randomIndex = Math.floor(Math.random() * accusedPlayers.length);
+      const recentlyAccused = playersRef.current.find(
+        (player) => player.gamername === accusedPlayers[randomIndex],
+      );
+      recentlyAccusedRef.current = recentlyAccused;
+      setRecentlyAccused(recentlyAccusedRef.current);
+      handleProgressToAccusedPage();
+    }
   };
   const handleLifeDeathSelection = (voterGamername, vote) => {
     // find the voter
-    const voter = playersRef.current.find((player) => player.gamername === voterGamername);
+    const voter = playersRef.current.find(
+      (player) => player.gamername === voterGamername,
+    );
     // if the voter is found, add the vote to the currentLifeDeathSelections array
     if (!voter) {
       return;
@@ -309,34 +414,37 @@ export const ActionProvider = ({ children }) => {
     );
     // if the voter has not voted, add the vote to the currentLifeDeathSelections array
     if (!currentVote) {
-      setCurrentLifeDeathSelections([
+      currentLifeDeathSelectionsRef.current = [
         ...currentLifeDeathSelectionsRef.current,
         { player: voter, vote },
-      ]);
+      ];
+      setCurrentLifeDeathSelections(currentLifeDeathSelectionsRef.current);
     }
     // if the voter has voted and this vote is different from the previous vote, update the vote in the currentLifeDeathSelections array
     else if (currentVote.vote !== vote) {
-      setCurrentLifeDeathSelections(
+      currentLifeDeathSelectionsRef.current =
         currentLifeDeathSelectionsRef.current.map((playerVote) => {
           if (playerVote.player === voter) {
             playerVote.vote = vote;
           }
           return playerVote;
-        }),
-      );
+        });
+      setCurrentLifeDeathSelections(currentLifeDeathSelectionsRef.current);
     }
     // if the voter has voted and this vote is the same as the previous vote, remove the vote from the currentLifeDeathSelections array
     else {
-      setCurrentLifeDeathSelections(
+      currentLifeDeathSelectionsRef.current =
         currentLifeDeathSelectionsRef.current.filter(
           (playerVote) => playerVote.player !== voter,
-        ),
-      );
+        );
+      setCurrentLifeDeathSelections(currentLifeDeathSelectionsRef.current);
     }
   };
   const handleLifeDeathVote = (voterGamername, vote) => {
     // find the voter
-    const voter = playersRef.current.find((player) => player.gamername === voterGamername);
+    const voter = playersRef.current.find(
+      (player) => player.gamername === voterGamername,
+    );
     // if the voter is found, add the vote to the currentLifeDeathVotes array
     if (!voter) {
       return;
@@ -347,32 +455,36 @@ export const ActionProvider = ({ children }) => {
     );
     // if the voter has not voted, add the vote to the currentLifeDeathVotes array
     if (!currentVote) {
-      setCurrentLifeDeathVotes([
+      currentLifeDeathVotesRef.current = [
         ...currentLifeDeathVotesRef.current,
         { player: voter, vote },
-      ]);
+      ];
+      setCurrentLifeDeathVotes(currentLifeDeathVotesRef.current);
     }
     // remove the vote from the currentLifeDeathSelections array
-    setCurrentLifeDeathSelections(
+    currentLifeDeathSelectionsRef.current =
       currentLifeDeathSelectionsRef.current.filter(
         (playerVote) => playerVote.player !== voter,
-      ),
-    );
+      );
+    setCurrentLifeDeathSelections(currentLifeDeathSelectionsRef.current);
   };
 
   const handleProgressToWelcomePage = () => {
     // play the intro audio
     introAudioRef.current.play();
     // set the page to WELCOME
-    setPage(WELCOME);
+    pageRef.current = WELCOME;
+    setPage(pageRef.current);
   };
   const handleProgressToAreYouReadyPage = () => {
     // set the page to YOU_READY
-    setPage(YOU_READY);
+    pageRef.current = YOU_READY;
+    setPage(pageRef.current);
   };
   const handleProgressToLookAtYourPhonePage = () => {
     // set the page to REVEAL_IDENTITY
-    setPage(REVEAL_IDENTITY);
+    pageRef.current = REVEAL_IDENTITY;
+    setPage(pageRef.current);
   };
   const handleProgressToInstructionsPage = () => {
     // stop the intro audio
@@ -382,35 +494,45 @@ export const ActionProvider = ({ children }) => {
     // play the intro audio again
     introAudioRef.current.play();
     // set the page to INSTRUCTIONS
-    setPage(INSTRUCTIONS);
+    pageRef.current = INSTRUCTIONS;
+    setPage(pageRef.current);
   };
   const handleProgressToNighttimePage = () => {
     // pause the intro audio
     introAudioRef.current.pause();
     // reset the currentMafiaSelections array
+    currentMafiaSelectionsRef.current = [];
     setCurrentMafiaSelections([]);
     // reset the currentMafiaVotes array
+    currentMafiaVotesRef.current = [];
     setCurrentMafiaVotes([]);
     // reset the currentKill
+    currentKillRef.current = null;
     setCurrentKill(null);
     // reset the currentDetectiveIdentification
+    currentDetectiveIdentificationRef.current = null;
     setCurrentDetectiveIdentification(null);
     // reset the currentAngelProtection
+    currentAngelProtectionRef.current = null;
     setCurrentAngelProtection(null);
     // reset the currentCivilianTriviaFinishes array
+    currentCivilianTriviaFinishesRef.current = [];
     setCurrentCivilianTriviaFinishes([]);
     // set the page to NIGHTTIME
-    setPage(NIGHTTIME);
+    pageRef.current = NIGHTTIME;
+    setPage(pageRef.current);
   };
   const handleProgressToNighttimeTimerPage = () => {
     // reset the nighttimeTimer
     setNighttimeTimer(120);
     // set the page to NIGHTTIME_TIMER
-    setPage(NIGHTTIME_TIMER);
+    pageRef.current = NIGHTTIME_TIMER;
+    setPage(pageRef.current);
   };
   const handleProgressToNightOverPage = () => {
     // set the page to NIGHT_OVER
-    setPage(NIGHT_OVER);
+    pageRef.current = NIGHT_OVER;
+    setPage(pageRef.current);
   };
   const handleProgressToStoryPage = () => {
     // decide on the player to die
@@ -434,47 +556,70 @@ export const ActionProvider = ({ children }) => {
       return;
     }
     // update the player's isAlive status
-    if (playerToDie) {
+    if (
+      playerToDie &&
+      playerToDie.gamername !==
+        currentAngelProtectionRef.current?.target.gamername
+    ) {
       playerToDie.isAlive = false;
     }
     // set the currentKill
-    setCurrentKill(playerToDie);
+    currentKillRef.current = playerToDie;
+    setCurrentKill(currentKillRef.current);
     // set the page to STORY
-    setPage(STORY);
+    pageRef.current = STORY;
+    setPage(pageRef.current);
   };
   const handleProgressToPostStoryPage = () => {
     // reset the accusationTimer
     setAccusationTimer(300);
     // reset the recentlyAccused
-    setRecentlyAccused(null);
+    recentlyAccusedRef.current = null;
+    setRecentlyAccused(recentlyAccusedRef.current);
     // set the page to POST_STORY_2
-    setPage(POST_STORY_2);
+    pageRef.current = POST_STORY_2;
+    setPage(pageRef.current);
   };
   const handleProgressToAccusationTimerPage = () => {
     // reset currentAccusations
+    currentAccusationsRef.current = [];
     setCurrentAccusations([]);
     // reset currentLifeDeathSelections
+    currentLifeDeathSelectionsRef.current = [];
     setCurrentLifeDeathSelections([]);
     // reset currentLifeDeathVotes
+    currentLifeDeathVotesRef.current = [];
     setCurrentLifeDeathVotes([]);
+    // set the page to ACCUSATIONS
+    pageRef.current = ACCUSATIONS;
+    setPage(pageRef.current);
   };
   const handleProgressToAccusedPage = () => {
+    // play narration audio
+    narrationAudioRef.current.currentTime = 0;
+    narrationAudioRef.current.play();
     // set the page to ACCUSED
-    setPage(ACCUSED);
+    pageRef.current = ACCUSED;
+    setPage(pageRef.current);
   };
   const handleProgressToVotingPage = () => {
     // set the page to VOTING
-    setPage(VOTING);
+    pageRef.current = VOTING;
+    setPage(pageRef.current);
   };
   const handleProgressToVotingTimerPage = () => {
+    // stop the narration audio
+    narrationAudioRef.current.pause();
     // reset the votingTimer
     setVotingTimer(300);
     // set the page to VOTING_TIMER
-    setPage(VOTING_TIMER);
+    pageRef.current = VOTING_TIMER;
+    setPage(pageRef.current);
   };
   const handleProgressToVotingResultsPage = () => {
     // set the page to VOTING_RESULTS
-    setPage(VOTING_RESULTS);
+    pageRef.current = VOTING_RESULTS;
+    setPage(pageRef.current);
   };
   const handleTransitionFromVotingResultsPage = () => {
     // check if player lives or dies
@@ -492,7 +637,8 @@ export const ActionProvider = ({ children }) => {
         }
         return player;
       });
-      setPlayers(newPlayers);
+      playersRef.current = newPlayers;
+      setPlayers(playersRef.current);
       // TODO: check if game is over
     } else {
       handleProgressToAccusationTimerPage();
@@ -500,7 +646,8 @@ export const ActionProvider = ({ children }) => {
   };
   const handleProgressToGameOverPage = () => {
     // set the page to GAME_OVER
-    setPage(GAME_OVER);
+    pageRef.current = GAME_OVER;
+    setPage(pageRef.current);
   };
 
   const actions = useMemo(
@@ -601,4 +748,23 @@ const shuffle = (array) => {
     ];
   }
   return array;
+};
+
+const isNightOver = (
+  mafiaVotes,
+  currentDetectiveIdentification,
+  currentAngelProtection,
+  currentCivilianTriviaFinishes,
+  playersLength,
+) => {
+  let totalNightCompletions = 0;
+  totalNightCompletions += mafiaVotes.length;
+  if (currentDetectiveIdentification) {
+    totalNightCompletions++;
+  }
+  if (currentAngelProtection) {
+    totalNightCompletions++;
+  }
+  totalNightCompletions += currentCivilianTriviaFinishes.length;
+  return totalNightCompletions === playersLength;
 };
