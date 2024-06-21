@@ -35,6 +35,7 @@ import {
   POST_STORY_2,
   ACCUSED,
   VOTING_TIMER,
+  VOTING_RESULTS,
 } from "./pages";
 import Night from "./pages/night";
 
@@ -67,9 +68,23 @@ function App() {
 
   useEffect(() => {
     if (self.isAlive) return;
-    setBgColor("var(--Heaven-White)");
-    setImage("url(./assets/heaven-clouds.png)");
-    setHeaderColor("var(--Main-Black)");
+    if (page === STORY) {
+      setTimeout(() => {
+        const womanScreamAudio = new Audio("./assets/female-scream.wav");
+        womanScreamAudio.play();
+        setBgColor("var(--Heaven-White)");
+        setImage("url(./assets/heaven-clouds.png)");
+        setHeaderColor("var(--Main-Black)");
+      }, 500);
+    } else if (page === VOTING_RESULTS) {
+      const manScreamAudio = new Audio("./assets/male-scream.wav");
+      manScreamAudio.play();
+      setBgColor("var(--Heaven-White)");
+      setImage("url(./assets/heaven-clouds.png)");
+      setHeaderColor("var(--Main-Black)");
+    } else {
+      console.log("DEATH", { page });
+    }
   }, [self.isAlive]);
 
   function getPage(page) {
@@ -110,53 +125,8 @@ function App() {
         return null;
       case VOTING_TIMER:
         return <Voting />;
-      // case NIGHT:
-      //   switch (role) {
-      //     case "mafia":
-      //       return (
-      //         <NightMafia/>
-      //       );
-      //     case "detective":
-      //       return (
-      //         <NightDetective/>
-      //       );
-      //     case "angel":
-      //       return (
-      //         <NightAngel/>
-      //       );
-      //     case "civilian":
-      //       return (
-      //         <NightCivilian/>
-      //       );
-      //     default:
-      //       return null;
-      //   }
-      // case NIGHT_FINISHED:
-      //   return <NightFinished/>;
-      // case DAY:
-      //   return (
-      //     <Day/>
-      //   );
-      // case VOTING:
-      //   return (
-      //     <Voting/>
-      //   );
-      // case WIN:
-      //   return (
-      //     <Win/>
-      //   );
-      // case HEAVEN_WELCOME:
-      //   return (
-      //     <HeavenWelcome/>
-      //   );
-      // case HEAVEN_DAY:
-      //   return (
-      //     <HeavenDay/>
-      //   );
-      // case HEAVEN_NIGHT:
-      //   return (
-      //     <HeavenNight/>
-      //   );
+      case VOTING_RESULTS:
+        return null;
       default:
         return null;
     }

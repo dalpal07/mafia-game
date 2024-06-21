@@ -43342,6 +43342,7 @@ Please use another name.` );
 	const ACCUSED = 12;
 	const VOTING = 13;
 	const VOTING_TIMER = 14;
+	const VOTING_RESULTS = 15;
 	const GAME_OVER = 16;
 
 	const VariableContext = /*#__PURE__*/reactExports.createContext({
@@ -49204,9 +49205,25 @@ Please use another name.` );
 	  }, [page]);
 	  reactExports.useEffect(() => {
 	    if (self.isAlive) return;
-	    setBgColor("var(--Heaven-White)");
-	    setImage("url(./assets/heaven-clouds.png)");
-	    setHeaderColor("var(--Main-Black)");
+	    if (page === STORY) {
+	      setTimeout(() => {
+	        const womanScreamAudio = new Audio("./assets/female-scream.wav");
+	        womanScreamAudio.play();
+	        setBgColor("var(--Heaven-White)");
+	        setImage("url(./assets/heaven-clouds.png)");
+	        setHeaderColor("var(--Main-Black)");
+	      }, 500);
+	    } else if (page === VOTING_RESULTS) {
+	      const manScreamAudio = new Audio("./assets/male-scream.wav");
+	      manScreamAudio.play();
+	      setBgColor("var(--Heaven-White)");
+	      setImage("url(./assets/heaven-clouds.png)");
+	      setHeaderColor("var(--Main-Black)");
+	    } else {
+	      console.log("DEATH", {
+	        page
+	      });
+	    }
 	  }, [self.isAlive]);
 	  function getPage(page) {
 	    if (!self.isAlive) {
@@ -49248,53 +49265,8 @@ Please use another name.` );
 	        return null;
 	      case VOTING_TIMER:
 	        return /*#__PURE__*/React.createElement(Voting, null);
-	      // case NIGHT:
-	      //   switch (role) {
-	      //     case "mafia":
-	      //       return (
-	      //         <NightMafia/>
-	      //       );
-	      //     case "detective":
-	      //       return (
-	      //         <NightDetective/>
-	      //       );
-	      //     case "angel":
-	      //       return (
-	      //         <NightAngel/>
-	      //       );
-	      //     case "civilian":
-	      //       return (
-	      //         <NightCivilian/>
-	      //       );
-	      //     default:
-	      //       return null;
-	      //   }
-	      // case NIGHT_FINISHED:
-	      //   return <NightFinished/>;
-	      // case DAY:
-	      //   return (
-	      //     <Day/>
-	      //   );
-	      // case VOTING:
-	      //   return (
-	      //     <Voting/>
-	      //   );
-	      // case WIN:
-	      //   return (
-	      //     <Win/>
-	      //   );
-	      // case HEAVEN_WELCOME:
-	      //   return (
-	      //     <HeavenWelcome/>
-	      //   );
-	      // case HEAVEN_DAY:
-	      //   return (
-	      //     <HeavenDay/>
-	      //   );
-	      // case HEAVEN_NIGHT:
-	      //   return (
-	      //     <HeavenNight/>
-	      //   );
+	      case VOTING_RESULTS:
+	        return null;
 	      default:
 	        return null;
 	    }
