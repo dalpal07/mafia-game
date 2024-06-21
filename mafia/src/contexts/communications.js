@@ -192,7 +192,7 @@ export const CommunicationProvider = ({ children }) => {
     } else if (msg.name === "MafiaVote") {
       handleMafiaVote(msg.player, msg.vote);
     } else if (msg.name === "DetectiveIdentification") {
-      handleDetectiveIdentification(msg.player, msg.identification);
+      handleDetectiveIdentification(msg.identification);
     } else if (msg.name === "AngelProtection") {
       handleAngelProtection(msg.protection);
     } else if (msg.name === "CivilianFinishTrivia") {

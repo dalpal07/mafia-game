@@ -1,16 +1,20 @@
 import React, { useEffect, useState, useContext } from "react";
 import { Box } from "@mui/material";
 import { Text } from "../components/text";
+import { VariableContext } from "../contexts/variables";
+import { ActionContext } from "../contexts/actions";
 
 export default function VotingResults() {
+  const { recentlyAccused } = useContext(VariableContext);
+  const { handleProgressToAccusationTimerPage } = useContext(ActionContext);
+
   const [showRole, setShowRole] = useState(false);
   const notExecutedAudio = new Audio("./assets/not-executed.mp3");
   const executedAudio = new Audio("./assets/executed.mp3");
   const narrationAudio = new Audio("./assets/narration.mp3");
   narrationAudio.volume = 0.5;
-  const fate = "live";
+  const fate = recentlyAccused?.isAlive ? "live" : "die";
   const death2Audio = new Audio("./assets/Deathloop2.wav");
-  const evaluateVotingResults = () => {};
 
   useEffect(() => {
     narrationAudio.play();
@@ -19,7 +23,7 @@ export default function VotingResults() {
       setTimeout(() => notExecutedAudio.play(), 1000);
       notExecutedAudio.onended = () => {
         narrationAudio.pause();
-        setTimeout(() => () => {}, 1000);
+        setTimeout(() => handleProgressToAccusationTimerPage(), 1000);
       };
     } else {
       setTimeout(() => {
@@ -43,7 +47,7 @@ export default function VotingResults() {
   return (
     <>
       {showRole && fate === "die" ? <Box style={{ height: 36 }} /> : null}
-      <Text size={56}>{"accused player"}</Text>
+      <Text size={56}>{recentlyAccused?.realname}</Text>
       <Text
         size={56}
         color={fate === "live" ? "var(--Main-White)" : "var(--Main-Red)"}
@@ -54,12 +58,15 @@ export default function VotingResults() {
       {showRole && fate === "die" ? (
         <Text
           size={36}
-          opacity={"player role" === "mafia" ? 1 : 0.75}
+          opacity={recentlyAccused?.role === "mafia" ? 1 : 0.75}
           color={
-            "player role" === "mafia" ? "var(--Main-Red)" : "var(--Main-White)"
+            recentlyAccused?.role === "mafia"
+              ? "var(--Main-Red)"
+              : "var(--Main-White)"
           }
         >
-          {"accused player"} was{"player role" === "mafia" ? " " : " not "}mafia
+          {recentlyAccused?.realname} was
+          {recentlyAccused?.role === "mafia" ? " " : " not "}mafia
         </Text>
       ) : null}
     </>

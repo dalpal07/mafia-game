@@ -52,7 +52,6 @@ export const ActionContext = createContext({
   handleProgressToVotingPage: () => {},
   handleProgressToVotingTimerPage: () => {},
   handleProgressToVotingResultsPage: () => {},
-  handleTransitionFromVotingResultsPage: () => {},
   handleProgressToGameOverPage: () => {},
 });
 
@@ -80,6 +79,7 @@ export const ActionProvider = ({ children }) => {
     setAccusationTimer,
     setRecentlyAccused,
     setVotingTimer,
+    votingTimer,
     playersRef,
     pageRef,
     currentMafiaSelectionsRef,
@@ -115,6 +115,12 @@ export const ActionProvider = ({ children }) => {
       handleProgressToNighttimePage();
     }
   }, [accusationTimer]);
+
+  useEffect(() => {
+    if (votingTimer === 0 && pageRef.current === VOTING_TIMER) {
+      handleProgressToVotingResultsPage();
+    }
+  }, [votingTimer]);
 
   const handlePlayerJoin = (gamername) => {
     // create a new player info object, with the gamername
@@ -400,6 +406,7 @@ export const ActionProvider = ({ children }) => {
     }
   };
   const handleLifeDeathSelection = (voterGamername, vote) => {
+    if (pageRef.current !== VOTING_TIMER) return;
     // find the voter
     const voter = playersRef.current.find(
       (player) => player.gamername === voterGamername,
@@ -441,6 +448,7 @@ export const ActionProvider = ({ children }) => {
     }
   };
   const handleLifeDeathVote = (voterGamername, vote) => {
+    if (pageRef.current !== VOTING_TIMER) return;
     // find the voter
     const voter = playersRef.current.find(
       (player) => player.gamername === voterGamername,
@@ -467,6 +475,14 @@ export const ActionProvider = ({ children }) => {
         (playerVote) => playerVote.player !== voter,
       );
     setCurrentLifeDeathSelections(currentLifeDeathSelectionsRef.current);
+    // check if voting is over
+    if (
+      // everyone who is alive has voted, except for the accused player
+      currentLifeDeathVotesRef.current.length ===
+      playersRef.current.filter((player) => player.isAlive).length - 1
+    ) {
+      handleProgressToVotingResultsPage();
+    }
   };
 
   const handleProgressToWelcomePage = () => {
@@ -597,6 +613,7 @@ export const ActionProvider = ({ children }) => {
   const handleProgressToAccusedPage = () => {
     // play narration audio
     narrationAudioRef.current.currentTime = 0;
+    narrationAudioRef.current.volume = 0.5;
     narrationAudioRef.current.play();
     // set the page to ACCUSED
     pageRef.current = ACCUSED;
@@ -610,6 +627,10 @@ export const ActionProvider = ({ children }) => {
   const handleProgressToVotingTimerPage = () => {
     // stop the narration audio
     narrationAudioRef.current.pause();
+    // start the intro audio on loop
+    introAudioRef.current.currentTime = 0;
+    introAudioRef.current.loop = true;
+    introAudioRef.current.play();
     // reset the votingTimer
     setVotingTimer(300);
     // set the page to VOTING_TIMER
@@ -617,11 +638,8 @@ export const ActionProvider = ({ children }) => {
     setPage(pageRef.current);
   };
   const handleProgressToVotingResultsPage = () => {
-    // set the page to VOTING_RESULTS
-    pageRef.current = VOTING_RESULTS;
-    setPage(pageRef.current);
-  };
-  const handleTransitionFromVotingResultsPage = () => {
+    // stop the intro audio
+    introAudioRef.current.pause();
     // check if player lives or dies
     const votesToLive = currentLifeDeathVotesRef.current.filter(
       (vote) => vote.vote === "live",
@@ -634,15 +652,17 @@ export const ActionProvider = ({ children }) => {
       const newPlayers = playersRef.current.map((player) => {
         if (player.gamername === recentlyAccusedRef.current?.gamername) {
           player.isAlive = false;
+          recentlyAccusedRef.current = player;
+          setRecentlyAccused(recentlyAccusedRef.current);
         }
         return player;
       });
       playersRef.current = newPlayers;
       setPlayers(playersRef.current);
-      // TODO: check if game is over
-    } else {
-      handleProgressToAccusationTimerPage();
     }
+    // set the page to VOTING_RESULTS
+    pageRef.current = VOTING_RESULTS;
+    setPage(pageRef.current);
   };
   const handleProgressToGameOverPage = () => {
     // set the page to GAME_OVER
@@ -679,7 +699,6 @@ export const ActionProvider = ({ children }) => {
       handleProgressToVotingPage,
       handleProgressToVotingTimerPage,
       handleProgressToVotingResultsPage,
-      handleTransitionFromVotingResultsPage,
       handleProgressToGameOverPage,
     }),
     [
@@ -710,7 +729,6 @@ export const ActionProvider = ({ children }) => {
       handleProgressToVotingPage,
       handleProgressToVotingTimerPage,
       handleProgressToVotingResultsPage,
-      handleTransitionFromVotingResultsPage,
       handleProgressToGameOverPage,
     ],
   );

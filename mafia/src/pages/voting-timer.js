@@ -11,8 +11,12 @@ import Timer from "../components/timer";
 import { VariableContext } from "../contexts/variables";
 
 export default function VotingTimer() {
-  const { currentLifeDeathSelections, currentLifeDeathVotes } =
-    useContext(VariableContext);
+  const {
+    currentLifeDeathSelections,
+    currentLifeDeathVotes,
+    votingTimer,
+    setVotingTimer,
+  } = useContext(VariableContext);
 
   const [liveVotes, setLiveVotes] = useState([]);
   const first4LiveVotes = liveVotes.slice(0, 4);
@@ -44,14 +48,14 @@ export default function VotingTimer() {
       }
     });
     currentLifeDeathSelections.forEach((selection) => {
-      if (selection === "live") {
+      if (selection.vote === "live") {
         newLiveVotes.push({
-          realname: vote.player.realname,
+          realname: selection.player.realname,
           voteSubmitted: false,
         });
       } else {
         newDieVotes.push({
-          realname: vote.player.realname,
+          realname: selection.player.realname,
           voteSubmitted: false,
         });
       }
@@ -62,7 +66,7 @@ export default function VotingTimer() {
 
   return (
     <>
-      <Timer />
+      <Timer timer={votingTimer} setTimer={setVotingTimer} />
       <Text size={56} opacity={0.75}>
         what will {"accused person"}'s fate be?
       </Text>
