@@ -22,10 +22,10 @@ export const NameButton = styled(TheButton)(
   ({
     selected = false,
     selectedcolor = "var(--Main-White)",
-    borderColor = "var(--Main-White)",
+    bordercolor = "var(--Main-White)",
   }) => ({
     backgroundColor: selected ? selectedcolor : "transparent",
-    border: `1px solid ${borderColor}`,
+    border: `1px solid ${bordercolor}`,
     "&:hover": {
       backgroundColor: selected ? selectedcolor : "transparent",
     },

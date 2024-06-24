@@ -48,6 +48,7 @@ function App() {
   const [headerColor, setHeaderColor] = useState("var(--Main-White)");
   const [bgColor, setBgColor] = useState("var(--Main-Black)");
   const [image, setImage] = useState("url(./assets/night-stars.png)");
+  const [showHeaven, setShowHeaven] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -56,13 +57,110 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (!self.isAlive) return;
-    if (page === NIGHT_OVER) {
-      setHeaderTime("day");
-      setTimeout(() => {
+    if (showHeaven) {
+      switch (page) {
+        case WELCOME:
+        case YOU_READY:
+        case REVEAL_IDENTITY:
+        case INSTRUCTIONS:
+          setHeaderTime("night");
+          setHeaderColor("var(--Main-Black)");
+          setBgColor("var(--Heaven-White)");
+          setImage("url(./assets/heaven-stars.png)");
+          break;
+        case NIGHTTIME:
+          setHeaderTime("night");
+          setHeaderColor("var(--Main-Black)");
+          setTimeout(() => {
+            setBgColor("var(--Heaven-White)");
+            setImage("url(./assets/heaven-stars.png)");
+          }, 1000);
+          break;
+        case NIGHTTIME_TIMER:
+          setHeaderTime("night");
+          setHeaderColor("var(--Main-Black)");
+          setBgColor("var(--Heaven-White)");
+          setImage("url(./assets/heaven-stars.png)");
+          break;
+        case NIGHT_OVER:
+          setHeaderTime("day");
+          setHeaderColor("var(--Main-Black)");
+          setTimeout(() => {
+            setBgColor("var(--Heaven-White)");
+            setImage("url(./assets/heaven-clouds.png)");
+          }, 1000);
+          break;
+        case STORY:
+        case POST_STORY_2:
+        case ACCUSATIONS:
+        case ACCUSED:
+        case VOTING:
+        case VOTING_TIMER:
+        case VOTING_RESULTS:
+          setHeaderTime("day");
+          setHeaderColor("var(--Main-Black)");
+          setBgColor("var(--Heaven-White)");
+          setImage("url(./assets/heaven-clouds.png)");
+          break;
+        default:
+          setHeaderTime("night");
+          setHeaderColor("var(--Main-Black)");
+          setBgColor("var(--Heaven-White)");
+          setImage("url(./assets/heaven-stars.png)");
+          break;
+      }
+      return;
+    }
+    switch (page) {
+      case WELCOME:
+      case YOU_READY:
+      case REVEAL_IDENTITY:
+      case INSTRUCTIONS:
+        setHeaderTime("night");
+        setHeaderColor("var(--Main-White)");
+        setBgColor("var(--Main-Black)");
+        setImage("url(./assets/night-stars.png)");
+        break;
+      case NIGHTTIME:
+        setHeaderTime("night");
+        setHeaderColor("var(--Main-White)");
+        setTimeout(() => {
+          setBgColor("var(--Main-Black)");
+          setImage("url(./assets/night-stars.png)");
+        }, 1000);
+        break;
+      case NIGHTTIME_TIMER:
+        setHeaderTime("night");
+        setHeaderColor("var(--Main-White)");
+        setBgColor("var(--Main-Black)");
+        setImage("url(./assets/night-stars.png)");
+        break;
+      case NIGHT_OVER:
+        setHeaderTime("day");
+        setHeaderColor("var(--Main-White)");
+        setTimeout(() => {
+          setBgColor("var(--Main-Gray)");
+          setImage("url(./assets/day-clouds.png)");
+        }, 1000);
+        break;
+      case STORY:
+      case POST_STORY_2:
+      case ACCUSATIONS:
+      case ACCUSED:
+      case VOTING:
+      case VOTING_TIMER:
+      case VOTING_RESULTS:
+        setHeaderTime("day");
+        setHeaderColor("var(--Main-White)");
         setBgColor("var(--Main-Gray)");
         setImage("url(./assets/day-clouds.png)");
-      }, 1250);
+        break;
+      default:
+        setHeaderTime("night");
+        setHeaderColor("var(--Main-White)");
+        setBgColor("var(--Main-Black)");
+        setImage("url(./assets/night-stars.png)");
+        break;
     }
   }, [page]);
 
@@ -70,6 +168,7 @@ function App() {
     if (self.isAlive) return;
     if (page === STORY) {
       setTimeout(() => {
+        setShowHeaven(true);
         const womanScreamAudio = new Audio("./assets/female-scream.wav");
         womanScreamAudio.play();
         setBgColor("var(--Heaven-White)");
@@ -77,19 +176,38 @@ function App() {
         setHeaderColor("var(--Main-Black)");
       }, 500);
     } else if (page === VOTING_RESULTS) {
+      setShowHeaven(true);
       const manScreamAudio = new Audio("./assets/male-scream.wav");
       manScreamAudio.play();
       setBgColor("var(--Heaven-White)");
       setImage("url(./assets/heaven-clouds.png)");
       setHeaderColor("var(--Main-Black)");
-    } else {
-      console.log("DEATH", { page });
     }
   }, [self.isAlive]);
 
   function getPage(page) {
-    if (!self.isAlive) {
-      return null;
+    if (showHeaven) {
+      switch (page) {
+        case NIGHTTIME:
+          return <HeavenWelcome />;
+        case NIGHTTIME_TIMER:
+          return <HeavenNight />;
+        case NIGHT_OVER:
+        case STORY:
+        case POST_STORY_2:
+          return <HeavenDay nightRecap={true} />;
+        case ACCUSATIONS:
+          return <HeavenDay accusing={true} />;
+        case ACCUSED:
+        case VOTING:
+        case VOTING_TIMER:
+        case VOTING_RESULTS:
+          return <HeavenDay />;
+        case GAME_OVER:
+          return <Win />;
+        default:
+          return null;
+      }
     }
     switch (page) {
       case WAITING_PLAYERS:
@@ -127,6 +245,8 @@ function App() {
         return <Voting />;
       case VOTING_RESULTS:
         return null;
+      case GAME_OVER:
+        return <Win />;
       default:
         return null;
     }

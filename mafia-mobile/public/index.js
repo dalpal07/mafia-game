@@ -19524,10 +19524,10 @@ Please use another name.` );
 	const NameButton = styled$1(TheButton)(({
 	  selected = false,
 	  selectedcolor = "var(--Main-White)",
-	  borderColor = "var(--Main-White)"
+	  bordercolor = "var(--Main-White)"
 	}) => ({
 	  backgroundColor: selected ? selectedcolor : "transparent",
-	  border: `1px solid ${borderColor}`,
+	  border: `1px solid ${bordercolor}`,
 	  "&:hover": {
 	    backgroundColor: selected ? selectedcolor : "transparent"
 	  }
@@ -45014,6 +45014,276 @@ Please use another name.` );
 	  }, "submit vote")));
 	}
 
+	function Win() {
+	  const {
+	    self,
+	    players
+	  } = reactExports.useContext(VariableContext);
+	  const getWinner = () => {
+	    const alivePlayers = players.filter(player => player.isAlive);
+	    const mafia = alivePlayers.filter(player => player.role === "mafia");
+	    if (mafia.length === 0) {
+	      if (self.role === "mafia") {
+	        return false;
+	      }
+	      return true;
+	    } else {
+	      if (self.role === "mafia") {
+	        return true;
+	      }
+	      return false;
+	    }
+	  };
+	  const winner = getWinner();
+	  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Text, {
+	    size: 18,
+	    opacity: 0.5
+	  }, "game over"), /*#__PURE__*/React.createElement(Text, {
+	    opacity: 0.75
+	  }, winner ? "your team wins!" : "you failed"), self.isHost ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Box$1, {
+	    style: {
+	      height: 1
+	    }
+	  }), /*#__PURE__*/React.createElement(TheButton, null, /*#__PURE__*/React.createElement(Text, {
+	    size: 18,
+	    weight: 700
+	  }, "same players")), /*#__PURE__*/React.createElement(NameButton, null, /*#__PURE__*/React.createElement(Text, {
+	    size: 18,
+	    weight: 700
+	  }, "new players"))) : null);
+	}
+
+	function HeavenWelcome() {
+	  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Text, {
+	    color: "var(--Main-Black)"
+	  }, "it's nighttime"), /*#__PURE__*/React.createElement(ConstrainedBox, {
+	    width: 289
+	  }, /*#__PURE__*/React.createElement(Text, {
+	    color: "var(--Main-Black)",
+	    size: 18,
+	    opacity: 0.75
+	  }, "you will be able to select to see the actions of other players")), /*#__PURE__*/React.createElement(Text, {
+	    color: "var(--Main-Red)",
+	    weight: 700
+	  }, "don't say a word"));
+	}
+
+	function HeavenNight() {
+	  const {
+	    players,
+	    currentAngelProtection,
+	    currentDetectiveIdentification,
+	    currentMafiaSelections,
+	    currentMafiaVotes
+	  } = reactExports.useContext(VariableContext);
+	  const [selected, setSelected] = reactExports.useState(null); // angel, detective, mafia
+	  const [actionsFollowing, setActionsFollowing] = reactExports.useState(null);
+	  const [followingName, setFollowingName] = reactExports.useState(null);
+	  const [followingTarget, setFollowingTarget] = reactExports.useState(null);
+	  const [followingTargetRole, setFollowingTargetRole] = reactExports.useState(null);
+	  const playersToList = players.filter(player => player.isAlive);
+	  reactExports.useEffect(() => {
+	    if (actionsFollowing === "angel") {
+	      if (currentAngelProtection) {
+	        setFollowingTarget(currentAngelProtection.target.realname);
+	      }
+	    }
+	    if (actionsFollowing === "detective") {
+	      if (currentDetectiveIdentification) {
+	        setFollowingTarget(currentDetectiveIdentification.target.realname);
+	        setFollowingTargetRole(currentDetectiveIdentification.target.role);
+	      }
+	    }
+	  }, [currentAngelProtection, currentDetectiveIdentification, actionsFollowing]);
+	  const handleFollow = () => {
+	    setActionsFollowing(selected);
+	    const followingName = players.find(player => player.role === selected)?.realname;
+	    setFollowingName(followingName);
+	  };
+	  if (actionsFollowing === "angel" || actionsFollowing === "detective") {
+	    return /*#__PURE__*/React.createElement(React.Fragment, null, followingTarget === null ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Text, {
+	      color: "var(--Main-Black)",
+	      opacity: 0.75
+	    }, followingName), /*#__PURE__*/React.createElement(Text, {
+	      color: "var(--Main-Black)",
+	      size: 18,
+	      opacity: 0.5
+	    }, "is making a selection...")) : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Text, {
+	      color: "var(--Main-Black)",
+	      opacity: 0.75
+	    }, followingTarget, actionsFollowing === "detective" ? ` (${followingTargetRole})` : null), /*#__PURE__*/React.createElement(Text, {
+	      color: "var(--Main-Black)",
+	      size: 18,
+	      opacity: 0.5
+	    }, actionsFollowing === "detective" ? "was identified by" : "was saved by"), /*#__PURE__*/React.createElement(Text, {
+	      color: "var(--Main-Black)",
+	      opacity: 0.75
+	    }, followingName)));
+	  } else if (actionsFollowing === "mafia") {
+	    return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(ScrollableFlexColumnBox, null, playersToList.map((player, index) => {
+	      let votes = 0;
+	      currentMafiaVotes.forEach(vote => {
+	        if (vote.target.gamername === player.gamername) {
+	          votes++;
+	        }
+	      });
+	      currentMafiaSelections.forEach(selection => {
+	        if (selection.target.gamername === player.gamername) {
+	          votes++;
+	        }
+	      });
+	      return /*#__PURE__*/React.createElement(NameButton, {
+	        key: index,
+	        disabled: player.role === "mafia",
+	        bordercolor: "var(--Main-Black)"
+	      }, /*#__PURE__*/React.createElement(Box$1, {
+	        style: {
+	          display: "flex",
+	          flexDirection: "row",
+	          alignItems: "center",
+	          justifyContent: "center",
+	          gap: 3,
+	          position: "absolute",
+	          right: 15
+	        }
+	      }, votes > 0 ? /*#__PURE__*/React.createElement(Box$1, {
+	        style: {
+	          width: 30.158,
+	          height: 30.158,
+	          borderRadius: "50%",
+	          backgroundColor: "transparent",
+	          display: "flex",
+	          alignItems: "center",
+	          justifyContent: "center",
+	          position: "relative",
+	          opacity: 0.5
+	        }
+	      }, /*#__PURE__*/React.createElement(Skull, {
+	        color: "var(--Main-Black)"
+	      }), votes > 1 ? /*#__PURE__*/React.createElement(Text, {
+	        size: 18,
+	        style: {
+	          position: "absolute",
+	          right: -17,
+	          bottom: -2
+	        },
+	        color: "var(--Main-Black)"
+	      }, "x", votes) : null) : null, votes > 1 ? /*#__PURE__*/React.createElement(Box$1, {
+	        style: {
+	          width: 17
+	        }
+	      }) : null), /*#__PURE__*/React.createElement(Text, {
+	        size: 18,
+	        color: "var(--Main-Black)"
+	      }, player.realname, player.role === "mafia" ? " (mafia)" : null));
+	    })));
+	  }
+	  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(ConstrainedBox, {
+	    width: 289
+	  }, /*#__PURE__*/React.createElement(Text, {
+	    color: "var(--Main-Black)",
+	    opacity: 0.75
+	  }, "who\u2019s actions would you like to follow tonight?")), /*#__PURE__*/React.createElement(NameButton, {
+	    bordercolor: "var(--Main-Black)",
+	    selectedcolor: "var(--Main-Yellow)",
+	    selected: selected === "angel",
+	    onClick: () => setSelected("angel"),
+	    disabled: !players.find(player => player.role === "angel")?.isAlive
+	  }, /*#__PURE__*/React.createElement(Text, {
+	    color: "var(--Main-Black)",
+	    size: 18
+	  }, "the angel", !players.find(player => player.role === "angel")?.isAlive ? " (dead)" : null)), /*#__PURE__*/React.createElement(NameButton, {
+	    bordercolor: "var(--Main-Black)",
+	    selectedcolor: "var(--Main-Blue)",
+	    selected: selected === "detective",
+	    onClick: () => setSelected("detective"),
+	    disabled: !players.find(player => player.role === "detective")?.isAlive
+	  }, /*#__PURE__*/React.createElement(Text, {
+	    color: selected === "detective" ? "var(--Main-White)" : "var(--Main-Black)",
+	    size: 18
+	  }, "the detective", !players.find(player => player.role === "detective")?.isAlive ? " (dead)" : null)), /*#__PURE__*/React.createElement(NameButton, {
+	    bordercolor: "var(--Main-Black)",
+	    selectedcolor: "var(--Main-Red)",
+	    selected: selected === "mafia",
+	    onClick: () => setSelected("mafia")
+	  }, /*#__PURE__*/React.createElement(Text, {
+	    color: selected === "mafia" ? "var(--Main-White)" : "var(--Main-Black)",
+	    size: 18
+	  }, "the mafia")), /*#__PURE__*/React.createElement(Box$1, {
+	    style: {
+	      flex: 1
+	    }
+	  }), /*#__PURE__*/React.createElement(TheButton, {
+	    disabled: selected === null,
+	    onClick: handleFollow
+	  }, /*#__PURE__*/React.createElement(Text, {
+	    size: 18,
+	    weight: 700
+	  }, "follow")));
+	}
+
+	function HeavenDay({
+	  nightRecap = false,
+	  accusing = false
+	}) {
+	  const {
+	    players,
+	    currentAccusations
+	  } = reactExports.useContext(VariableContext);
+	  const playersToList = players.filter(player => player.isAlive);
+	  if (nightRecap) {
+	    return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(ConstrainedBox, {
+	      width: 289
+	    }, /*#__PURE__*/React.createElement(Text, {
+	      color: "var(--Main-Black)",
+	      size: 18,
+	      opacity: 0.75
+	    }, "see screen to learn what happened during the night")));
+	  } else if (accusing) {
+	    return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Text, {
+	      color: "var(--Main-Black)"
+	    }, "current accusations"), /*#__PURE__*/React.createElement(ScrollableFlexColumnBox, null, playersToList.map((player, index) => {
+	      const accusation = currentAccusations.find(accusation => accusation.target.gamername === player.gamername);
+	      return /*#__PURE__*/React.createElement(NameButton, {
+	        key: index,
+	        bordercolor: "var(--Main-Black)"
+	      }, /*#__PURE__*/React.createElement(Box$1, {
+	        style: {
+	          display: "flex",
+	          flexDirection: "row",
+	          alignItems: "center",
+	          justifyContent: "center",
+	          gap: 3,
+	          position: "absolute",
+	          right: 15
+	        }
+	      }, accusation ? /*#__PURE__*/React.createElement(Box$1, {
+	        style: {
+	          width: 30.158,
+	          height: 30.158,
+	          borderRadius: "50%",
+	          backgroundColor: "transparent",
+	          display: "flex",
+	          alignItems: "center",
+	          justifyContent: "center",
+	          position: "relative",
+	          opacity: 0.5
+	        }
+	      }, /*#__PURE__*/React.createElement(Finger, {
+	        color: "var(--Main-Black)"
+	      })) : null), /*#__PURE__*/React.createElement(Text, {
+	        size: 18,
+	        color: "var(--Main-Black)"
+	      }, player.realname));
+	    })));
+	  }
+	  return /*#__PURE__*/React.createElement(Text, {
+	    color: "var(--Main-Black)",
+	    size: 18,
+	    opacity: 0.75
+	  }, "see screen");
+	}
+
 	var v$1 = "5.9.0";
 	var fr$1 = 30;
 	var ip$1 = 0;
@@ -49188,25 +49458,124 @@ Please use another name.` );
 	  const [headerColor, setHeaderColor] = reactExports.useState("var(--Main-White)");
 	  const [bgColor, setBgColor] = reactExports.useState("var(--Main-Black)");
 	  const [image, setImage] = reactExports.useState("url(./assets/night-stars.png)");
+	  const [showHeaven, setShowHeaven] = reactExports.useState(false);
 	  reactExports.useEffect(() => {
 	    if (typeof window !== "undefined") {
 	      setScreenHeight(window.innerHeight);
 	    }
 	  }, []);
 	  reactExports.useEffect(() => {
-	    if (!self.isAlive) return;
-	    if (page === NIGHT_OVER) {
-	      setHeaderTime("day");
-	      setTimeout(() => {
+	    if (showHeaven) {
+	      switch (page) {
+	        case WELCOME:
+	        case YOU_READY:
+	        case REVEAL_IDENTITY:
+	        case INSTRUCTIONS:
+	          setHeaderTime("night");
+	          setHeaderColor("var(--Main-Black)");
+	          setBgColor("var(--Heaven-White)");
+	          setImage("url(./assets/heaven-stars.png)");
+	          break;
+	        case NIGHTTIME:
+	          setHeaderTime("night");
+	          setHeaderColor("var(--Main-Black)");
+	          setTimeout(() => {
+	            setBgColor("var(--Heaven-White)");
+	            setImage("url(./assets/heaven-stars.png)");
+	          }, 1000);
+	          break;
+	        case NIGHTTIME_TIMER:
+	          setHeaderTime("night");
+	          setHeaderColor("var(--Main-Black)");
+	          setBgColor("var(--Heaven-White)");
+	          setImage("url(./assets/heaven-stars.png)");
+	          break;
+	        case NIGHT_OVER:
+	          setHeaderTime("day");
+	          setHeaderColor("var(--Main-Black)");
+	          setTimeout(() => {
+	            setBgColor("var(--Heaven-White)");
+	            setImage("url(./assets/heaven-clouds.png)");
+	          }, 1000);
+	          break;
+	        case STORY:
+	        case POST_STORY_2:
+	        case ACCUSATIONS:
+	        case ACCUSED:
+	        case VOTING:
+	        case VOTING_TIMER:
+	        case VOTING_RESULTS:
+	          setHeaderTime("day");
+	          setHeaderColor("var(--Main-Black)");
+	          setBgColor("var(--Heaven-White)");
+	          setImage("url(./assets/heaven-clouds.png)");
+	          break;
+	        default:
+	          setHeaderTime("night");
+	          setHeaderColor("var(--Main-Black)");
+	          setBgColor("var(--Heaven-White)");
+	          setImage("url(./assets/heaven-stars.png)");
+	          break;
+	      }
+	      return;
+	    }
+	    switch (page) {
+	      case WELCOME:
+	      case YOU_READY:
+	      case REVEAL_IDENTITY:
+	      case INSTRUCTIONS:
+	        setHeaderTime("night");
+	        setHeaderColor("var(--Main-White)");
+	        setBgColor("var(--Main-Black)");
+	        setImage("url(./assets/night-stars.png)");
+	        break;
+	      case NIGHTTIME:
+	        setHeaderTime("night");
+	        setHeaderColor("var(--Main-White)");
+	        setTimeout(() => {
+	          setBgColor("var(--Main-Black)");
+	          setImage("url(./assets/night-stars.png)");
+	        }, 1000);
+	        break;
+	      case NIGHTTIME_TIMER:
+	        setHeaderTime("night");
+	        setHeaderColor("var(--Main-White)");
+	        setBgColor("var(--Main-Black)");
+	        setImage("url(./assets/night-stars.png)");
+	        break;
+	      case NIGHT_OVER:
+	        setHeaderTime("day");
+	        setHeaderColor("var(--Main-White)");
+	        setTimeout(() => {
+	          setBgColor("var(--Main-Gray)");
+	          setImage("url(./assets/day-clouds.png)");
+	        }, 1000);
+	        break;
+	      case STORY:
+	      case POST_STORY_2:
+	      case ACCUSATIONS:
+	      case ACCUSED:
+	      case VOTING:
+	      case VOTING_TIMER:
+	      case VOTING_RESULTS:
+	        setHeaderTime("day");
+	        setHeaderColor("var(--Main-White)");
 	        setBgColor("var(--Main-Gray)");
 	        setImage("url(./assets/day-clouds.png)");
-	      }, 1250);
+	        break;
+	      default:
+	        setHeaderTime("night");
+	        setHeaderColor("var(--Main-White)");
+	        setBgColor("var(--Main-Black)");
+	        setImage("url(./assets/night-stars.png)");
+	        break;
 	    }
 	  }, [page]);
 	  reactExports.useEffect(() => {
 	    if (self.isAlive) return;
 	    if (page === STORY) {
 	      setTimeout(() => {
+	        setShowHeaven(true);
 	        const womanScreamAudio = new Audio("./assets/female-scream.wav");
 	        womanScreamAudio.play();
 	        setBgColor("var(--Heaven-White)");
@@ -49214,20 +49583,41 @@ Please use another name.` );
 	        setHeaderColor("var(--Main-Black)");
 	      }, 500);
 	    } else if (page === VOTING_RESULTS) {
+	      setShowHeaven(true);
 	      const manScreamAudio = new Audio("./assets/male-scream.wav");
 	      manScreamAudio.play();
 	      setBgColor("var(--Heaven-White)");
 	      setImage("url(./assets/heaven-clouds.png)");
 	      setHeaderColor("var(--Main-Black)");
-	    } else {
-	      console.log("DEATH", {
-	        page
-	      });
 	    }
 	  }, [self.isAlive]);
 	  function getPage(page) {
-	    if (!self.isAlive) {
-	      return null;
+	    if (showHeaven) {
+	      switch (page) {
+	        case NIGHTTIME:
+	          return /*#__PURE__*/React.createElement(HeavenWelcome, null);
+	        case NIGHTTIME_TIMER:
+	          return /*#__PURE__*/React.createElement(HeavenNight, null);
+	        case NIGHT_OVER:
+	        case STORY:
+	        case POST_STORY_2:
+	          return /*#__PURE__*/React.createElement(HeavenDay, {
+	            nightRecap: true
+	          });
+	        case ACCUSATIONS:
+	          return /*#__PURE__*/React.createElement(HeavenDay, {
+	            accusing: true
+	          });
+	        case ACCUSED:
+	        case VOTING:
+	        case VOTING_TIMER:
+	        case VOTING_RESULTS:
+	          return /*#__PURE__*/React.createElement(HeavenDay, null);
+	        case GAME_OVER:
+	          return /*#__PURE__*/React.createElement(Win, null);
+	        default:
+	          return null;
+	      }
 	    }
 	    switch (page) {
 	      case WAITING_PLAYERS:
@@ -49267,6 +49657,8 @@ Please use another name.` );
 	        return /*#__PURE__*/React.createElement(Voting, null);
 	      case VOTING_RESULTS:
 	        return null;
+	      case GAME_OVER:
+	        return /*#__PURE__*/React.createElement(Win, null);
 	      default:
 	        return null;
 	    }

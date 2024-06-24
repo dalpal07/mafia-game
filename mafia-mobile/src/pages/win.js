@@ -1,9 +1,29 @@
-import React from "react";
+import React, {useContext} from "react";
 import { Text } from "../components/text";
 import { Box } from "@mui/material";
 import { NameButton, TheButton } from "../components/button";
+import { VariableContext } from "../contexts/variables";
 
-export default function Win({ winner, isHost, sendMessageToParent }) {
+export default function Win() {
+  const { self, players } = useContext(VariableContext);
+
+  const getWinner = () => {
+    const alivePlayers = players.filter((player) => player.isAlive);
+    const mafia = alivePlayers.filter((player) => player.role === "mafia");
+    if (mafia.length === 0) {
+      if (self.role === "mafia") {
+        return false;
+      }
+      return true;
+    }
+    else {
+      if (self.role === "mafia") {
+        return true;
+      }
+      return false;
+    }
+  };
+
   const handlePlayAgain = () => {
     sendMessageToParent({ name: "playAgain" });
   };
@@ -12,23 +32,25 @@ export default function Win({ winner, isHost, sendMessageToParent }) {
     sendMessageToParent({ name: "exit-press" });
   };
 
+  const winner = getWinner();
+
   return (
     <>
       <Text size={18} opacity={0.5}>
         game over
       </Text>
       <Text opacity={0.75}>{winner ? "your team wins!" : "you failed"}</Text>
-      {isHost ? (
+      {self.isHost ? (
         <>
           <Box style={{ height: 1 }} />
-          <TheButton onClick={handlePlayAgain}>
+          <TheButton>
             <Text size={18} weight={700}>
-              play again
+              same players
             </Text>
           </TheButton>
-          <NameButton onClick={handleExit}>
+          <NameButton>
             <Text size={18} weight={700}>
-              exit
+              new players
             </Text>
           </NameButton>
         </>

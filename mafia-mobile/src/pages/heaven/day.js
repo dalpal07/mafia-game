@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
   ConstrainedBox,
   ScrollableFlexColumnBox,
@@ -7,9 +7,11 @@ import { Box } from "@mui/material";
 import { Text } from "../../components/text";
 import { NameButton } from "../../components/button";
 import { Finger } from "../../components/icons";
+import { VariableContext } from "../../contexts/variables";
 
-export default function HeavenDay({ players, nightRecap, accusing }) {
-  const playersToList = players.filter((player) => !player.inHeaven);
+export default function HeavenDay({ nightRecap = false, accusing = false }) {
+  const { players, currentAccusations } = useContext(VariableContext);
+  const playersToList = players.filter((player) => player.isAlive);
 
   if (nightRecap) {
     return (
@@ -27,9 +29,11 @@ export default function HeavenDay({ players, nightRecap, accusing }) {
         <Text color={"var(--Main-Black)"}>current accusations</Text>
         <ScrollableFlexColumnBox>
           {playersToList.map((player, index) => {
-            const accusation = player.accusations.length > 0;
+            const accusation = currentAccusations.find(
+              (accusation) => accusation.target.gamername === player.gamername,
+            );
             return (
-              <NameButton key={index} borderColor={"var(--Main-Black)"}>
+              <NameButton key={index} bordercolor={"var(--Main-Black)"}>
                 <Box
                   style={{
                     display: "flex",

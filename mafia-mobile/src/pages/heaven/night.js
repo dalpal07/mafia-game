@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { Box } from "@mui/material";
 import {
   ConstrainedBox,
@@ -7,31 +7,32 @@ import {
 import { Text } from "../../components/text";
 import { NameButton, TheButton } from "../../components/button";
 import { Skull } from "../../components/icons";
+import { VariableContext } from "../../contexts/variables";
 
-export default function HeavenNight({ players }) {
+export default function HeavenNight() {
+  const { players, currentAngelProtection, currentDetectiveIdentification, currentMafiaSelections, currentMafiaVotes } = useContext(VariableContext);
+
   const [selected, setSelected] = useState(null); // angel, detective, mafia
   const [actionsFollowing, setActionsFollowing] = useState(null);
   const [followingName, setFollowingName] = useState(null);
   const [followingTarget, setFollowingTarget] = useState(null);
   const [followingTargetRole, setFollowingTargetRole] = useState(null);
 
-  const playersToList = players.filter((player) => !player.inHeaven);
+  const playersToList = players.filter((player) => player.isAlive);
 
   useEffect(() => {
     if (actionsFollowing === "angel") {
-      const angelSaved = players.find((player) => player.saved);
-      if (angelSaved) {
-        setFollowingTarget(angelSaved.realname);
+      if (currentAngelProtection) {
+        setFollowingTarget(currentAngelProtection.target.realname);
       }
     }
     if (actionsFollowing === "detective") {
-      const detectiveFound = players.find((player) => player.identified);
-      if (detectiveFound) {
-        setFollowingTarget(detectiveFound.realname);
-        setFollowingTargetRole(detectiveFound.role);
+      if (currentDetectiveIdentification) {
+        setFollowingTarget(currentDetectiveIdentification.target.realname);
+        setFollowingTargetRole(currentDetectiveIdentification.target.role);
       }
     }
-  }, [players, actionsFollowing]);
+  }, [currentAngelProtection, currentDetectiveIdentification, actionsFollowing]);
 
   const handleFollow = () => {
     setActionsFollowing(selected);
@@ -74,43 +75,27 @@ export default function HeavenNight({ players }) {
       </>
     );
   } else if (actionsFollowing === "mafia") {
-    // if (mafiaDoneVoting) {
-    //     return (
-    //         <Box
-    //             style={{
-    //                 width: '100vw',
-    //                 height: '100vh',
-    //                 backgroundRepeat: 'repeat',
-    //                 backgroundImage: 'url(../../../assets/heaven-stars.png)',
-    //                 display: 'flex',
-    //                 flexDirection: 'column',
-    //                 alignItems: 'center',
-    //                 justifyContent: 'center',
-    //                 backgroundColor: '#E0E0E0',
-    //                 backgroundPosition: 'center',
-    //             }}
-    //         >
-    //             <StandardPageBox>
-    //                 <Header name={name} role={role} time={'night'} color={'var(--Main-Black)'}/>
-    //                 <Text color={'var(--Main-Black)'} size={18} opacity={0.75}>
-    //                     the mafia has voted
-    //                 </Text>
-    //                 <Text color={'var(--Main-Red)'} size={18}>
-    //                     soon, someone will die
-    //                 </Text>
-    //             </StandardPageBox>
-    //         </Box>
-    //     )
-    // }
     return (
       <>
         <ScrollableFlexColumnBox>
           {playersToList.map((player, index) => {
+            let votes = 0;
+            currentMafiaVotes.forEach((vote) => {
+              if (vote.target.gamername === player.gamername) {
+                votes++;
+              }
+            });
+            currentMafiaSelections.forEach((selection) => {
+              if (selection.target.gamername === player.gamername) {
+                votes++;
+              }
+            });
+
             return (
               <NameButton
                 key={index}
                 disabled={player.role === "mafia"}
-                borderColor={"var(--Main-Black)"}
+                bordercolor={"var(--Main-Black)"}
               >
                 <Box
                   style={{
@@ -123,7 +108,7 @@ export default function HeavenNight({ players }) {
                     right: 15,
                   }}
                 >
-                  {player.killVotes?.length > 0 ? (
+                  {votes > 0 ? (
                     <Box
                       style={{
                         width: 30.158,
@@ -138,7 +123,7 @@ export default function HeavenNight({ players }) {
                       }}
                     >
                       <Skull color={"var(--Main-Black)"} />
-                      {player.killVotes?.length > 1 ? (
+                      {votes > 1 ? (
                         <Text
                           size={18}
                           style={{
@@ -148,12 +133,12 @@ export default function HeavenNight({ players }) {
                           }}
                           color={"var(--Main-Black)"}
                         >
-                          x{player.killVotes?.length}
+                          x{votes}
                         </Text>
                       ) : null}
                     </Box>
                   ) : null}
-                  {player.killVotes?.length > 1 ? (
+                  {votes > 1 ? (
                     <Box style={{ width: 17 }} />
                   ) : null}
                 </Box>
@@ -177,26 +162,26 @@ export default function HeavenNight({ players }) {
         </Text>
       </ConstrainedBox>
       <NameButton
-        borderColor={"var(--Main-Black)"}
+        bordercolor={"var(--Main-Black)"}
         selectedcolor={"var(--Main-Yellow)"}
         selected={selected === "angel"}
         onClick={() => setSelected("angel")}
-        disabled={players.find((player) => player.role === "angel")?.inHeaven}
+        disabled={!players.find((player) => player.role === "angel")?.isAlive}
       >
         <Text color={"var(--Main-Black)"} size={18}>
           the angel
-          {players.find((player) => player.role === "angel")?.inHeaven
+          {!players.find((player) => player.role === "angel")?.isAlive
             ? " (dead)"
             : null}
         </Text>
       </NameButton>
       <NameButton
-        borderColor={"var(--Main-Black)"}
+        bordercolor={"var(--Main-Black)"}
         selectedcolor={"var(--Main-Blue)"}
         selected={selected === "detective"}
         onClick={() => setSelected("detective")}
         disabled={
-          players.find((player) => player.role === "detective")?.inHeaven
+          !players.find((player) => player.role === "detective")?.isAlive
         }
       >
         <Text
@@ -206,13 +191,13 @@ export default function HeavenNight({ players }) {
           size={18}
         >
           the detective
-          {players.find((player) => player.role === "detective")?.inHeaven
+          {!players.find((player) => player.role === "detective")?.isAlive
             ? " (dead)"
             : null}
         </Text>
       </NameButton>
       <NameButton
-        borderColor={"var(--Main-Black)"}
+        bordercolor={"var(--Main-Black)"}
         selectedcolor={"var(--Main-Red)"}
         selected={selected === "mafia"}
         onClick={() => setSelected("mafia")}

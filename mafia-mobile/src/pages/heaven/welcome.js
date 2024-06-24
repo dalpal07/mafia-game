@@ -5,7 +5,7 @@ import { Text } from "../../components/text";
 export default function HeavenWelcome() {
   return (
     <>
-      <Text color={"var(--Main-Black)"}>welcome to heaven</Text>
+      <Text color={"var(--Main-Black)"}>it's nighttime</Text>
       <ConstrainedBox width={289}>
         <Text color={"var(--Main-Black)"} size={18} opacity={0.75}>
           you will be able to select to see the actions of other players
