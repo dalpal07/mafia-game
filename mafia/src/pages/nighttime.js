@@ -2,7 +2,7 @@ import { Text } from "../components/text";
 import React, { useEffect, useContext } from "react";
 import { ActionContext } from "../contexts/actions";
 
-export default function Nighttime() {
+export default function Nighttime({ firstNight = true }) {
   const { handleProgressToNighttimeTimerPage } = useContext(ActionContext);
 
   const nighttimeSeePhonesAudio = new Audio(
@@ -12,8 +12,8 @@ export default function Nighttime() {
   const narrationAudio = new Audio("./assets/narration.mp3");
 
   useEffect(() => {
-    narrationAudio.play();
-    if (!false) {
+    if (firstNight) {
+      narrationAudio.play();
       setTimeout(() => nighttimeSeePhonesAudio.play(), 1000);
 
       nighttimeSeePhonesAudio.onended = () => {

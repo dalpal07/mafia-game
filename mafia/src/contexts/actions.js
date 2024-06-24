@@ -53,6 +53,7 @@ export const ActionContext = createContext({
   handleProgressToVotingTimerPage: () => {},
   handleProgressToVotingResultsPage: () => {},
   handleProgressToGameOverPage: () => {},
+  isGameOver: () => {},
 });
 
 export const ActionProvider = ({ children }) => {
@@ -206,21 +207,40 @@ export const ActionProvider = ({ children }) => {
   };
 
   const setNighttimeOverTimeout = () => {
+    clearTimeout(nighttimeOverTimeoutRef.current);
     nighttimeOverTimeoutRef.current = setTimeout(() => {
       if (pageRef.current === NIGHTTIME_TIMER) {
+        const alivePlayersLength = playersRef.current.filter(
+          (player) => player.isAlive,
+        ).length;
         if (
           isNightOver(
             currentMafiaVotesRef.current,
             currentDetectiveIdentificationRef.current,
             currentAngelProtectionRef.current,
             currentCivilianTriviaFinishesRef.current,
-            playersRef.current.length,
+            alivePlayersLength,
           )
         ) {
-          handleProgressToNightOverPage();
+          handleProgressToStoryPage();
         }
       }
     }, 2000);
+  };
+
+  const isGameOver = () => {
+    const alivePlayers = playersRef.current.filter((player) => player.isAlive);
+    const mafiaAlivePlayers = alivePlayers.filter(
+      (player) => player.role === "mafia",
+    );
+    if (
+      mafiaAlivePlayers.length >= alivePlayers.length / 2 ||
+      mafiaAlivePlayers.length === 0
+    ) {
+      return true;
+    } else {
+      return false;
+    }
   };
 
   const handleMafiaSelection = (mafiaGamername, targetGamername) => {
@@ -383,7 +403,7 @@ export const ActionProvider = ({ children }) => {
       { player: accuser, target },
     ];
     setCurrentAccusations(currentAccusationsRef.current);
-    // TODO: check if accusations are over
+    // check if accusations are over
     // find the max number of accusations for a single player
     const accusationCounts = {};
     currentAccusationsRef.current.forEach((accusation) => {
@@ -513,7 +533,12 @@ export const ActionProvider = ({ children }) => {
     pageRef.current = INSTRUCTIONS;
     setPage(pageRef.current);
   };
-  const handleProgressToNighttimePage = () => {
+  const handleProgressToNighttimePage = (onGameOver = () => {}) => {
+    if (isGameOver()) {
+      onGameOver();
+      handleProgressToGameOverPage();
+      return;
+    }
     // pause the intro audio
     introAudioRef.current.pause();
     // reset the currentMafiaSelections array
@@ -700,6 +725,7 @@ export const ActionProvider = ({ children }) => {
       handleProgressToVotingTimerPage,
       handleProgressToVotingResultsPage,
       handleProgressToGameOverPage,
+      isGameOver,
     }),
     [
       handlePlayerJoin,
@@ -730,6 +756,7 @@ export const ActionProvider = ({ children }) => {
       handleProgressToVotingTimerPage,
       handleProgressToVotingResultsPage,
       handleProgressToGameOverPage,
+      isGameOver,
     ],
   );
 
@@ -773,7 +800,7 @@ const isNightOver = (
   currentDetectiveIdentification,
   currentAngelProtection,
   currentCivilianTriviaFinishes,
-  playersLength,
+  alivePlayersLength,
 ) => {
   let totalNightCompletions = 0;
   totalNightCompletions += mafiaVotes.length;
@@ -784,5 +811,5 @@ const isNightOver = (
     totalNightCompletions++;
   }
   totalNightCompletions += currentCivilianTriviaFinishes.length;
-  return totalNightCompletions === playersLength;
+  return totalNightCompletions === alivePlayersLength;
 };

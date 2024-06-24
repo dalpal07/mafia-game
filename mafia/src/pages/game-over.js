@@ -1,13 +1,24 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useContext } from "react";
 import { Text } from "../components/text";
+import { VariableContext } from "../contexts/variables";
 
 export default function GameOver() {
+  const { players } = useContext(VariableContext);
+
+  const introAudio = new Audio("./assets/Introloop.wav");
+
+  const getWinner = () => {
+    const alivePlayers = players.filter((player) => player.isAlive);
+    const aliveMafia = alivePlayers.filter((player) => player.role === "mafia");
+    if (aliveMafia.length === 0) return "civilians";
+    return "mafia";
+  };
+
   const mafiaWinAudio = new Audio("./assets/mafia-win.mp3");
   const civiliansWinAudio = new Audio("./assets/civilians-win.mp3");
-  const winner = "mafia";
+  const winner = getWinner();
 
   useEffect(() => {
-    if (!winner) return;
     if (winner === "mafia") {
       const timeout = setTimeout(() => mafiaWinAudio.play(), 1000);
 
@@ -24,6 +35,15 @@ export default function GameOver() {
       };
     }
   }, [winner]);
+
+  useEffect(() => {
+    introAudio.loop = true;
+    introAudio.play();
+
+    return () => {
+      introAudio.pause();
+    };
+  }, []);
 
   return (
     <>

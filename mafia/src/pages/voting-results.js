@@ -6,7 +6,8 @@ import { ActionContext } from "../contexts/actions";
 
 export default function VotingResults() {
   const { recentlyAccused } = useContext(VariableContext);
-  const { handleProgressToAccusationTimerPage } = useContext(ActionContext);
+  const { handleProgressToAccusationTimerPage, handleProgressToNighttimePage } =
+    useContext(ActionContext);
 
   const [showRole, setShowRole] = useState(false);
   const notExecutedAudio = new Audio("./assets/not-executed.mp3");
@@ -33,7 +34,9 @@ export default function VotingResults() {
         narrationAudio.pause();
         death2Audio.play();
         setShowRole(true);
-        setTimeout(() => () => {}, 6000);
+        setTimeout(() => {
+          handleProgressToNighttimePage(() => death2Audio.pause());
+        }, 6000);
       };
     }
 

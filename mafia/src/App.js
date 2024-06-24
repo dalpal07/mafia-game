@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { InnerPageBox, StandardPageBox } from "./components/boxes";
 import WaitingPlayers from "./pages/waiting-players";
 import Welcome from "./pages/welcome";
@@ -36,6 +36,13 @@ const GAME_OVER = 16;
 
 function App() {
   const { page } = useContext(VariableContext);
+  const [firstNight, setFirstNight] = useState(true);
+
+  useEffect(() => {
+    if (page > NIGHTTIME) {
+      setFirstNight(false);
+    }
+  }, [page]);
 
   function getPage(page) {
     switch (page) {
@@ -47,7 +54,7 @@ function App() {
       case INSTRUCTIONS:
         return <Instructions />;
       case NIGHTTIME:
-        return <Nighttime />;
+        return <Nighttime firstNight={firstNight} />;
       case NIGHTTIME_TIMER:
         return <NighttimeTimer />;
       case NIGHT_OVER:

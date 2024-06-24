@@ -5,7 +5,11 @@ import { ActionContext } from "../contexts/actions";
 
 export default function Story() {
   const { currentKill, currentAngelProtection } = useContext(VariableContext);
-  const { handleProgressToPostStoryPage } = useContext(ActionContext);
+  const {
+    handleProgressToPostStoryPage,
+    isGameOver,
+    handleProgressToGameOverPage,
+  } = useContext(ActionContext);
 
   const [reveal, setReveal] = useState(false);
   const playerMurderedAudio = new Audio("./assets/player-murdered.mp3");
@@ -19,14 +23,26 @@ export default function Story() {
 
   useEffect(() => {
     setTimeout(() => {
+      if (saved) {
+        const savedAudio = new Audio("./assets/chime.mp3");
+        savedAudio.play();
+        setTimeout(() => {
+          savedAudio.pause();
+        }, 3000);
+      }
       setReveal(true);
       deathAudio.play();
       setTimeout(() => {
         if (!saved) {
-          playerMurderedAudio.play();
-          playerMurderedAudio.onended = () => {
-            handleProgressToPostStoryPage();
-          };
+          if (isGameOver()) {
+            deathAudio.pause();
+            handleProgressToGameOverPage();
+          } else {
+            playerMurderedAudio.play();
+            playerMurderedAudio.onended = () => {
+              handleProgressToPostStoryPage();
+            };
+          }
         } else {
           playerAlmostMurderedAudio.play();
           playerAlmostMurderedAudio.onended = () => {
